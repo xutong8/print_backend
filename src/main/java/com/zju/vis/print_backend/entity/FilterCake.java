@@ -1,7 +1,10 @@
 package com.zju.vis.print_backend.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.List;
 
 
 @Entity
@@ -32,6 +35,16 @@ public class FilterCake {
 
     @Column(name = "filter_cake_remarks", nullable = false)
     private String filterCakeRemarks;
+
+    // 滤饼产品多对多反向映射
+    @ManyToMany
+    @JoinTable(name = "rel_p_fc",
+            joinColumns = {@JoinColumn(name = "filter_cake_id")},
+            inverseJoinColumns = {@JoinColumn(name="product_id")
+            })
+    @JsonIgnore
+    private List<Product> productList;
+
 
     public Long getFilterCakeId() {
         return filterCakeId;
@@ -95,5 +108,13 @@ public class FilterCake {
 
     public void setFilterCakeRemarks(String filterCakeRemarks) {
         this.filterCakeRemarks = filterCakeRemarks;
+    }
+
+    public List<Product> getProductList() {
+        return productList;
+    }
+
+    public void setProductList(List<Product> productList) {
+        this.productList = productList;
     }
 }

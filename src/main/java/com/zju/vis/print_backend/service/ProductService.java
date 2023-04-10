@@ -1,5 +1,6 @@
 package com.zju.vis.print_backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -39,10 +40,11 @@ public class ProductService {
     }
   }
 
-  // public List<Product> findAllByCondition(String rawMaterialName){
-  //   List<>
-  //   return ;
-  // }
+  public  List<Product> findAllByCondition(String rawMaterialName, String filterCakeId, String productSeriesId){
+
+
+    return new ArrayList<>();
+  }
 
   // public boolean addProduct(){
   //

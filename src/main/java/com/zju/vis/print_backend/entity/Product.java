@@ -41,8 +41,7 @@ public class Product{
   private String productRemarks;
 
 
-  //引用的权限实体对象集合
-  // @ManyToMany(targetEntity = RawMaterial.class)
+  // 产品与原料多对多关系
   @ManyToMany
   @JoinTable(name = "rel_p_rm",
           joinColumns = {@JoinColumn(name = "product_id")},
@@ -50,6 +49,15 @@ public class Product{
   })
   private List<RawMaterial> rawMaterialList;
 
+  // 产品与滤饼多对多关系
+  @ManyToMany
+  @JoinTable(name = "rel_p_fc",
+          joinColumns = {@JoinColumn(name = "product_id")},
+          inverseJoinColumns = {@JoinColumn(name="filter_cake_id")
+  })
+  private List<FilterCake> filterCakeList;
+
+  // 产品与产品系列对应关系
 
 
   public Long getProductId() {
@@ -136,4 +144,7 @@ public class Product{
     return rawMaterialList;
   }
 
+  public List<FilterCake> getFilterCakeList() {
+    return filterCakeList;
+  }
 }

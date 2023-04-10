@@ -1,6 +1,5 @@
 package com.zju.vis.print_backend.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -31,8 +30,8 @@ public class RawMaterial {
     @Column(name = "raw_material_specification", nullable = false)
     private String rawMaterialSpecification;
 
+    // 原料产品对应反向映射
     //@JsonIgnore 保证不会重复调用JSON无限嵌套循环
-
     @ManyToMany
     @JoinTable(name = "rel_p_rm",
             joinColumns = {@JoinColumn(name = "raw_material_id")},

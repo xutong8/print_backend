@@ -24,7 +24,6 @@ public class RawMaterialService {
 
     /**
      * 根据原料名返回对应的原料对象
-     *
      * @param MaterialName
      * @return
      */
@@ -35,32 +34,6 @@ public class RawMaterialService {
         }
         return rawMaterialRepository.findAllByRawMaterialNameContaining(MaterialName);
     }
-
-
-    /**
-     * 根据原料名字查找对应的产品模糊查询
-     * 如果有多个对应的原料则返回这一组原料对应的产品集合
-     // * @param MaterialName
-     */
-    // public Set<Product> findProductByRawMaterial(String MaterialName){
-    //     List<RawMaterial> rawMaterialList = this.findAllByRawMaterialNameContaining(MaterialName);
-    //     // System.out.println("原料列表集合");
-    //     // System.out.println(rawMaterialList.size());
-    //     Set<Product> productSet = new HashSet<>();
-    //     if(rawMaterialList!=null && rawMaterialList.size()>0 ){
-    //         for(RawMaterial rawMaterial: rawMaterialList){
-    //             List<Product> productList = rawMaterial.getProductList();
-    //             if(productList!=null && productList.size()>0 ){
-    //                 for(Product product: productList){
-    //                     productSet.add(product);
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     // System.out.println("对应的产品集合");
-    //     // System.out.println(productSet.size());
-    //     return productSet;
-    // }
 
     public List<Product> getProductByRawMaterialId(Long rawMaterialId){
         // Product product = productRepository.findProductByProductId(productId);
@@ -82,5 +55,30 @@ public class RawMaterialService {
             return productList;
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * 根据原料名字查找对应的产品模糊查询
+     * 如果有多个对应的原料则返回这一组原料对应的产品集合
+     * @param MaterialName
+     */
+    public Set<Product> findProductsByRawMaterialName(String MaterialName){
+        List<RawMaterial> rawMaterialList = findAllByRawMaterialNameContaining(MaterialName);
+        System.out.println("原料列表集合");
+        System.out.println(rawMaterialList.size());
+        Set<Product> productSet = new HashSet<>();
+        if(rawMaterialList!=null && rawMaterialList.size()>0 ){
+            for(RawMaterial rawMaterial: rawMaterialList){
+                List<Product> productList = rawMaterial.getProductList();
+                if(productList!=null && productList.size()>0 ){
+                    for(Product product: productList){
+                        productSet.add(product);
+                    }
+                }
+            }
+        }
+        System.out.println("对应的产品集合");
+        System.out.println(productSet.size());
+        return productSet;
     }
 }
