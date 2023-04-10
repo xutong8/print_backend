@@ -1,126 +1,139 @@
 package com.zju.vis.print_backend.entity;
 
-import java.io.Serializable;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "tb_product")
-public class Product implements Serializable {
+public class Product{
 
   @Id
   @GeneratedValue
   @Column(name = "product_id", nullable = false)
-  private Long product_id;
+  private Long productId;
 
   @Column(name = "product_name", nullable = false)
-  private String product_name;
+  private String productName;
 
   @Column(name = "product_index", nullable = false)
-  private String product_index;
+  private String productIndex;
 
   @Column(name = "product_code", nullable = false)
-  private String product_code;
+  private String productCode;
 
   @Column(name = "product_color")
-  private String product_color;
+  private String productColor;
 
   @Column(name = "product_processing_cost", nullable = false)
-  private Float product_processing_cost;
+  private Float productProcessingCost;
 
   @Column(name = "product_accounting_quantity", nullable = false)
-  private Integer product_accounting_quantity;
+  private Integer productAccountingQuantity;
 
   @Column(name = "product_series_id")
-  private Integer product_series_id;
+  private Integer productSeriesId;
 
   @Column(name = "product_factory_name", nullable = false)
-  private String product_factory_name;
+  private String productFactoryName;
 
   @Column(name = "product_remarks")
-  private String product_remarks;
+  private String productRemarks;
 
-  public Long getProduct_id() {
-    return product_id;
+
+  //引用的权限实体对象集合
+  // @ManyToMany(targetEntity = RawMaterial.class)
+  @ManyToMany
+  @JoinTable(name = "rel_p_rm",
+          joinColumns = {@JoinColumn(name = "product_id")},
+          inverseJoinColumns = {@JoinColumn(name="raw_material_id")
+  })
+  private List<RawMaterial> rawMaterialList;
+
+
+
+  public Long getProductId() {
+    return productId;
   }
 
-  public void setProduct_id(Long product_id) {
-    this.product_id = product_id;
+  public void setProductId(Long productId) {
+    this.productId = productId;
   }
 
-  public String getProduct_name() {
-    return product_name;
+  public String getProductName() {
+    return productName;
   }
 
-  public void setProduct_name(String product_name) {
-    this.product_name = product_name;
+  public void setProductName(String productName) {
+    this.productName = productName;
   }
 
-  public String getProduct_index() {
-    return product_index;
+  public String getProductIndex() {
+    return productIndex;
   }
 
-  public void setProduct_index(String product_index) {
-    this.product_index = product_index;
+  public void setProductIndex(String productIndex) {
+    this.productIndex = productIndex;
   }
 
-  public String getProduct_code() {
-    return product_code;
+  public String getProductCode() {
+    return productCode;
   }
 
-  public void setProduct_code(String product_code) {
-    this.product_code = product_code;
+  public void setProductCode(String productCode) {
+    this.productCode = productCode;
   }
 
-  public String getProduct_color() {
-    return product_color;
+  public String getProductColor() {
+    return productColor;
   }
 
-  public void setProduct_color(String product_color) {
-    this.product_color = product_color;
+  public void setProductColor(String productColor) {
+    this.productColor = productColor;
   }
 
-  public Float getProduct_processing_cost() {
-    return product_processing_cost;
+  public Float getProductProcessingCost() {
+    return productProcessingCost;
   }
 
-  public void setProduct_processing_cost(Float product_processing_cost) {
-    this.product_processing_cost = product_processing_cost;
+  public void setProductProcessingCost(Float productProcessingCost) {
+    this.productProcessingCost = productProcessingCost;
   }
 
-  public Integer getProduct_accounting_quantity() {
-    return product_accounting_quantity;
+  public Integer getProductAccountingQuantity() {
+    return productAccountingQuantity;
   }
 
-  public void setProduct_accounting_quantity(Integer product_accounting_quantity) {
-    this.product_accounting_quantity = product_accounting_quantity;
+  public void setProductAccountingQuantity(Integer productAccountingQuantity) {
+    this.productAccountingQuantity = productAccountingQuantity;
   }
 
-  public Integer getProduct_series_id() {
-    return product_series_id;
+  public Integer getProductSeriesId() {
+    return productSeriesId;
   }
 
-  public void setProduct_series_id(Integer product_series_id) {
-    this.product_series_id = product_series_id;
+  public void setProductSeriesId(Integer productSeriesId) {
+    this.productSeriesId = productSeriesId;
   }
 
-  public String getProduct_factory_name() {
-    return product_factory_name;
+  public String getProductFactoryName() {
+    return productFactoryName;
   }
 
-  public void setProduct_factory_name(String product_factory_name) {
-    this.product_factory_name = product_factory_name;
+  public void setProductFactoryName(String productFactoryName) {
+    this.productFactoryName = productFactoryName;
   }
 
-  public String getProduct_remarks() {
-    return product_remarks;
+  public String getProductRemarks() {
+    return productRemarks;
   }
 
-  public void setProduct_remarks(String product_remarks) {
-    this.product_remarks = product_remarks;
+  public void setProductRemarks(String productRemarks) {
+    this.productRemarks = productRemarks;
   }
+
+  public List<RawMaterial> getRawMaterialList() {
+    return rawMaterialList;
+  }
+
 }
