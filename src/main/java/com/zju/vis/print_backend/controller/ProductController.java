@@ -5,11 +5,9 @@ import java.util.List;
 import javax.annotation.Resource;
 
 
+import com.zju.vis.print_backend.entity.RawMaterial;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.service.ProductService;
@@ -19,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(description = "产品管理")
 @RequestMapping("/product")
+@CrossOrigin
 @Controller
 public class ProductController {
   
@@ -36,10 +35,10 @@ public class ProductController {
   @ApiOperation(value = "根据产品Id返回对应的原料")
   @RequestMapping(value = "/findRawMaterialByProductID", method = RequestMethod.GET)
   @ResponseBody
-  public void getProductAndRawMaterial(
+  public List<RawMaterial> getProductAndRawMaterial(
           @RequestParam(value = "productId") Long productId
   ){
-    productService.getProductAndRawMaterial(productId);
+    return productService.getProductAndRawMaterial(productId);
   }
 
 

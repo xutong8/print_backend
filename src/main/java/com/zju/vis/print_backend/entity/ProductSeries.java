@@ -1,6 +1,7 @@
 package com.zju.vis.print_backend.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_product_series")
@@ -16,6 +17,11 @@ public class ProductSeries {
 
     @Column(name = "product_series_function", nullable = false)
     private String productSeriesFunction;
+
+    // 产品列表
+    @OneToMany
+    @JoinColumn(name = "product_series_id")
+    private List<Product> productList;
 
     public Long getProductSeriesId() {
         return productSeriesId;
@@ -39,5 +45,9 @@ public class ProductSeries {
 
     public void setProductSeriesFunction(String productSeriesFunction) {
         this.productSeriesFunction = productSeriesFunction;
+    }
+
+    public List<Product> getProductList() {
+        return productList;
     }
 }

@@ -23,7 +23,7 @@ public class ProductService {
     return productRepository.findAll();
   }
 
-  public void getProductAndRawMaterial(Long productId){
+  public List<RawMaterial> getProductAndRawMaterial(Long productId){
     Product product = productRepository.findProductByProductId(productId);
     if(product != null){
       System.out.println("产品名称:" + product.getProductName());
@@ -37,7 +37,9 @@ public class ProductService {
           System.out.println(rawMaterial.getRawMaterialName()+";");
         }
       }
+      return rawMaterialList;
     }
+    return new ArrayList<>();
   }
 
   public  List<Product> findAllByCondition(String rawMaterialName, String filterCakeId, String productSeriesId){

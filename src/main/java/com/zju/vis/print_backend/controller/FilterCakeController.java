@@ -7,6 +7,7 @@ import com.zju.vis.print_backend.service.FilterCakeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 @Api(description = "滤饼管理")
 @RequestMapping("/filterCake")
+@CrossOrigin
 @Controller
 public class FilterCakeController {
 
