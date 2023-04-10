@@ -1,6 +1,7 @@
 package com.zju.vis.print_backend.entity;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.*;
 
@@ -59,6 +60,19 @@ public class Product{
 
   // 产品与产品系列对应关系
 
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Product product = (Product) o;
+    return Objects.equals(productId, product.productId);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(productId);
+  }
 
   public Long getProductId() {
     return productId;
