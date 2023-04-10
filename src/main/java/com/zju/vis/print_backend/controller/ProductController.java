@@ -41,7 +41,18 @@ public class ProductController {
     return productService.getProductAndRawMaterial(productId);
   }
 
+  @ApiOperation(value = "根据条件返回对应的产品(滤饼名、原料名、系列名)")
+  @RequestMapping(value = "/findAllByCondition", method = RequestMethod.GET)
+  @ResponseBody
+  public List<Product> findAllByCondition(
+          @RequestParam(value = "rawMaterialName(可以缺失)", defaultValue = "") String rawMaterialName,
+          @RequestParam(value = "filterCakeName(可以缺失)", defaultValue = "") String filterCakeName,
+          @RequestParam(value = "productSeriesName(可以缺失)", defaultValue = "") String productSeriesName
+  ){
+    return productService.findAllByCondition(rawMaterialName,filterCakeName,productSeriesName);
+  }
 
+  
 
   // @ApiOperation(value = "添加新产品")
   // @RequestMapping(value = "/addProduct", method = RequestMethod.POST)
