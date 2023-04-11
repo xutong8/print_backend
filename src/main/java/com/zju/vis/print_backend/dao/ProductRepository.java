@@ -8,6 +8,11 @@ import com.zju.vis.print_backend.entity.Product;
 
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-  List<Product> findAll();
-  Product findProductByProductId(Long productId);
+
+    List<Product> findAll();
+
+    Product findProductByProductId(Long productId);
+
+    //根据productId 删除记录
+    void deleteByProductId(Long productId);
 }
