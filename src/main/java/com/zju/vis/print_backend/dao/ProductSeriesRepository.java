@@ -9,4 +9,7 @@ public interface ProductSeriesRepository extends JpaRepository<ProductSeries, Lo
     ProductSeries findProductSeriesByProductSeriesId(Long productSeriesId);
     List<ProductSeries> findAll();
     List<ProductSeries> findProductSeriesByProductSeriesNameContaining(String productSeriesName);
+
+    //根据productSeriesId删除记录
+    void deleteByProductSeriesId(Long productSeriesId);
 }

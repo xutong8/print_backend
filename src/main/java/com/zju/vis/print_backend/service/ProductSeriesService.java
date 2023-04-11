@@ -4,6 +4,7 @@ import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashSet;
@@ -54,6 +55,11 @@ public class ProductSeriesService {
         System.out.println("产品系列对应的产品数量");
         System.out.println(productSet.size());
         return productSet;
+    }
+    //根据 删除记录
+    @Transactional
+    public void deleteByProductSeriesId(Long productSeriesId) {
+        productSeriesRepository.deleteByProductSeriesId(productSeriesId);
     }
 
 }

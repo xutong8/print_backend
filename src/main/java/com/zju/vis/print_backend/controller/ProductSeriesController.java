@@ -5,6 +5,7 @@ import com.zju.vis.print_backend.entity.ProductSeries;
 import com.zju.vis.print_backend.service.ProductSeriesService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +37,14 @@ public class ProductSeriesController {
         return productSeriesService.findProductsByProductSeriesName(productSeriesName);
     }
 
+    @ApiOperation(value = "通过 productSeriesId 删除记录")
+    @RequestMapping(value = "/deleteByProductSeriesId", method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity<String> deleteByProductSeriesId(
+            @RequestParam(value = "productSeriesId") Long productSeriesId
+    ) {
+        productSeriesService.deleteByProductSeriesId(productSeriesId);
+        return ResponseEntity.ok("Product with ID: " + productSeriesId + " has been deleted.");
+    }
 
 }
