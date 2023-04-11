@@ -1,9 +1,6 @@
 package com.zju.vis.print_backend.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -120,5 +117,24 @@ public class ProductService {
     public Product addProduct(Product product) {
         return productRepository.save(product);
     }
+
+    //update product data
+    public Product updateProduct(Long productId, Product updatedProduct) {
+        return productRepository.findById(productId)
+                .map(product -> {
+                    product.setProductName(updatedProduct.getProductName());
+                    product.setProductIndex(updatedProduct.getProductIndex());
+                    product.setProductCode(updatedProduct.getProductCode());
+                    product.setProductColor(updatedProduct.getProductColor());
+                    product.setProductProcessingCost(updatedProduct.getProductProcessingCost());
+                    product.setProductAccountingQuantity(updatedProduct.getProductAccountingQuantity());
+                    product.setProductSeriesId(updatedProduct.getProductSeriesId());
+                    product.setProductFactoryName(updatedProduct.getProductFactoryName());
+                    product.setProductRemarks(updatedProduct.getProductRemarks());
+                    return productRepository.save(product);
+                })
+                .orElseThrow(() -> new NoSuchElementException("Product not found with id " + productId));
+    }
+
 
 }

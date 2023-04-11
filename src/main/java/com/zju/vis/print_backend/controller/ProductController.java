@@ -108,4 +108,15 @@ public class ProductController {
         return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
+    @ApiOperation(value = "更新产品信息")
+    @RequestMapping(value = "/updateProduct", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity<Product> updateProduct(
+            @RequestParam(value = "productId") Long productId,
+            @Valid @RequestBody Product updatedProduct
+    ) {
+        Product updated = productService.updateProduct(productId, updatedProduct);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
 }
