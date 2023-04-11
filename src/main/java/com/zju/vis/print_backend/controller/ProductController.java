@@ -3,6 +3,7 @@ package com.zju.vis.print_backend.controller;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 
 import com.zju.vis.print_backend.entity.RawMaterial;
@@ -15,6 +16,8 @@ import com.zju.vis.print_backend.service.ProductService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @Api(description = "产品管理")
 @RequestMapping("/product")
@@ -96,4 +99,13 @@ public class ProductController {
         productService.deleteByProductId(productId);
         return ResponseEntity.ok("Product with ID: " + productId + " has been deleted.");
     }
+
+    @ApiOperation(value = "添加新产品")
+    @RequestMapping(value = "/addProduct", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<Product> addProduct(@Valid @RequestBody Product product) {
+        Product savedProduct = productService.addProduct(product);
+        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+    }
+
 }
