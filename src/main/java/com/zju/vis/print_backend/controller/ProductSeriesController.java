@@ -47,4 +47,11 @@ public class ProductSeriesController {
         return ResponseEntity.ok("Product with ID: " + productSeriesId + " has been deleted.");
     }
 
+    @ApiOperation(value = "添加新的产品系列")
+    @RequestMapping(value = "/addProductSeries", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<String> addProductSeries(@RequestBody ProductSeries productSeries) {
+        ProductSeries newProductSeries = productSeriesService.addProductSeries(productSeries);
+        return ResponseEntity.ok("New Product Series with ID: " + newProductSeries.getProductSeriesId() + " has been added.");
+    }
 }

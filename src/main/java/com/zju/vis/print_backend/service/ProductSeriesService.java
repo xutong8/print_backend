@@ -62,4 +62,9 @@ public class ProductSeriesService {
         productSeriesRepository.deleteByProductSeriesId(productSeriesId);
     }
 
+    //add productSeries data
+    public ProductSeries addProductSeries(ProductSeries productSeries) {
+        return productSeriesRepository.save(productSeries);
+    }
+
 }
