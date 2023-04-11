@@ -33,6 +33,9 @@ public class ProductService {
 
   public boolean isEmptyString(String string) { return string == null || string.isEmpty();}
 
+  //查
+  //-------------------------------------------------------------------------
+
   public List<Product> findAll() {
     return productRepository.findAll();
   }
@@ -69,6 +72,7 @@ public class ProductService {
 
   public  List<Product> findAllByCondition(String rawMaterialName, String filterCakeName, String productSeriesName){
     if(isEmptyString(rawMaterialName) && isEmptyString(filterCakeName) && isEmptyString(productSeriesName)){
+      System.out.println("findAllNND");
       return findAll();
     }
     Set<Product> rawMaterialProductSet = new HashSet<>();
@@ -76,18 +80,30 @@ public class ProductService {
     Set<Product> productSeriesProductSet = new HashSet<>();
     if(!isEmptyString(rawMaterialName)){
       rawMaterialProductSet = rawMaterialService.findProductsByRawMaterialName(rawMaterialName);
+      System.out.println("rawMaterialProductSet 大小" + rawMaterialProductSet.size());
     }
     if(!isEmptyString(filterCakeName)){
       filterCakeProductSet = filterCakeService.findProductsByFilterCakeName(filterCakeName);
+      System.out.println("filterCakeProductSet 大小" + filterCakeProductSet.size());
     }
     if(!isEmptyString(productSeriesName)){
       productSeriesProductSet = productSeriesService.findProductsByProductSeriesName(productSeriesName);
+      System.out.println("productSeriesProductSet 大小" + productSeriesProductSet.size());
     }
 
+    Set<Product> resultSet = mixedSet(rawMaterialProductSet,mixedSet(filterCakeProductSet,productSeriesProductSet));
+    System.out.println("resultSet 大小" + resultSet.size());
     List<Product> resultList = new ArrayList<>();
+
     resultList.addAll(mixedSet(rawMaterialProductSet,mixedSet(filterCakeProductSet,productSeriesProductSet)));
+    System.out.println("resultList 大小" + resultList.size());
     return resultList;
   }
+
+  //增
+  //-------------------------------------------------------------------------
+
+
 
   // public boolean addProduct(){
   //

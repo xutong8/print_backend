@@ -45,14 +45,19 @@ public class ProductController {
   @RequestMapping(value = "/findAllByCondition", method = RequestMethod.GET)
   @ResponseBody
   public List<Product> findAllByCondition(
-          @RequestParam(value = "rawMaterialName(可以缺失)", defaultValue = "") String rawMaterialName,
-          @RequestParam(value = "filterCakeName(可以缺失)", defaultValue = "") String filterCakeName,
-          @RequestParam(value = "productSeriesName(可以缺失)", defaultValue = "") String productSeriesName
+          @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName,
+          @RequestParam(value = "filterCakeName", defaultValue = "") String filterCakeName,
+          @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName
   ){
+    // findAllByCondition(String rawMaterialName, String filterCakeName, String productSeriesName)
+    System.out.println("List<Product> findAllByCondition   " +
+            "rawMaterialName: " + rawMaterialName +
+            "  filterCakeName: " + filterCakeName +
+            "  productSeriesName: " + productSeriesName);
+
     return productService.findAllByCondition(rawMaterialName,filterCakeName,productSeriesName);
   }
 
-  
 
   // @ApiOperation(value = "添加新产品")
   // @RequestMapping(value = "/addProduct", method = RequestMethod.POST)

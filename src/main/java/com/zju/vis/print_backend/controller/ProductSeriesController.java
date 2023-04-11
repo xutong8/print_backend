@@ -6,10 +6,7 @@ import com.zju.vis.print_backend.service.ProductSeriesService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -33,7 +30,11 @@ public class ProductSeriesController {
     @ApiOperation(value = "根据系列名称返回对应的产品")
     @RequestMapping(value = "/findProductsByProductSeriesName", method = RequestMethod.GET)
     @ResponseBody
-    public Set<Product> findProductsByProductSeriesName(String MaterialName){
-        return productSeriesService.findProductsByProductSeriesName(MaterialName);
+    public Set<Product> findProductsByProductSeriesName(
+            @RequestParam(value = "productSeriesName")String productSeriesName
+    ){
+        return productSeriesService.findProductsByProductSeriesName(productSeriesName);
     }
+
+
 }

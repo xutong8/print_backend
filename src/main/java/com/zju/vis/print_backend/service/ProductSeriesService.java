@@ -17,8 +17,14 @@ public class ProductSeriesService {
 
     public boolean isEmptyString(String string) { return string == null || string.isEmpty();}
 
+    //查
+    //-------------------------------------------------------------------------
     public List<ProductSeries> findAll(){
         return productSeriesRepository.findAll();
+    }
+
+    public ProductSeries findProductSeriesByProductSeriesId(Long productSeriesId){
+        return productSeriesRepository.findProductSeriesByProductSeriesId(productSeriesId);
     }
 
     public List<ProductSeries> findProductSeriesByProductSeriesNameContaining(String productSeries){
@@ -30,6 +36,7 @@ public class ProductSeriesService {
     }
 
     public Set<Product> findProductsByProductSeriesName(String productSeriesName){
+        System.out.println("productSeriesName: " + productSeriesName);
         List<ProductSeries> productSeriesList = findProductSeriesByProductSeriesNameContaining(productSeriesName);
         System.out.println("产品系列集合数量");
         System.out.println(productSeriesList.size());
@@ -48,4 +55,7 @@ public class ProductSeriesService {
         System.out.println(productSet.size());
         return productSet;
     }
+
+    // 其他函数
+
 }

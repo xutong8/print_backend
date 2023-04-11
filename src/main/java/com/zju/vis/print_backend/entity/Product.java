@@ -1,8 +1,11 @@
 package com.zju.vis.print_backend.entity;
 
+import com.zju.vis.print_backend.service.ProductSeriesService;
+
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.Resource;
 import javax.persistence.*;
 
 @Entity
@@ -35,6 +38,9 @@ public class Product{
   @Column(name = "product_series_id")
   private Integer productSeriesId;
 
+  // @Transient
+  // private String productSeriesName;
+
   @Column(name = "product_factory_name", nullable = false)
   private String productFactoryName;
 
@@ -58,7 +64,9 @@ public class Product{
   })
   private List<FilterCake> filterCakeList;
 
-  // 产品与产品系列对应关系
+  //
+  // @ManyToOne
+  // private ProductSeries productSeries;
 
 
   @Override
@@ -138,6 +146,10 @@ public class Product{
     this.productSeriesId = productSeriesId;
   }
 
+  // public String getProductSeriesName() {
+  //   return
+  // }
+
   public String getProductFactoryName() {
     return productFactoryName;
   }
@@ -161,4 +173,8 @@ public class Product{
   public List<FilterCake> getFilterCakeList() {
     return filterCakeList;
   }
+
+  // public ProductSeries getProductSeries() {
+  //   return productSeries;
+  // }
 }
