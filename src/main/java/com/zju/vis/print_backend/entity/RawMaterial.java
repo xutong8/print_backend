@@ -3,6 +3,7 @@ package com.zju.vis.print_backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -11,7 +12,7 @@ import java.util.List;
 public class RawMaterial {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "raw_material_id", nullable = false)
     private Long rawMaterialId;
 
@@ -38,7 +39,7 @@ public class RawMaterial {
             inverseJoinColumns = {@JoinColumn(name="product_id")
             })
     @JsonIgnore
-    private List<Product> productList;
+    private List<Product> productList=new ArrayList<>();
 
 
 

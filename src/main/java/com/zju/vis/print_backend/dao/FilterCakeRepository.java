@@ -8,4 +8,6 @@ import java.util.List;
 public interface FilterCakeRepository extends JpaRepository<FilterCake, Long> {
     List<FilterCake> findAll();
     List<FilterCake> findAllByFilterCakeNameContaining(String filterCakeName);
+//    void deleteByFilterCakeId(Long filterCakeId);
+
 }

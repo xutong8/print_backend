@@ -4,6 +4,7 @@ package com.zju.vis.print_backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -11,7 +12,7 @@ import java.util.List;
 @Table(name = "tb_filter_cake")
 public class FilterCake {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "filter_cake_id", nullable = false)
     private Long filterCakeId;
 
@@ -43,7 +44,7 @@ public class FilterCake {
             inverseJoinColumns = {@JoinColumn(name="product_id")
             })
     @JsonIgnore
-    private List<Product> productList;
+    private List<Product> productList=new ArrayList<>();
 
 
     public Long getFilterCakeId() {

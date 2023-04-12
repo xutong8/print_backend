@@ -6,13 +6,13 @@ import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.service.FilterCakeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -44,5 +44,34 @@ public class FilterCakeController {
     @ResponseBody
     public Set<Product> findProductsByFilterCakeName(String MaterialName){
         return filterCakeService.findProductsByFilterCakeName(MaterialName);
+    }
+
+//    @ApiOperation(value = "通过 filterCakeId 删除记录")
+//    @RequestMapping(value = "/deleteByFilterCakeId", method = RequestMethod.DELETE)
+//    @ResponseBody
+//    public ResponseEntity<String> deleteByFilterCakeId(
+//            @RequestParam(value = "filterCakeId") Long filterCakeId
+//    ) {
+//        filterCakeService.deleteByFilterCakeId(filterCakeId);
+//        return ResponseEntity.ok("FilterCake with ID: " + filterCakeId + " has been deleted.");
+//    }
+
+    @ApiOperation(value = "添加新滤饼")
+    @RequestMapping(value = "/addFilterCake", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<FilterCake> addFilterCake(@Valid @RequestBody FilterCake filterCake) {
+        FilterCake savedFilterCake = filterCakeService.addFilterCake(filterCake);
+        return new ResponseEntity<>(savedFilterCake, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "更新滤饼信息")
+    @RequestMapping(value = "/updateFilterCake", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity<FilterCake> updateFilterCake(
+            @RequestParam(value = "filterCakeId") Long filterCakeId,
+            @Valid @RequestBody FilterCake updatedFilterCake
+    ) {
+        FilterCake updated = filterCakeService.updateFilterCake(filterCakeId, updatedFilterCake);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 }
