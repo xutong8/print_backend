@@ -6,10 +6,7 @@ import com.zju.vis.print_backend.entity.RawMaterial;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class RawMaterialService {
@@ -81,4 +78,21 @@ public class RawMaterialService {
         System.out.println(productSet.size());
         return productSet;
     }
+
+    public RawMaterial addRawMaterial(RawMaterial rawMaterial) {
+        return rawMaterialRepository.save(rawMaterial);
+    }
+    public RawMaterial updateRawMaterial(Long rawMaterialId, RawMaterial updatedRawMaterial) {
+        return rawMaterialRepository.findById(rawMaterialId)
+                .map(rawMaterial -> {
+                    rawMaterial.setRawMaterialName(updatedRawMaterial.getRawMaterialName());
+                    rawMaterial.setRawMaterialIndex(updatedRawMaterial.getRawMaterialIndex());
+                    rawMaterial.setRawMaterialPrice(updatedRawMaterial.getRawMaterialPrice());
+                    rawMaterial.setRawMaterialConventional(updatedRawMaterial.getRawMaterialConventional());
+                    rawMaterial.setRawMaterialSpecification(updatedRawMaterial.getRawMaterialSpecification());
+                    return rawMaterialRepository.save(rawMaterial);
+                })
+                .orElseThrow(() -> new NoSuchElementException("RawMaterial not found with id " + rawMaterialId));
+    }
+
 }
