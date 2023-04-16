@@ -3,23 +3,41 @@ package com.zju.vis.print_backend.service;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.entity.Product;
-import com.zju.vis.print_backend.entity.ProductSeries;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+
+import java.util.*;
 
 @Service
 public class FilterCakeService {
     @Resource
     FilterCakeRepository filterCakeRepository;
+
+    // 用于返回滤饼列表名
+    public class FilterCakeName{
+        private Long filterCakeId;
+        private String filterCakeName;
+
+        public Long getFilterCakeId() {
+            return filterCakeId;
+        }
+
+        public void setFilterCakeId(Long filterCakeId) {
+            this.filterCakeId = filterCakeId;
+        }
+
+        public String getFilterCakeName() {
+            return filterCakeName;
+        }
+
+        public void setFilterCakeName(String filterCakeName) {
+            this.filterCakeName = filterCakeName;
+        }
+    }
 
     public boolean isEmptyString(String string) {
         return string == null || string.isEmpty();
@@ -31,6 +49,17 @@ public class FilterCakeService {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<FilterCake> page = filterCakeRepository.findAll(pageable);
         return page.toList();
+    }
+
+    public List<FilterCakeName> findAllFilterCakeName(){
+        List<FilterCakeName> filterCakeNameList = new ArrayList<>();
+        for(FilterCake filterCake: filterCakeRepository.findAll()){
+            FilterCakeName filterCakeName = new FilterCakeName();
+            filterCakeName.setFilterCakeId(filterCake.getFilterCakeId());
+            filterCakeName.setFilterCakeName(filterCake.getFilterCakeName());
+            filterCakeNameList.add(filterCakeName);
+        }
+        return filterCakeNameList;
     }
 
     public  FilterCake findFilterCakeByFilterCakeName(String filterCakeName){

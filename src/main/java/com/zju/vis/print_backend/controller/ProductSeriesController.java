@@ -27,10 +27,18 @@ public class ProductSeriesController {
     @ApiOperation(value = "获取所有的产品系列")
     @RequestMapping(value = "/findAllProductSeries", method = RequestMethod.GET)
     @ResponseBody
-    public List<ProductSeries> findAll(Integer pageNo,
-                                       Integer pageSize
+    public List<ProductSeries> findAll(
+            @RequestParam(value = "pageNo" ,defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ){
         return productSeriesService.findAll(pageNo,pageSize);
+    }
+
+    @ApiOperation(value = "获取所有的产品系列名称")
+    @RequestMapping(value = "/findAllProductSeriesName", method = RequestMethod.GET)
+    @ResponseBody
+    public List<ProductSeriesService.ProductSeriesName> findAllProductSeriesName(){
+        return productSeriesService.findAllProductSeriesName();
     }
 
     @ApiOperation(value = "根据系列名称返回对应的产品")

@@ -28,10 +28,18 @@ public class RawMaterialController {
     @ApiOperation(value = "获取所有原料")
     @RequestMapping(value = "/findAllRawMaterial", method = RequestMethod.GET)
     @ResponseBody
-    public List<RawMaterial> findAll(Integer pageNo,
-                                     Integer pageSize
+    public List<RawMaterial> findAll(
+            @RequestParam(value = "pageNo" ,defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ) {
         return rawMaterialService.findAll(pageNo,pageSize);
+    }
+
+    @ApiOperation(value = "获取所有原料名称")
+    @RequestMapping(value = "/findAllRawMaterialName", method = RequestMethod.GET)
+    @ResponseBody
+    public List<RawMaterialService.RawMaterialName> findAll() {
+        return rawMaterialService.findAllRawMaterialName();
     }
 
 
@@ -48,8 +56,10 @@ public class RawMaterialController {
     @ApiOperation(value = "根据名称返回原料")
     @RequestMapping(value = "/findAllByRawMaterialNameContaining", method = RequestMethod.GET)
     @ResponseBody
-    public List<RawMaterial> findAllByRawMaterialNameContaining(String RawMaterialName) {
-        return rawMaterialService.findAllByRawMaterialNameContaining(RawMaterialName);
+    public List<RawMaterial> findAllByRawMaterialNameContaining(
+            @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName
+    ) {
+        return rawMaterialService.findAllByRawMaterialNameContaining(rawMaterialName);
     }
 
     @ApiOperation(value = "根据名称返回对应的产品")

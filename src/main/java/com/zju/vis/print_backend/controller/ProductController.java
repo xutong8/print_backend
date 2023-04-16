@@ -32,8 +32,9 @@ public class ProductController {
     @ApiOperation(value = "获取所有产品")
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     @ResponseBody
-    public List<Product> findAll(Integer pageNo,
-                                 Integer pageSize
+    public List<Product> findAll(
+            @RequestParam(value = "pageNo" ,defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ) {
         return productService.findAll(pageNo,pageSize);
     }
@@ -74,35 +75,6 @@ public class ProductController {
 
     return list;
   }
-
-
-    // @ApiOperation(value = "添加新产品")
-    // @RequestMapping(value = "/addProduct", method = RequestMethod.POST)
-    // @ResponseBody
-    // public boolean addProduct(
-    //         @RequestParam(value = "ProductJson") Json ProductJson
-    // ) {
-    //   return true;
-    // }
-    //
-    // @ApiOperation(value = "删除产品")
-    // @RequestMapping(value = "/deleteById", method = RequestMethod.POST)
-    // @ResponseBody
-    // public boolean deleteById(
-    //         @RequestParam(value = "product_id") Integer product_id
-    // ){
-    //   return true;
-    // }
-    //
-    // @ApiOperation(value = "编辑产品信息")
-    // @RequestMapping(value = "/updateProduct", method = RequestMethod.POST)
-    // @ResponseBody
-    // public boolean updateProduct(
-    //         @RequestParam(value = "product_id") Integer product_id,
-    //         @RequestParam(value = "ProductJson") Json ProductJson
-    // ){
-    //   return true;
-    // }
 
     @ApiOperation(value = "通过 productId 删除记录")
     @RequestMapping(value = "/deleteByProductId", method = RequestMethod.DELETE)

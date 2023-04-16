@@ -28,9 +28,18 @@ public class FilterCakeController {
     @ApiOperation(value = "获取所有滤饼")
     @RequestMapping(value = "/findAllFilterCake", method = RequestMethod.GET)
     @ResponseBody
-    public List<FilterCake> findAll(Integer pageNo,
-                                    Integer pageSize){
+    public List<FilterCake> findAll(
+            @RequestParam(value = "pageNo" ,defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
+    ){
         return filterCakeService.findAll(pageNo,pageSize);
+    }
+
+    @ApiOperation(value = "获取所有滤饼的名称")
+    @RequestMapping(value = "/findAllFilterCakeName", method = RequestMethod.GET)
+    @ResponseBody
+    public List<FilterCakeService.FilterCakeName> findAllFilterCakeName(){
+        return filterCakeService.findAllFilterCakeName();
     }
 
     @ApiOperation(value = "根据滤饼名称返回对应滤饼")
@@ -46,16 +55,6 @@ public class FilterCakeController {
     public Set<Product> findProductsByFilterCakeName(String MaterialName){
         return filterCakeService.findProductsByFilterCakeName(MaterialName);
     }
-
-//    @ApiOperation(value = "通过 filterCakeId 删除记录")
-//    @RequestMapping(value = "/deleteByFilterCakeId", method = RequestMethod.DELETE)
-//    @ResponseBody
-//    public ResponseEntity<String> deleteByFilterCakeId(
-//            @RequestParam(value = "filterCakeId") Long filterCakeId
-//    ) {
-//        filterCakeService.deleteByFilterCakeId(filterCakeId);
-//        return ResponseEntity.ok("FilterCake with ID: " + filterCakeId + " has been deleted.");
-//    }
 
     @ApiOperation(value = "添加新滤饼")
     @RequestMapping(value = "/addFilterCake", method = RequestMethod.POST)

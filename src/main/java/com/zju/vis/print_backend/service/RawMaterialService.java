@@ -16,7 +16,30 @@ public class RawMaterialService {
     @Resource
     private RawMaterialRepository rawMaterialRepository;
 
+    // 用于返回原料列表名
+    public class RawMaterialName{
+        private Long rawMaterialId;
+        private String rawMaterialName;
+
+        public Long getRawMaterialId() {
+            return rawMaterialId;
+        }
+
+        public void setRawMaterialId(Long rawMaterialId) {
+            this.rawMaterialId = rawMaterialId;
+        }
+
+        public String getRawMaterialName() {
+            return rawMaterialName;
+        }
+
+        public void setRawMaterialName(String rawMaterialName) {
+            this.rawMaterialName = rawMaterialName;
+        }
+    }
+
     public boolean isEmptyString(String string) { return string == null || string.isEmpty();}
+
 
     public List<RawMaterial> findAll(Integer pageNo,
                                      Integer pageSize
@@ -26,14 +49,22 @@ public class RawMaterialService {
         return page.toList();
     }
 
+    public List<RawMaterialName> findAllRawMaterialName(){
+        List<RawMaterialName> rawMaterialNameList = new ArrayList<>();
+        for (RawMaterial rawMaterial: rawMaterialRepository.findAll()){
+            RawMaterialName rawMaterialName = new RawMaterialName();
+            rawMaterialName.setRawMaterialId(rawMaterial.getRawMaterialId());
+            rawMaterialName.setRawMaterialName(rawMaterial.getRawMaterialName());
+            rawMaterialNameList.add(rawMaterialName);
+        }
+        return rawMaterialNameList;
+    }
+
     public RawMaterial findRawMaterialByRawMaterialName(String MaterialName){
         return rawMaterialRepository.findRawMaterialByRawMaterialName(MaterialName);
     }
-    /**
-     * 根据原料名返回对应的原料对象
-     * @param MaterialName
-     * @return
-     */
+
+
     public List<RawMaterial> findAllByRawMaterialNameContaining(String MaterialName) {
         // 空字符串返回全部值
         if(isEmptyString(MaterialName)){
@@ -41,6 +72,7 @@ public class RawMaterialService {
         }
         return rawMaterialRepository.findAllByRawMaterialNameContaining(MaterialName);
     }
+
 
     public List<Product> getProductByRawMaterialId(Long rawMaterialId){
         // Product product = productRepository.findProductByProductId(productId);
@@ -92,7 +124,6 @@ public class RawMaterialService {
         System.out.println(productSet.size());
         return productSet;
     }
-
 
 
     public RawMaterial addRawMaterial(RawMaterial rawMaterial) {

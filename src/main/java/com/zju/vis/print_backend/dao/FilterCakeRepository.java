@@ -9,6 +9,4 @@ public interface FilterCakeRepository extends JpaRepository<FilterCake, Long> {
     List<FilterCake> findAll();
     FilterCake findFilterCakeByFilterCakeName(String filterCakeName);
     List<FilterCake> findAllByFilterCakeNameContaining(String filterCakeName);
-//    void deleteByFilterCakeId(Long filterCakeId);
-
 }

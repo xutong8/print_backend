@@ -10,19 +10,39 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ProductSeriesService {
     @Resource
     ProductSeriesRepository productSeriesRepository;
 
+    public class ProductSeriesName{
+        private Long productSeriesId;
+        private String productSeriesName;
+
+        public Long getProductSeriesId() {
+            return productSeriesId;
+        }
+
+        public void setProductSeriesId(Long productSeriesId) {
+            this.productSeriesId = productSeriesId;
+        }
+
+        public String getProductSeriesName() {
+            return productSeriesName;
+        }
+
+        public void setProductSeriesName(String productSeriesName) {
+            this.productSeriesName = productSeriesName;
+        }
+    }
+
     public boolean isEmptyString(String string) {
         return string == null || string.isEmpty();
     }
+
+
 
     //查
     //-------------------------------------------------------------------------
@@ -32,6 +52,17 @@ public class ProductSeriesService {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<ProductSeries> page = productSeriesRepository.findAll(pageable);
         return page.toList();
+    }
+
+    public  List<ProductSeriesName> findAllProductSeriesName(){
+        List<ProductSeriesName> productSeriesNameList = new ArrayList<>();
+        for(ProductSeries productSeries: productSeriesRepository.findAll()){
+            ProductSeriesName productSeriesName = new ProductSeriesName();
+            productSeriesName.setProductSeriesId(productSeries.getProductSeriesId());
+            productSeriesName.setProductSeriesName(productSeries.getProductSeriesName());
+            productSeriesNameList.add(productSeriesName);
+        }
+        return productSeriesNameList;
     }
 
     public ProductSeries findProductSeriesByProductSeriesId(Long productSeriesId) {
