@@ -40,7 +40,7 @@ public class Product {
     private Integer productAccountingQuantity;
 
     @Column(name = "product_series_id")
-    private Integer productSeriesId;
+    private Long productSeriesId;
 
     // @Transient
     // private String productSeriesName;
@@ -143,11 +143,11 @@ public class Product {
         this.productAccountingQuantity = productAccountingQuantity;
     }
 
-    public Integer getProductSeriesId() {
+    public Long getProductSeriesId() {
         return productSeriesId;
     }
 
-    public void setProductSeriesId(Integer productSeriesId) {
+    public void setProductSeriesId(Long productSeriesId) {
         this.productSeriesId = productSeriesId;
     }
 
