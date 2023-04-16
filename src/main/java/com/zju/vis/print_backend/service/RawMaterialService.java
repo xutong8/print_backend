@@ -3,6 +3,9 @@ package com.zju.vis.print_backend.service;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.RawMaterial;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -15,10 +18,17 @@ public class RawMaterialService {
 
     public boolean isEmptyString(String string) { return string == null || string.isEmpty();}
 
-    public List<RawMaterial> findAll() {
-        return rawMaterialRepository.findAll();
+    public List<RawMaterial> findAll(Integer pageNo,
+                                     Integer pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<RawMaterial> page = rawMaterialRepository.findAll(pageable);
+        return page.toList();
     }
 
+    public RawMaterial findRawMaterialByRawMaterialName(String MaterialName){
+        return rawMaterialRepository.findRawMaterialByRawMaterialName(MaterialName);
+    }
     /**
      * 根据原料名返回对应的原料对象
      * @param MaterialName
@@ -60,24 +70,30 @@ public class RawMaterialService {
      * @param MaterialName
      */
     public Set<Product> findProductsByRawMaterialName(String MaterialName){
-        List<RawMaterial> rawMaterialList = findAllByRawMaterialNameContaining(MaterialName);
-        System.out.println("原料列表集合");
-        System.out.println(rawMaterialList.size());
+        RawMaterial rawMaterial = findRawMaterialByRawMaterialName(MaterialName);
+        // List<RawMaterial> rawMaterialList = findAllByRawMaterialNameContaining(MaterialName);
+        // System.out.println("原料列表集合");
+        // System.out.println(rawMaterialList.size());
         Set<Product> productSet = new HashSet<>();
-        if(rawMaterialList!=null && rawMaterialList.size()>0 ){
-            for(RawMaterial rawMaterial: rawMaterialList){
-                List<Product> productList = rawMaterial.getProductList();
-                if(productList!=null && productList.size()>0 ){
-                    for(Product product: productList){
-                        productSet.add(product);
-                    }
-                }
-            }
+
+        if(rawMaterial!=null){
+            productSet.addAll(rawMaterial.getProductList());
+            // for(RawMaterial rawMaterial: rawMaterialList){
+            //     List<Product> productList = rawMaterial.getProductList();
+            //     productSet.addAll(productList);
+            //     // if(productList!=null && productList.size()>0 ){
+            //     //     for(Product product: productList){
+            //     //         productSet.add(product);
+            //     //     }
+            //     // }
+            // }
         }
         System.out.println("对应的产品集合");
         System.out.println(productSet.size());
         return productSet;
     }
+
+
 
     public RawMaterial addRawMaterial(RawMaterial rawMaterial) {
         return rawMaterialRepository.save(rawMaterial);

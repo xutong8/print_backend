@@ -5,8 +5,14 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+
+
 import com.zju.vis.print_backend.entity.ProductSeries;
 import com.zju.vis.print_backend.entity.RawMaterial;
+import io.swagger.models.auth.In;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.zju.vis.print_backend.dao.ProductRepository;
@@ -36,8 +42,12 @@ public class ProductService {
     //查
     //-------------------------------------------------------------------------
 
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public List<Product> findAll(Integer pageNo,
+                                 Integer pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Product> page = productRepository.findAll(pageable);
+        return page.toList();
     }
 
     public List<RawMaterial> getProductAndRawMaterial(Long productId) {
@@ -70,10 +80,26 @@ public class ProductService {
         return resultSet;
     }
 
-    public List<Product> findAllByCondition(String rawMaterialName, String filterCakeName, String productSeriesName) {
+    // 列表分页 , 页数从0开始记
+    public List<Product> pageList(List<Product> listToPage, Integer pageNo, Integer pageSize){
+        if(listToPage.size() < pageNo*pageSize){
+            return new ArrayList<>();
+        }
+        List<Product> subList = listToPage.stream().skip((pageNo)*pageSize).limit(pageSize).
+                collect(Collectors.toList());
+        return subList;
+    }
+
+
+    public List<Product> findAllByCondition(String rawMaterialName,
+                                            String filterCakeName,
+                                            String productSeriesName,
+                                            Integer pageNo,
+                                            Integer pageSize
+    ) {
         if (isEmptyString(rawMaterialName) && isEmptyString(filterCakeName) && isEmptyString(productSeriesName)) {
             System.out.println("findAllNND");
-            return findAll();
+            return findAll(pageNo,pageSize);
         }
         Set<Product> rawMaterialProductSet = new HashSet<>();
         Set<Product> filterCakeProductSet = new HashSet<>();
@@ -96,22 +122,27 @@ public class ProductService {
         List<Product> resultList = new ArrayList<>();
         resultList.addAll(mixedSet(rawMaterialProductSet, mixedSet(filterCakeProductSet, productSeriesProductSet)));
         System.out.println("resultList 大小" + resultList.size());
-        return resultList;
+
+        List<Product> subList = pageList(resultList,0,10);
+        return subList;
     }
 
-    //增
-    //-------------------------------------------------------------------------
+
 
     // public boolean addProduct(){
     //
     //   return productRepository.addProduct();
     // }
-
+    //删
+    //-------------------------------------------------------------------------
     //根据productId 删除记录
     @Transactional
     public void deleteByProductId(Long productId) {
         productRepository.deleteByProductId(productId);
     }
+
+    //增
+    //-------------------------------------------------------------------------
 
     //add product data
     public Product addProduct(Product product) {

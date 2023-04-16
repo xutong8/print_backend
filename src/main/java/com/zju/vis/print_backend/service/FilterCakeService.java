@@ -3,6 +3,10 @@ package com.zju.vis.print_backend.service;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.entity.Product;
+import com.zju.vis.print_backend.entity.ProductSeries;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -21,10 +25,17 @@ public class FilterCakeService {
         return string == null || string.isEmpty();
     }
 
-    public List<FilterCake> findAll() {
-        return filterCakeRepository.findAll();
+    public List<FilterCake> findAll(Integer pageNo,
+                                    Integer pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<FilterCake> page = filterCakeRepository.findAll(pageable);
+        return page.toList();
     }
 
+    public  FilterCake findFilterCakeByFilterCakeName(String filterCakeName){
+        return filterCakeRepository.findFilterCakeByFilterCakeName(filterCakeName);
+    }
 
     public List<FilterCake> findAllByFilterCakeNameContaining(String filterCakeName) {
         // 空字符串返回全部值
@@ -35,19 +46,22 @@ public class FilterCakeService {
     }
 
     public Set<Product> findProductsByFilterCakeName(String filterCakeName) {
-        List<FilterCake> filterCakeList = findAllByFilterCakeNameContaining(filterCakeName);
-        System.out.println("滤饼列表集合");
-        System.out.println(filterCakeList.size());
+        FilterCake filterCake = findFilterCakeByFilterCakeName(filterCakeName);
+        // List<FilterCake> filterCakeList = findAllByFilterCakeNameContaining(filterCakeName);
+        // System.out.println("滤饼列表集合");
+        // System.out.println(filterCakeList.size());
         Set<Product> productSet = new HashSet<>();
-        if (filterCakeList != null && filterCakeList.size() > 0) {
-            for (FilterCake filterCake : filterCakeList) {
-                List<Product> productList = filterCake.getProductList();
-                if (productList != null && productList.size() > 0) {
-                    for (Product product : productList) {
-                        productSet.add(product);
-                    }
-                }
-            }
+        if (filterCake != null) {
+            productSet.addAll(filterCake.getProductList());
+            // for (FilterCake filterCake : filterCakeList) {
+            //     List<Product> productList = filterCake.getProductList();
+            //     productSet.addAll(productList);
+            //     // if (productList != null && productList.size() > 0) {
+            //     //     for (Product product : productList) {
+            //     //         productSet.add(product);
+            //     //     }
+            //     // }
+            // }
         }
         System.out.println("滤饼对应的产品集合大小");
         System.out.println(productSet.size());

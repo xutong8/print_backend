@@ -8,5 +8,6 @@ import java.util.List;
 public interface RawMaterialRepository extends JpaRepository<RawMaterial, Long> {
     List<RawMaterial> findAll();
     RawMaterial findRawMaterialByRawMaterialId(Long rawMaterialId);
+    RawMaterial findRawMaterialByRawMaterialName(String rawMaterialName);
     List<RawMaterial> findAllByRawMaterialNameContaining(String rawMaterialName);
 }

@@ -28,8 +28,9 @@ public class FilterCakeController {
     @ApiOperation(value = "获取所有滤饼")
     @RequestMapping(value = "/findAllFilterCake", method = RequestMethod.GET)
     @ResponseBody
-    public List<FilterCake> findAll(){
-        return filterCakeService.findAll();
+    public List<FilterCake> findAll(Integer pageNo,
+                                    Integer pageSize){
+        return filterCakeService.findAll(pageNo,pageSize);
     }
 
     @ApiOperation(value = "根据滤饼名称返回对应滤饼")

@@ -3,6 +3,9 @@ package com.zju.vis.print_backend.service;
 import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +26,12 @@ public class ProductSeriesService {
 
     //查
     //-------------------------------------------------------------------------
-    public List<ProductSeries> findAll() {
-        return productSeriesRepository.findAll();
+    public List<ProductSeries> findAll(Integer pageNo,
+                                       Integer pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<ProductSeries> page = productSeriesRepository.findAll(pageable);
+        return page.toList();
     }
 
     public ProductSeries findProductSeriesByProductSeriesId(Long productSeriesId) {
@@ -39,21 +46,26 @@ public class ProductSeriesService {
         return productSeriesRepository.findProductSeriesByProductSeriesNameContaining(productSeries);
     }
 
+    public ProductSeries findProductSeriesByProductSeriesName(String productSeriesName){
+        return productSeriesRepository.findProductSeriesByProductSeriesName(productSeriesName);
+    }
+
     public Set<Product> findProductsByProductSeriesName(String productSeriesName) {
         System.out.println("productSeriesName: " + productSeriesName);
-        List<ProductSeries> productSeriesList = findProductSeriesByProductSeriesNameContaining(productSeriesName);
-        System.out.println("产品系列集合数量");
-        System.out.println(productSeriesList.size());
+        ProductSeries productSeries = findProductSeriesByProductSeriesName(productSeriesName);
+        // List<ProductSeries> productSeriesList = findProductSeriesByProductSeriesNameContaining(productSeriesName);
         Set<Product> productSet = new HashSet<>();
-        if (productSeriesList != null && productSeriesList.size() > 0) {
-            for (ProductSeries productSeries : productSeriesList) {
-                List<Product> productList = productSeries.getProductList();
-                if (productList != null && productList.size() > 0) {
-                    for (Product product : productList) {
-                        productSet.add(product);
-                    }
-                }
-            }
+        if (productSeries != null) {
+            productSet.addAll(productSeries.getProductList());
+            // for (ProductSeries productSeries : productSeriesList) {
+            //     List<Product> productList = productSeries.getProductList();
+            //     productSet.addAll(productList);
+            //     // if (productList != null && productList.size() > 0) {
+            //     //     for (Product product : productList) {
+            //     //         productSet.add(product);
+            //     //     }
+            //     // }
+            // }
         }
         System.out.println("产品系列对应的产品数量");
         System.out.println(productSet.size());

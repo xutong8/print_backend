@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 
 import com.zju.vis.print_backend.entity.RawMaterial;
+import io.swagger.models.auth.In;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +32,10 @@ public class ProductController {
     @ApiOperation(value = "获取所有产品")
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     @ResponseBody
-    public List<Product> findAll() {
-        return productService.findAll();
+    public List<Product> findAll(Integer pageNo,
+                                 Integer pageSize
+    ) {
+        return productService.findAll(pageNo,pageSize);
     }
 
 
@@ -51,14 +54,25 @@ public class ProductController {
   public List<Product> findAllByCondition(
           @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName,
           @RequestParam(value = "filterCakeName", defaultValue = "") String filterCakeName,
-          @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName
-  ){
+          @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName,
+          @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+          @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+          ){
+
     // findAllByCondition(String rawMaterialName, String filterCakeName, String productSeriesName)
     System.out.println("List<Product> findAllByCondition   " +
             "rawMaterialName: " + rawMaterialName +
             "  filterCakeName: " + filterCakeName +
             "  productSeriesName: " + productSeriesName);
-    return productService.findAllByCondition(rawMaterialName,filterCakeName,productSeriesName);
+
+      long s = System.currentTimeMillis();
+      List<Product> list = productService.findAllByCondition(rawMaterialName,filterCakeName,productSeriesName,pageNo,pageSize);
+      long e = System.currentTimeMillis();
+      System.out.println("findbycondition开始的时间：" + s);
+      System.out.println("findbycondition结束的时间：" + e);
+      System.out.println("findbycondition查询的时间差为：" + (e - s));
+
+    return list;
   }
 
 

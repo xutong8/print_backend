@@ -27,8 +27,10 @@ public class ProductSeriesController {
     @ApiOperation(value = "获取所有的产品系列")
     @RequestMapping(value = "/findAllProductSeries", method = RequestMethod.GET)
     @ResponseBody
-    public List<ProductSeries> findAll(){
-        return productSeriesService.findAll();
+    public List<ProductSeries> findAll(Integer pageNo,
+                                       Integer pageSize
+    ){
+        return productSeriesService.findAll(pageNo,pageSize);
     }
 
     @ApiOperation(value = "根据系列名称返回对应的产品")
