@@ -2,6 +2,7 @@ package com.zju.vis.print_backend.dao;
 
 import java.util.List;
 
+import com.zju.vis.print_backend.entity.RawMaterial;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,7 +22,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     // <T> toArray(T[] a);
-
 
     //根据productId 删除记录
     void deleteByProductId(Long productId);

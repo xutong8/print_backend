@@ -309,4 +309,8 @@ public class FilterCakeService {
     //    public void deleteByFilterCakeId(Long filterCakeId) {
     //        filterCakeRepository.deleteByFilterCakeId(filterCakeId);
     //    }
+
+    public FilterCakeService.FilterCakeStandard findFilterCakeByFilterCakeId(Long filterCakeId){
+        return  FilterCakeStandardization(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId));
+    }
 }

@@ -4,6 +4,7 @@ package com.zju.vis.print_backend.controller;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.service.FilterCakeService;
+import com.zju.vis.print_backend.service.RawMaterialService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -82,5 +83,14 @@ public class FilterCakeController {
     ) {
         FilterCake updated = filterCakeService.updateFilterCake(filterCakeId, updatedFilterCake);
         return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "根据 ID 返回原料")
+    @RequestMapping(value = "/findFilterCakeByRawMaterialId", method = RequestMethod.GET)
+    @ResponseBody
+    public FilterCakeService.FilterCakeStandard findFilterCakeByFilterCakeId(
+            @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId
+    ) {
+        return filterCakeService.findFilterCakeByFilterCakeId(filterCakeId);
     }
 }

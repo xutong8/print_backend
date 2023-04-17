@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 
 import com.zju.vis.print_backend.entity.RawMaterial;
+import com.zju.vis.print_backend.service.RawMaterialService;
 import io.swagger.models.auth.In;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -105,4 +106,12 @@ public class ProductController {
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
+    @ApiOperation(value = "根据 ID 返回产品")
+    @RequestMapping(value = "/findProductByProductId", method = RequestMethod.GET)
+    @ResponseBody
+    public ProductService.ProductStandard findProductByProductId(
+            @RequestParam(value = "productId", defaultValue = "") Long productId
+    ) {
+        return productService.findProductByProductId(productId);
+    }
 }

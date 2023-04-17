@@ -356,4 +356,8 @@ public class ProductService {
     }
 
 
+    public ProductService.ProductStandard findProductByProductId(Long productId){
+        return  ProductStandardization(productRepository.findProductByProductId(productId));
+    }
+
 }
