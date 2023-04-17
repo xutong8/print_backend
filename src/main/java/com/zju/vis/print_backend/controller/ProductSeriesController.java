@@ -28,10 +28,10 @@ public class ProductSeriesController {
     @RequestMapping(value = "/findAllProductSeries", method = RequestMethod.GET)
     @ResponseBody
     public List<ProductSeries> findAll(
-            @RequestParam(value = "pageNo" ,defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ){
-        return productSeriesService.findAll(pageNo,pageSize);
+        return productSeriesService.findAll(pageNo-1,pageSize);
     }
 
     @ApiOperation(value = "获取所有的产品系列名称")

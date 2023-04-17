@@ -8,9 +8,7 @@ import javax.annotation.Resource;
 
 
 
-import com.zju.vis.print_backend.entity.ProductSeries;
 import com.zju.vis.print_backend.entity.RawMaterial;
-import io.swagger.models.auth.In;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,10 +40,10 @@ public class ProductService {
         private Integer pageNo;
         private Integer pageSize;
         private Integer pageNum;
-        private Integer productNum;
+        private Integer total;
 
         // 返回的标准列表
-        private List<ProductStandard>  productStandardList;
+        private List<ProductStandard>  list;
 
         public Integer getPageNo() {
             return pageNo;
@@ -71,20 +69,20 @@ public class ProductService {
             this.pageNum = pageNum;
         }
 
-        public Integer getProductNum() {
-            return productNum;
+        public Integer getTotal() {
+            return total;
         }
 
-        public void setProductNum(Integer productNum) {
-            this.productNum = productNum;
+        public void setTotal(Integer total) {
+            this.total = total;
         }
 
-        public List<ProductStandard> getProductStandardList() {
-            return productStandardList;
+        public List<ProductStandard> getList() {
+            return list;
         }
 
-        public void setProductStandardList(List<ProductStandard> productStandardList) {
-            this.productStandardList = productStandardList;
+        public void setList(List<ProductStandard> list) {
+            this.list = list;
         }
     }
 
@@ -97,15 +95,13 @@ public class ProductService {
             productStandardList.add(ProductStandardization(product));
         }
         ProductPackage productPackage = new ProductPackage();
-        productPackage.setPageNo(pageNo);
+        productPackage.setPageNo(pageNo + 1);
         productPackage.setPageSize(pageSize);
         productPackage.setPageNum(
                 (productNum-1) / pageSize + 1
         );
-        // productPackage.setProductNum(pageNum);
-        // productPackage.setProductNum(productStandardList.size());
-        productPackage.setProductNum(productNum);
-        productPackage.setProductStandardList(productStandardList);
+        productPackage.setTotal(productNum);
+        productPackage.setList(productStandardList);
         return productPackage;
     }
 

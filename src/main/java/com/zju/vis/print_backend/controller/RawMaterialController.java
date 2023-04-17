@@ -29,10 +29,10 @@ public class RawMaterialController {
     @RequestMapping(value = "/findAllRawMaterial", method = RequestMethod.GET)
     @ResponseBody
     public List<RawMaterial> findAll(
-            @RequestParam(value = "pageNo" ,defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ) {
-        return rawMaterialService.findAll(pageNo,pageSize);
+        return rawMaterialService.findAll(pageNo-1,pageSize);
     }
 
     @ApiOperation(value = "获取所有原料名称")

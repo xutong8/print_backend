@@ -33,10 +33,10 @@ public class ProductController {
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     @ResponseBody
     public ProductService.ProductPackage findAll(
-            @RequestParam(value = "pageNo" ,defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ) {
-        return productService.findAll(pageNo,pageSize);
+        return productService.findAll(pageNo-1,pageSize);
     }
 
 
@@ -56,7 +56,7 @@ public class ProductController {
           @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName,
           @RequestParam(value = "filterCakeName", defaultValue = "") String filterCakeName,
           @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName,
-          @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+          @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
           @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
           ){
 
@@ -67,7 +67,7 @@ public class ProductController {
             "  productSeriesName: " + productSeriesName);
 
       long s = System.currentTimeMillis();
-      ProductService.ProductPackage list = productService.findAllByCondition(rawMaterialName,filterCakeName,productSeriesName,pageNo,pageSize);
+      ProductService.ProductPackage list = productService.findAllByCondition(rawMaterialName,filterCakeName,productSeriesName,pageNo-1,pageSize);
       long e = System.currentTimeMillis();
       System.out.println("findbycondition开始的时间：" + s);
       System.out.println("findbycondition结束的时间：" + e);

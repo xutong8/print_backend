@@ -39,16 +39,186 @@ public class FilterCakeService {
         }
     }
 
+    // FilterCake 结果封装
+    public class FilterCakePackage{
+        // 附加信息
+        private Integer pageNo;
+        private Integer pageSize;
+        private Integer pageNum;
+        private Integer total;
+
+        // 返回的标准列表
+        private List<FilterCakeStandard> list;
+
+        public Integer getPageNo() {
+            return pageNo;
+        }
+
+        public void setPageNo(Integer pageNo) {
+            this.pageNo = pageNo;
+        }
+
+        public Integer getPageSize() {
+            return pageSize;
+        }
+
+        public void setPageSize(Integer pageSize) {
+            this.pageSize = pageSize;
+        }
+
+        public Integer getPageNum() {
+            return pageNum;
+        }
+
+        public void setPageNum(Integer pageNum) {
+            this.pageNum = pageNum;
+        }
+
+        public Integer getTotal() {
+            return total;
+        }
+
+        public void setTotal(Integer total) {
+            this.total = total;
+        }
+
+        public List<FilterCakeStandard> getList() {
+            return list;
+        }
+
+        public void setList(List<FilterCakeStandard> list) {
+            this.list = list;
+        }
+    }
+
+    // List<FilterCake> 添加额外信息打包发送
+    public FilterCakePackage packFilterCake(List<FilterCake> filterCakeList,
+                             Integer pageNo,Integer pageSize,
+                             Integer filterCakeNum){
+        List<FilterCakeStandard> filterCakeStandardList = new ArrayList<>();
+        for(FilterCake filterCake: filterCakeList){
+            filterCakeStandardList.add(FilterCakeStandardization(filterCake));
+        }
+        FilterCakePackage filterCakePackage = new FilterCakePackage();
+        filterCakePackage.setPageNo(pageNo + 1);
+        filterCakePackage.setPageSize(pageSize);
+        filterCakePackage.setPageNum(
+                (filterCakeNum-1) / pageSize + 1
+        );
+        filterCakePackage.setTotal(filterCakeNum);
+        filterCakePackage.setList(filterCakeStandardList);
+        return filterCakePackage;
+    }
+
+    // FilterCake 标准化形式类
+    public class FilterCakeStandard{
+        private Long filterCakeId;
+        private String filterCakeName;
+        private String filterCakeIndex;
+        private String filterCakeColor;
+        private Double filterCakeUnitPrice;
+        private Integer filterCakePriceIncreasePercent;
+        private String filterCakeSpecification;
+        private String filterCakeRemarks;
+
+        public Long getFilterCakeId() {
+            return filterCakeId;
+        }
+
+        public void setFilterCakeId(Long filterCakeId) {
+            this.filterCakeId = filterCakeId;
+        }
+
+        public String getFilterCakeName() {
+            return filterCakeName;
+        }
+
+        public void setFilterCakeName(String filterCakeName) {
+            this.filterCakeName = filterCakeName;
+        }
+
+        public String getFilterCakeIndex() {
+            return filterCakeIndex;
+        }
+
+        public void setFilterCakeIndex(String filterCakeIndex) {
+            this.filterCakeIndex = filterCakeIndex;
+        }
+
+        public String getFilterCakeColor() {
+            return filterCakeColor;
+        }
+
+        public void setFilterCakeColor(String filterCakeColor) {
+            this.filterCakeColor = filterCakeColor;
+        }
+
+        public Double getFilterCakeUnitPrice() {
+            return filterCakeUnitPrice;
+        }
+
+        public void setFilterCakeUnitPrice(Double filterCakeUnitPrice) {
+            this.filterCakeUnitPrice = filterCakeUnitPrice;
+        }
+
+        public Integer getFilterCakePriceIncreasePercent() {
+            return filterCakePriceIncreasePercent;
+        }
+
+        public void setFilterCakePriceIncreasePercent(Integer filterCakePriceIncreasePercent) {
+            this.filterCakePriceIncreasePercent = filterCakePriceIncreasePercent;
+        }
+
+        public String getFilterCakeSpecification() {
+            return filterCakeSpecification;
+        }
+
+        public void setFilterCakeSpecification(String filterCakeSpecification) {
+            this.filterCakeSpecification = filterCakeSpecification;
+        }
+
+        public String getFilterCakeRemarks() {
+            return filterCakeRemarks;
+        }
+
+        public void setFilterCakeRemarks(String filterCakeRemarks) {
+            this.filterCakeRemarks = filterCakeRemarks;
+        }
+    }
+
+    // FilterCake 转化为标准对象 FilterCakeStandard
+    public FilterCakeStandard FilterCakeStandardization(FilterCake filterCake){
+        FilterCakeStandard filterCakeStandard = new FilterCakeStandard();
+        filterCakeStandard.setFilterCakeId(filterCake.getFilterCakeId());
+        filterCakeStandard.setFilterCakeName(filterCake.getFilterCakeName());
+        filterCakeStandard.setFilterCakeIndex(filterCake.getFilterCakeIndex());
+        filterCakeStandard.setFilterCakeColor(filterCake.getFilterCakeColor());
+        // 设置滤饼单价 当前为假数据 todo：递归计算真实数据
+        filterCakeStandard.setFilterCakeUnitPrice(
+                Math.random() * (500.0 - 10.0) + 10.0
+        );
+        // 设置滤饼价格涨幅 当前为假数据 todo：递归计算真实数据
+        filterCakeStandard.setFilterCakePriceIncreasePercent(
+                (int) (Math.random() * 100) - 50
+        );
+        filterCakeStandard.setFilterCakeSpecification(filterCake.getFilterCakeSpecification());
+        filterCakeStandard.setFilterCakeRemarks(filterCake.getFilterCakeRemarks());
+        return filterCakeStandard;
+    }
+
+
+
     public boolean isEmptyString(String string) {
         return string == null || string.isEmpty();
     }
 
-    public List<FilterCake> findAll(Integer pageNo,
+    public FilterCakePackage findAll(Integer pageNo,
                                     Integer pageSize
     ) {
+        Integer filterCakeNum = filterCakeRepository.findAll().size();
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<FilterCake> page = filterCakeRepository.findAll(pageable);
-        return page.toList();
+        return packFilterCake(page.toList(),pageNo,pageSize,filterCakeNum);
     }
 
     public List<FilterCakeName> findAllFilterCakeName(){
@@ -76,9 +246,6 @@ public class FilterCakeService {
 
     public Set<Product> findProductsByFilterCakeName(String filterCakeName) {
         FilterCake filterCake = findFilterCakeByFilterCakeName(filterCakeName);
-        // List<FilterCake> filterCakeList = findAllByFilterCakeNameContaining(filterCakeName);
-        // System.out.println("滤饼列表集合");
-        // System.out.println(filterCakeList.size());
         Set<Product> productSet = new HashSet<>();
         if (filterCake != null) {
             productSet.addAll(filterCake.getProductList());
