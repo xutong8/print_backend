@@ -17,6 +17,9 @@ public class FilterCakeService {
     @Resource
     FilterCakeRepository filterCakeRepository;
 
+    // 调用一般方法
+    Utils utils = new Utils();
+
     // 用于返回滤饼列表名
     public class FilterCakeName{
         private Long filterCakeId;
@@ -207,12 +210,6 @@ public class FilterCakeService {
     }
 
 
-
-    public boolean isEmptyString(String string) {
-        return string == null || string.isEmpty();
-    }
-
-
     //查
     //-------------------------------------------------------------------------
     public FilterCakePackage findAll(Integer pageNo,
@@ -241,7 +238,7 @@ public class FilterCakeService {
             Integer pageNo, Integer pageSize
     ){
         List<FilterCake> filterCakeList = new ArrayList<>();
-        Utils utils = new Utils();
+
         switch (typeOfQuery){
             case "滤饼名称":
                 filterCakeList = filterCakeRepository.findAllByFilterCakeNameContaining(conditionOfQuery);
@@ -264,7 +261,7 @@ public class FilterCakeService {
 
     public List<FilterCake> findAllByFilterCakeNameContaining(String filterCakeName) {
         // 空字符串返回全部值
-        if (isEmptyString(filterCakeName)) {
+        if (utils.isEmptyString(filterCakeName)) {
             return filterCakeRepository.findAll();
         }
         return filterCakeRepository.findAllByFilterCakeNameContaining(filterCakeName);

@@ -10,4 +10,5 @@ public interface RawMaterialRepository extends JpaRepository<RawMaterial, Long> 
     RawMaterial findRawMaterialByRawMaterialId(Long rawMaterialId);
     RawMaterial findRawMaterialByRawMaterialName(String rawMaterialName);
     List<RawMaterial> findAllByRawMaterialNameContaining(String rawMaterialName);
+    List<RawMaterial> findAllByRawMaterialIndexContaining(String rawMaterialIndex);
 }

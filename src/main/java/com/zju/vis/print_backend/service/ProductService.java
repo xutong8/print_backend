@@ -24,6 +24,9 @@ public class ProductService {
     @Resource
     private ProductRepository productRepository;
 
+    // 调用一般方法
+    Utils utils = new Utils();
+
     // 调用其他Service的方法
     @Resource
     private RawMaterialService rawMaterialService;
@@ -34,7 +37,7 @@ public class ProductService {
     @Resource
     private ProductSeriesService productSeriesService;
 
-    //Product 结果封装
+    // Product 结果封装
     public class ProductPackage{
         // 附加信息
         private Integer pageNo;
@@ -86,7 +89,7 @@ public class ProductService {
         }
     }
 
-    // List<ProductStandard> 添加额外信息打包发送
+    // List<Product> 添加额外信息打包发送
     public ProductPackage packProduct(List<Product> productList,
                                       Integer pageNo,Integer pageSize,
                                       Integer productNum){
@@ -203,7 +206,7 @@ public class ProductService {
 
     }
 
-    // Product 转化为标准化对象 ProductStandard
+    // Product 转化为标准对象 ProductStandard
     public ProductStandard ProductStandardization(Product product){
         ProductStandard productStandard = new ProductStandard();
         productStandard.setProductId(product.getProductId());
@@ -231,13 +234,8 @@ public class ProductService {
     }
 
 
-    public boolean isEmptyString(String string) {
-        return string == null || string.isEmpty();
-    }
-
     //查
     //-------------------------------------------------------------------------
-
     public ProductPackage findAll(Integer pageNo,
                                  Integer pageSize
     ) {
@@ -277,16 +275,6 @@ public class ProductService {
         return resultSet;
     }
 
-    // // 列表分页 , 页数从0开始记
-    // public List<Product> pageList(List<Product> listToPage, Integer pageNo, Integer pageSize){
-    //     if(listToPage.size() < pageNo*pageSize){
-    //         return new ArrayList<>();
-    //     }
-    //     List<Product> subList = listToPage.stream().skip((pageNo)*pageSize).limit(pageSize).
-    //             collect(Collectors.toList());
-    //     return subList;
-    // }
-
 
     public ProductPackage findAllByCondition(String rawMaterialName,
                                             String filterCakeName,
@@ -294,7 +282,7 @@ public class ProductService {
                                             Integer pageNo,
                                             Integer pageSize
     ) {
-        if (isEmptyString(rawMaterialName) && isEmptyString(filterCakeName) && isEmptyString(productSeriesName)) {
+        if (utils.isEmptyString(rawMaterialName) && utils.isEmptyString(filterCakeName) && utils.isEmptyString(productSeriesName)) {
             System.out.println("findAllNND");
             return findAll(pageNo,pageSize);
             // return null;
@@ -302,15 +290,15 @@ public class ProductService {
         Set<Product> rawMaterialProductSet = new HashSet<>();
         Set<Product> filterCakeProductSet = new HashSet<>();
         Set<Product> productSeriesProductSet = new HashSet<>();
-        if (!isEmptyString(rawMaterialName)) {
+        if (!utils.isEmptyString(rawMaterialName)) {
             rawMaterialProductSet = rawMaterialService.findProductsByRawMaterialName(rawMaterialName);
             System.out.println("rawMaterialProductSet 大小" + rawMaterialProductSet.size());
         }
-        if (!isEmptyString(filterCakeName)) {
+        if (!utils.isEmptyString(filterCakeName)) {
             filterCakeProductSet = filterCakeService.findProductsByFilterCakeName(filterCakeName);
             System.out.println("filterCakeProductSet 大小" + filterCakeProductSet.size());
         }
-        if (!isEmptyString(productSeriesName)) {
+        if (!utils.isEmptyString(productSeriesName)) {
             productSeriesProductSet = productSeriesService.findProductsByProductSeriesName(productSeriesName);
             System.out.println("productSeriesProductSet 大小" + productSeriesProductSet.size());
         }
@@ -321,7 +309,7 @@ public class ProductService {
         resultList.addAll(mixedSet(rawMaterialProductSet, mixedSet(filterCakeProductSet, productSeriesProductSet)));
         System.out.println("resultList 大小" + resultList.size());
 
-        Utils utils = new Utils();
+
         List<Product> subList = utils.pageList(resultList,pageNo,pageSize);
         Integer productNum = resultList.size();
         return packProduct(subList,pageNo,pageSize,productNum);

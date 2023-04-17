@@ -23,7 +23,7 @@ public class RawMaterial {
     private String rawMaterialIndex;
 
     @Column(name = "raw_material_price", nullable = false)
-    private Float rawMaterialPrice;
+    private Double rawMaterialPrice;
 
     @Column(name = "raw_material_conventional", nullable = false)
     private String rawMaterialConventional;
@@ -67,11 +67,11 @@ public class RawMaterial {
         this.rawMaterialIndex = rawMaterialIndex;
     }
 
-    public Float getRawMaterialPrice() {
+    public Double getRawMaterialPrice() {
         return rawMaterialPrice;
     }
 
-    public void setRawMaterialPrice(Float rawMaterialPrice) {
+    public void setRawMaterialPrice(Double rawMaterialPrice) {
         this.rawMaterialPrice = rawMaterialPrice;
     }
 

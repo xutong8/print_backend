@@ -17,6 +17,9 @@ public class ProductSeriesService {
     @Resource
     ProductSeriesRepository productSeriesRepository;
 
+    // 调用一般方法
+    Utils utils = new Utils();
+
     public class ProductSeriesName{
         private Long productSeriesId;
         private String productSeriesName;
@@ -37,11 +40,6 @@ public class ProductSeriesService {
             this.productSeriesName = productSeriesName;
         }
     }
-
-    public boolean isEmptyString(String string) {
-        return string == null || string.isEmpty();
-    }
-
 
 
     //查
@@ -71,7 +69,7 @@ public class ProductSeriesService {
 
     public List<ProductSeries> findProductSeriesByProductSeriesNameContaining(String productSeries) {
         // 空字符串返回全部值
-        if (isEmptyString(productSeries)) {
+        if (utils.isEmptyString(productSeries)) {
             return productSeriesRepository.findAll();
         }
         return productSeriesRepository.findProductSeriesByProductSeriesNameContaining(productSeries);
