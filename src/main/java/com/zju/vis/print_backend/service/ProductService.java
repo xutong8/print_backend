@@ -245,6 +245,13 @@ public class ProductService {
         return packProduct(page.toList(),pageNo,pageSize,productNum);
     }
 
+    public ProductService.ProductStandard findProductByProductId(Long productId){
+        if(productRepository.findProductByProductId(productId) == null){
+            return new ProductStandard();
+        }
+        return  ProductStandardization(productRepository.findProductByProductId(productId));
+    }
+
     public List<RawMaterial> getProductAndRawMaterial(Long productId) {
         Product product = productRepository.findProductByProductId(productId);
         if (product != null) {
@@ -356,8 +363,6 @@ public class ProductService {
     }
 
 
-    public ProductService.ProductStandard findProductByProductId(Long productId){
-        return  ProductStandardization(productRepository.findProductByProductId(productId));
-    }
+
 
 }

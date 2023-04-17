@@ -255,6 +255,13 @@ public class FilterCakeService {
         );
     }
 
+    public FilterCakeService.FilterCakeStandard findFilterCakeByFilterCakeId(Long filterCakeId){
+        if(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId) == null){
+            return new FilterCakeStandard();
+        }
+        return  FilterCakeStandardization(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId));
+    }
+
     public  FilterCake findFilterCakeByFilterCakeName(String filterCakeName){
         return filterCakeRepository.findFilterCakeByFilterCakeName(filterCakeName);
     }
@@ -310,7 +317,5 @@ public class FilterCakeService {
     //        filterCakeRepository.deleteByFilterCakeId(filterCakeId);
     //    }
 
-    public FilterCakeService.FilterCakeStandard findFilterCakeByFilterCakeId(Long filterCakeId){
-        return  FilterCakeStandardization(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId));
-    }
+
 }

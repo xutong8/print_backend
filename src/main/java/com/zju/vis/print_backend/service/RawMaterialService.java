@@ -235,6 +235,9 @@ public class RawMaterialService {
     }
 
     public RawMaterialStandard findRawMaterialByRawMaterialId(Long rawMaterialId){
+        if(rawMaterialRepository.findRawMaterialByRawMaterialId(rawMaterialId) == null){
+            return new RawMaterialStandard();
+        }
         return  RawMaterialStandardization(rawMaterialRepository.findRawMaterialByRawMaterialId(rawMaterialId));
     }
 
