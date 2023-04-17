@@ -109,11 +109,15 @@ public class ProductSeriesService {
         productSeriesRepository.deleteByProductSeriesId(productSeriesId);
     }
 
+    //增
+    //-------------------------------------------------------------------------
     //add productSeries data
     public ProductSeries addProductSeries(ProductSeries productSeries) {
         return productSeriesRepository.save(productSeries);
     }
 
+    //改
+    //-------------------------------------------------------------------------
     //update product data
     public ProductSeries updateProductSeries(Long productSeriesId, ProductSeries updatedProductSeries) {
         return productSeriesRepository.findById(productSeriesId)

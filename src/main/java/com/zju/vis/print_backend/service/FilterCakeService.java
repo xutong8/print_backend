@@ -212,6 +212,9 @@ public class FilterCakeService {
         return string == null || string.isEmpty();
     }
 
+
+    //查
+    //-------------------------------------------------------------------------
     public FilterCakePackage findAll(Integer pageNo,
                                     Integer pageSize
     ) {
@@ -232,6 +235,29 @@ public class FilterCakeService {
         return filterCakeNameList;
     }
 
+
+    public FilterCakePackage findAllFilterCakeByCondition(
+            String typeOfQuery, String conditionOfQuery,
+            Integer pageNo, Integer pageSize
+    ){
+        List<FilterCake> filterCakeList = new ArrayList<>();
+        Utils utils = new Utils();
+        switch (typeOfQuery){
+            case "滤饼名称":
+                filterCakeList = filterCakeRepository.findAllByFilterCakeNameContaining(conditionOfQuery);
+                break;
+            case "滤饼编号":
+                filterCakeList = filterCakeRepository.findAllByFilterCakeIndexContaining(conditionOfQuery);
+                break;
+            case "滤饼颜色":
+                filterCakeList = filterCakeRepository.findAllByFilterCakeColorContaining(conditionOfQuery);
+                break;
+        }
+        return packFilterCake(
+                utils.pageList(filterCakeList, pageNo, pageSize),pageNo,pageSize,filterCakeList.size()
+        );
+    }
+
     public  FilterCake findFilterCakeByFilterCakeName(String filterCakeName){
         return filterCakeRepository.findFilterCakeByFilterCakeName(filterCakeName);
     }
@@ -249,29 +275,23 @@ public class FilterCakeService {
         Set<Product> productSet = new HashSet<>();
         if (filterCake != null) {
             productSet.addAll(filterCake.getProductList());
-            // for (FilterCake filterCake : filterCakeList) {
-            //     List<Product> productList = filterCake.getProductList();
-            //     productSet.addAll(productList);
-            //     // if (productList != null && productList.size() > 0) {
-            //     //     for (Product product : productList) {
-            //     //         productSet.add(product);
-            //     //     }
-            //     // }
-            // }
         }
         System.out.println("滤饼对应的产品集合大小");
         System.out.println(productSet.size());
         return productSet;
     }
 
-    //    @Transactional
-//    public void deleteByFilterCakeId(Long filterCakeId) {
-//        filterCakeRepository.deleteByFilterCakeId(filterCakeId);
-//    }
+
+
+    //增
+    //-------------------------------------------------------------------------
     public FilterCake addFilterCake(FilterCake filterCake) {
         return filterCakeRepository.save(filterCake);
     }
 
+
+    //改
+    //-------------------------------------------------------------------------
     // update FilterCake data
     public FilterCake updateFilterCake(Long filterCakeId, FilterCake updatedFilterCake) {
         return filterCakeRepository.findById(filterCakeId)
@@ -287,4 +307,9 @@ public class FilterCakeService {
                 })
                 .orElseThrow(() -> new NoSuchElementException("FilterCake not found with id " + filterCakeId));
     }
+
+    //    @Transactional
+    //    public void deleteByFilterCakeId(Long filterCakeId) {
+    //        filterCakeRepository.deleteByFilterCakeId(filterCakeId);
+    //    }
 }

@@ -35,6 +35,7 @@ public class FilterCakeController {
         return filterCakeService.findAll(pageNo-1 ,pageSize);
     }
 
+    // 精简列表项
     @ApiOperation(value = "获取所有滤饼的名称")
     @RequestMapping(value = "/findAllFilterCakeName", method = RequestMethod.GET)
     @ResponseBody
@@ -42,13 +43,20 @@ public class FilterCakeController {
         return filterCakeService.findAllFilterCakeName();
     }
 
+    // 根据条件返回
+    @ApiOperation(value = "根据条件返回所有的滤饼")
+    @RequestMapping(value = "/findAllFilterCakeByCondition" ,method = RequestMethod.GET)
+    @ResponseBody
+    public FilterCakeService.FilterCakePackage findAllFilterCakeByCondition(
+            @RequestParam(value = "typeOfQuery", defaultValue = "滤饼名称") String typeOfQuery,
+            @RequestParam(value = "conditionOfQuery" ,defaultValue = "") String conditionOfQuery,
+            @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
+            @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
+    ){
+        // return filterCakeService.findAllByFilterCakeNameContaining(filterCakeName);
+        return filterCakeService.findAllFilterCakeByCondition(typeOfQuery, conditionOfQuery, pageNo-1, pageSize);
+    }
 
-    // @ApiOperation(value = "根据滤饼名称返回对应滤饼")
-    // @RequestMapping(value = "/findAllByFilterCakeNameContaining" ,method = RequestMethod.GET)
-    // @ResponseBody
-    // public List<FilterCake> findAllByFilterCakeNameContaining(String filterCakeName){
-    //     return filterCakeService.findAllByFilterCakeNameContaining(filterCakeName);
-    // }
 
     // @ApiOperation(value = "根据滤饼名称返回对应的产品")
     // @RequestMapping(value = "/findProductsByFilterCakeName", method = RequestMethod.GET)

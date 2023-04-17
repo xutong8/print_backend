@@ -277,15 +277,15 @@ public class ProductService {
         return resultSet;
     }
 
-    // 列表分页 , 页数从0开始记
-    public List<Product> pageList(List<Product> listToPage, Integer pageNo, Integer pageSize){
-        if(listToPage.size() < pageNo*pageSize){
-            return new ArrayList<>();
-        }
-        List<Product> subList = listToPage.stream().skip((pageNo)*pageSize).limit(pageSize).
-                collect(Collectors.toList());
-        return subList;
-    }
+    // // 列表分页 , 页数从0开始记
+    // public List<Product> pageList(List<Product> listToPage, Integer pageNo, Integer pageSize){
+    //     if(listToPage.size() < pageNo*pageSize){
+    //         return new ArrayList<>();
+    //     }
+    //     List<Product> subList = listToPage.stream().skip((pageNo)*pageSize).limit(pageSize).
+    //             collect(Collectors.toList());
+    //     return subList;
+    // }
 
 
     public ProductPackage findAllByCondition(String rawMaterialName,
@@ -321,7 +321,8 @@ public class ProductService {
         resultList.addAll(mixedSet(rawMaterialProductSet, mixedSet(filterCakeProductSet, productSeriesProductSet)));
         System.out.println("resultList 大小" + resultList.size());
 
-        List<Product> subList = pageList(resultList,pageNo,pageSize);
+        Utils utils = new Utils();
+        List<Product> subList = utils.pageList(resultList,pageNo,pageSize);
         Integer productNum = resultList.size();
         return packProduct(subList,pageNo,pageSize,productNum);
     }
