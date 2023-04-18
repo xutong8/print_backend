@@ -3,12 +3,14 @@ package com.zju.vis.print_backend.service;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.RawMaterial;
+import com.zju.vis.print_backend.entity.RelProductRawMaterial;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+
 import java.util.*;
 
 @Service
@@ -226,14 +228,26 @@ public class RawMaterialService {
         }
     }
 
+    // 根据调用者的productId filterCakeId 结合自身找到对应的投料量
+    public Double getInventory(List<RelProductRawMaterial> relProductRawMaterialList, Long productId, Long rawMaterialId){
+        for(RelProductRawMaterial relProductRawMaterial: relProductRawMaterialList){
+            if((relProductRawMaterial.getId().getProductId().longValue() == productId.longValue()) && (relProductRawMaterial.getId().getRawMaterialId().longValue() == rawMaterialId.longValue())){
+                System.out.println("返回的Inventory:" + relProductRawMaterial.getInventory());
+                return relProductRawMaterial.getInventory();
+            }
+        }
+        return -1.0;
+    }
     // 简单原料信息封装
-    public RawMaterialSimple simplifyRawMaterial(RawMaterial rawMaterial){
+    public RawMaterialSimple simplifyRawMaterial(RawMaterial rawMaterial,Long productId){
         RawMaterialSimple rawMaterialSimple = new RawMaterialSimple();
         rawMaterialSimple.setRawMaterialId(rawMaterial.getRawMaterialId());
         rawMaterialSimple.setRawMaterialName(rawMaterial.getRawMaterialName());
-        rawMaterialSimple.setInventory(1.0);
+        rawMaterialSimple.setInventory(getInventory(rawMaterial.getRelProductRawMaterialList(),
+                productId,rawMaterial.getRawMaterialId()));
         return rawMaterialSimple;
     }
+
 
     //查
     //-------------------------------------------------------------------------

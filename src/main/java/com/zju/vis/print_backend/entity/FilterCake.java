@@ -1,12 +1,10 @@
 package com.zju.vis.print_backend.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
 @Entity
@@ -42,10 +40,10 @@ public class FilterCake {
     @ManyToMany
     @JoinTable(name = "rel_p_fc",
             joinColumns = {@JoinColumn(name = "filter_cake_id")},
-            inverseJoinColumns = {@JoinColumn(name="product_id")
+            inverseJoinColumns = {@JoinColumn(name = "product_id")
             })
     @JsonIgnore
-    private List<Product> productList=new ArrayList<>();
+    private List<Product> productList = new ArrayList<>();
 
     @OneToMany(mappedBy = "filterCake")
     List<RelProductFilterCake> relProductFilterCakeList;

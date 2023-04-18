@@ -10,7 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "tb_raw_material")
 public class RawMaterial {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "raw_material_id", nullable = false)
@@ -41,7 +40,16 @@ public class RawMaterial {
     @JsonIgnore
     private List<Product> productList=new ArrayList<>();
 
+    public List<RelProductRawMaterial> getRelProductRawMaterialList() {
+        return relProductRawMaterialList;
+    }
 
+    public void setRelProductRawMaterialList(List<RelProductRawMaterial> relProductRawMaterialList) {
+        this.relProductRawMaterialList = relProductRawMaterialList;
+    }
+
+    @OneToMany(mappedBy = "rawMaterial")
+    List<RelProductRawMaterial> relProductRawMaterialList;
 
     public Long getRawMaterialId() {
         return rawMaterialId;
@@ -99,4 +107,7 @@ public class RawMaterial {
     //     this.productList = productList;
     // }
 
+    public void setProductList(List<Product> productList) {
+        this.productList = productList;
+    }
 }
