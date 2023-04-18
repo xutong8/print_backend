@@ -6,6 +6,7 @@ import com.zju.vis.print_backend.service.ProductSeriesService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.persistence.*;
@@ -68,6 +69,8 @@ public class Product {
             })
     private List<FilterCake> filterCakeList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product")
+    private List<RelProductFilterCake> relProductFilterCakeList;
 
     //
     // @ManyToOne
@@ -182,4 +185,13 @@ public class Product {
     // public ProductSeries getProductSeries() {
     //   return productSeries;
     // }
+
+
+    public List<RelProductFilterCake> getRelProductFilterCakeList() {
+        return relProductFilterCakeList;
+    }
+
+    public void setRelProductFilterCakeList(List<RelProductFilterCake> relProductFilterCakeList) {
+        this.relProductFilterCakeList = relProductFilterCakeList;
+    }
 }

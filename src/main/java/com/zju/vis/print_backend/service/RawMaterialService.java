@@ -195,6 +195,46 @@ public class RawMaterialService {
         return rawMaterialStandard;
     }
 
+    // 用于简单原料简单信息
+    public class RawMaterialSimple{
+        private Long rawMaterialId;
+        private String rawMaterialName;
+        private Double inventory;
+
+        public Long getRawMaterialId() {
+            return rawMaterialId;
+        }
+
+        public void setRawMaterialId(Long rawMaterialId) {
+            this.rawMaterialId = rawMaterialId;
+        }
+
+        public String getRawMaterialName() {
+            return rawMaterialName;
+        }
+
+        public void setRawMaterialName(String rawMaterialName) {
+            this.rawMaterialName = rawMaterialName;
+        }
+
+        public Double getInventory() {
+            return inventory;
+        }
+
+        public void setInventory(Double inventory) {
+            this.inventory = inventory;
+        }
+    }
+
+    // 简单原料信息封装
+    public RawMaterialSimple simplifyRawMaterial(RawMaterial rawMaterial){
+        RawMaterialSimple rawMaterialSimple = new RawMaterialSimple();
+        rawMaterialSimple.setRawMaterialId(rawMaterial.getRawMaterialId());
+        rawMaterialSimple.setRawMaterialName(rawMaterial.getRawMaterialName());
+        rawMaterialSimple.setInventory(1.0);
+        return rawMaterialSimple;
+    }
+
     //查
     //-------------------------------------------------------------------------
     public RawMaterialPackage findAll(Integer pageNo,

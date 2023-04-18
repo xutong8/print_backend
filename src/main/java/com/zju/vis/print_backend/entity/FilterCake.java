@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -46,6 +47,8 @@ public class FilterCake {
     @JsonIgnore
     private List<Product> productList=new ArrayList<>();
 
+    @OneToMany(mappedBy = "filterCake")
+    List<RelProductFilterCake> relProductFilterCakeList;
 
     public Long getFilterCakeId() {
         return filterCakeId;
@@ -117,5 +120,13 @@ public class FilterCake {
 
     public void setProductList(List<Product> productList) {
         this.productList = productList;
+    }
+
+    public List<RelProductFilterCake> getRelProductFilterCakeList() {
+        return relProductFilterCakeList;
+    }
+
+    public void setRelProductFilterCakeList(List<RelProductFilterCake> relProductFilterCakeList) {
+        this.relProductFilterCakeList = relProductFilterCakeList;
     }
 }

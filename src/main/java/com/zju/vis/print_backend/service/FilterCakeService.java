@@ -3,6 +3,7 @@ package com.zju.vis.print_backend.service;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.entity.Product;
+import com.zju.vis.print_backend.entity.RelProductFilterCake;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -207,6 +208,57 @@ public class FilterCakeService {
         filterCakeStandard.setFilterCakeSpecification(filterCake.getFilterCakeSpecification());
         filterCakeStandard.setFilterCakeRemarks(filterCake.getFilterCakeRemarks());
         return filterCakeStandard;
+    }
+
+    // 用于返回滤饼简单信息
+    public class FilterCakeSimple{
+        private Long filterCakeId;
+        private String filterCakeName;
+        private Double inventory;
+
+        public Long getFilterCakeId() {
+            return filterCakeId;
+        }
+
+        public void setFilterCakeId(Long filterCakeId) {
+            this.filterCakeId = filterCakeId;
+        }
+
+        public String getFilterCakeName() {
+            return filterCakeName;
+        }
+
+        public void setFilterCakeName(String filterCakeName) {
+            this.filterCakeName = filterCakeName;
+        }
+
+        public Double getInventory() {
+            return inventory;
+        }
+
+        public void setInventory(Double inventory) {
+            this.inventory = inventory;
+        }
+    }
+
+    // 根据调用者的productId filterCakeId 结合自身找到对应的投料量
+    public Double getInventory(List<RelProductFilterCake> relProductFilterCakeList, Long productId, Long filterCakeId){
+        for(RelProductFilterCake relProductFilterCake: relProductFilterCakeList){
+            if((relProductFilterCake.getId().getProductId().longValue() == productId.longValue()) && (relProductFilterCake.getId().getFilterCakeId().longValue() == filterCakeId.longValue())){
+                System.out.println("返回的Inventory:" + relProductFilterCake.getInventory());
+                return relProductFilterCake.getInventory();
+            }
+        }
+        return -1.0;
+    }
+
+    public FilterCakeSimple simplifyFilterCake(FilterCake filterCake, Long productId){
+        FilterCakeSimple filterCakeSimple = new FilterCakeSimple();
+        filterCakeSimple.setFilterCakeId(filterCake.getFilterCakeId());
+        filterCakeSimple.setFilterCakeName(filterCake.getFilterCakeName());
+        filterCakeSimple.setInventory(getInventory(filterCake.getRelProductFilterCakeList(),
+                productId,filterCake.getFilterCakeId()));
+        return filterCakeSimple;
     }
 
 

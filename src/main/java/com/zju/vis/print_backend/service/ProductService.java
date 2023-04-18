@@ -7,8 +7,10 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 
-
+import com.zju.vis.print_backend.dao.RelProductFilterCakeRepository;
+import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.entity.RawMaterial;
+import com.zju.vis.print_backend.entity.RelProductFilterCake;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -108,6 +110,8 @@ public class ProductService {
         return productPackage;
     }
 
+
+
     // Product 标准化形式类 (前端单个节点最终结果
     public class ProductStandard{
         private Long productId;
@@ -120,6 +124,8 @@ public class ProductService {
         private String productSeriesName;
         private String productFactoryName;
         private String productRemarks;
+        private List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList;
+        private List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList;
 
         public Long getProductId() {
             return productId;
@@ -203,7 +209,21 @@ public class ProductService {
             this.productRemarks = productRemarks;
         }
 
+        public List<RawMaterialService.RawMaterialSimple> getRawMaterialSimpleList() {
+            return rawMaterialSimpleList;
+        }
 
+        public void setRawMaterialSimpleList(List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList) {
+            this.rawMaterialSimpleList = rawMaterialSimpleList;
+        }
+
+        public List<FilterCakeService.FilterCakeSimple> getFilterCakeSimpleList() {
+            return filterCakeSimpleList;
+        }
+
+        public void setFilterCakeSimpleList(List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList) {
+            this.filterCakeSimpleList = filterCakeSimpleList;
+        }
     }
 
     // Product 转化为标准对象 ProductStandard
@@ -230,8 +250,17 @@ public class ProductService {
         );
         productStandard.setProductFactoryName(product.getProductFactoryName());
         productStandard.setProductRemarks(product.getProductRemarks());
+        // 设置返回的简单滤饼表
+        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        for(FilterCake filterCake: product.getFilterCakeList()){
+            filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake,product.getProductId()));
+        }
+        productStandard.setFilterCakeSimpleList(filterCakeSimpleList);
+
         return productStandard;
     }
+
+
 
 
     //查
@@ -245,12 +274,17 @@ public class ProductService {
         return packProduct(page.toList(),pageNo,pageSize,productNum);
     }
 
+
     public ProductService.ProductStandard findProductByProductId(Long productId){
         if(productRepository.findProductByProductId(productId) == null){
             return new ProductStandard();
         }
         return  ProductStandardization(productRepository.findProductByProductId(productId));
     }
+
+    // public Product findProductByProductId(Long productId){
+    //     return  productRepository.findProductByProductId(productId);
+    // }
 
     public List<RawMaterial> getProductAndRawMaterial(Long productId) {
         Product product = productRepository.findProductByProductId(productId);
@@ -282,6 +316,13 @@ public class ProductService {
         return resultSet;
     }
 
+    public class ProductCondition{
+        private String rawMaterialName;
+        private String filterCakeName;
+        private String productSeriesName;
+        private Integer pageNo;
+        private Integer pageSize;
+    }
 
     public ProductPackage findAllByCondition(String rawMaterialName,
                                             String filterCakeName,
@@ -363,6 +404,11 @@ public class ProductService {
     }
 
 
-
+    // test
+    @Resource
+    RelProductFilterCakeRepository relProductFilterCakeRepository;
+    public List<RelProductFilterCake> findAllRel(){
+        return relProductFilterCakeRepository.findAll();
+    }
 
 }

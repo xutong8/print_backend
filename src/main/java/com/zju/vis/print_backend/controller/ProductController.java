@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 
 import com.zju.vis.print_backend.entity.RawMaterial;
+import com.zju.vis.print_backend.entity.RelProductFilterCake;
 import com.zju.vis.print_backend.service.RawMaterialService;
 import io.swagger.models.auth.In;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import springfox.documentation.spring.web.json.Json;
 
 @Api(description = "产品管理")
 @RequestMapping("/product")
@@ -57,12 +59,13 @@ public class ProductController {
           @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName,
           @RequestParam(value = "filterCakeName", defaultValue = "") String filterCakeName,
           @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName,
+          // @Valid @RequestBody ,
           @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
           @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
           ){
 
     // findAllByCondition(String rawMaterialName, String filterCakeName, String productSeriesName)
-    System.out.println("List<Product> findAllByCondition   " +
+        System.out.println("List<Product> findAllByCondition   " +
             "rawMaterialName: " + rawMaterialName +
             "  filterCakeName: " + filterCakeName +
             "  productSeriesName: " + productSeriesName);
@@ -109,9 +112,18 @@ public class ProductController {
     @ApiOperation(value = "根据 ID 返回产品")
     @RequestMapping(value = "/findProductByProductId", method = RequestMethod.GET)
     @ResponseBody
+    // public Product findProductByProductId(
     public ProductService.ProductStandard findProductByProductId(
             @RequestParam(value = "productId", defaultValue = "") Long productId
     ) {
         return productService.findProductByProductId(productId);
+    }
+
+    // test
+    @ApiOperation(value = "测试用接口")
+    @RequestMapping(value = "/findAllRel", method = RequestMethod.GET)
+    @ResponseBody
+    public List<RelProductFilterCake> findAllRel(){
+        return productService.findAllRel();
     }
 }
