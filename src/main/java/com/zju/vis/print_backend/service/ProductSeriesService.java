@@ -79,6 +79,10 @@ public class ProductSeriesService {
         return productSeriesRepository.findProductSeriesByProductSeriesName(productSeriesName);
     }
 
+    public Long findProductSeriesIdByProductSeriesName(String productSeriesName){
+        return productSeriesRepository.findProductSeriesIdByProductSeriesName(productSeriesName);
+    }
+
     public Set<Product> findProductsByProductSeriesName(String productSeriesName) {
         System.out.println("productSeriesName: " + productSeriesName);
         ProductSeries productSeries = findProductSeriesByProductSeriesName(productSeriesName);
@@ -86,15 +90,6 @@ public class ProductSeriesService {
         Set<Product> productSet = new HashSet<>();
         if (productSeries != null) {
             productSet.addAll(productSeries.getProductList());
-            // for (ProductSeries productSeries : productSeriesList) {
-            //     List<Product> productList = productSeries.getProductList();
-            //     productSet.addAll(productList);
-            //     // if (productList != null && productList.size() > 0) {
-            //     //     for (Product product : productList) {
-            //     //         productSet.add(product);
-            //     //     }
-            //     // }
-            // }
         }
         System.out.println("产品系列对应的产品数量");
         System.out.println(productSet.size());

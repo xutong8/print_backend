@@ -154,7 +154,14 @@ public class Product {
         this.productSeriesId = productSeriesId;
     }
 
-    // public String getProductSeriesName() {
+    public void setRawMaterialList(List<RawMaterial> rawMaterialList) {
+        this.rawMaterialList = rawMaterialList;
+    }
+
+    public void setFilterCakeList(List<FilterCake> filterCakeList) {
+        this.filterCakeList = filterCakeList;
+    }
+// public String getProductSeriesName() {
     //   return
     // }
 

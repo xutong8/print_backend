@@ -115,7 +115,7 @@ public class RawMaterialService {
     }
 
     // RawMaterial 标准化形式类
-    public class RawMaterialStandard{
+    public static class RawMaterialStandard{
         private Long rawMaterialId;
         private String rawMaterialName;
         private String rawMaterialIndex;
@@ -196,9 +196,14 @@ public class RawMaterialService {
         rawMaterialStandard.setRawMaterialSpecification(rawMaterial.getRawMaterialSpecification());
         return rawMaterialStandard;
     }
-
+    public RawMaterial deSimplifyRawMaterial(RawMaterialSimple rawMaterialSimple, Long productId) {
+        RawMaterial rawMaterial = new RawMaterial();
+        rawMaterial = findRawMaterialByRawMaterialName(rawMaterialSimple.rawMaterialName);
+        //todo : 用料量信息在简化的原料信息里面
+        return rawMaterial;
+    }
     // 用于简单原料简单信息
-    public class RawMaterialSimple{
+    public static class RawMaterialSimple{
         private Long rawMaterialId;
         private String rawMaterialName;
         private Double inventory;

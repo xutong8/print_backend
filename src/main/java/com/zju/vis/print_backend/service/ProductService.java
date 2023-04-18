@@ -109,7 +109,7 @@ public class ProductService {
     }
 
     // Product 标准化形式类 (前端单个节点最终结果
-    public class ProductStandard {
+    public static class ProductStandard {
         private Long productId;
         private String productName;
         private String productIndex;
@@ -432,11 +432,6 @@ public class ProductService {
         return packProduct(subList, pageNo, pageSize, productNum);
     }
 
-
-    // public boolean addProduct(){
-    //
-    //   return productRepository.addProduct();
-    // }
     //删
     //-------------------------------------------------------------------------
     //根据productId 删除记录
@@ -448,8 +443,45 @@ public class ProductService {
     //增
     //-------------------------------------------------------------------------
 
-    //add product data
-    public Product addProduct(Product product) {
+    public Product deStandardizeProduct(ProductStandard productStandard) {
+        Product product = new Product();
+        product.setProductId(productStandard.getProductId());
+        product.setProductName(productStandard.getProductName());
+        product.setProductIndex(productStandard.getProductIndex());
+        product.setProductCode(productStandard.getProductCode());
+        product.setProductColor(productStandard.getProductColor());
+        product.setProductAccountingQuantity(productStandard.getProductAccountingQuantity());
+        product.setProductProcessingCost(productStandard.getProductProcessingCost());
+        product.setProductFactoryName(productStandard.getProductFactoryName());
+        product.setProductRemarks(productStandard.getProductRemarks());
+
+        // Set the real productSeriesId based on the productSeriesName
+        Long productSeriesId = productSeriesService.findProductSeriesIdByProductSeriesName(productStandard.getProductSeriesName());
+        if (productSeriesId != null) {
+            product.setProductSeriesId(productSeriesId);
+        }
+        // Convert the simplified raw material list back to its original format
+        List<RawMaterial> rawMaterialList = new ArrayList<>();
+        for (RawMaterialService.RawMaterialSimple rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
+            RawMaterial rawMaterial = rawMaterialService.deSimplifyRawMaterial(rawMaterialSimple, productStandard.getProductId());
+            rawMaterialList.add(rawMaterial);
+        }
+        product.setRawMaterialList(rawMaterialList);
+
+        // Convert the simplified filter cake list back to its original format
+        List<FilterCake> filterCakeList = new ArrayList<>();
+        for (FilterCakeService.FilterCakeSimple filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
+            FilterCake filterCake = filterCakeService.deSimplifyFilterCake(filterCakeSimple, productStandard.getProductId());
+            filterCakeList.add(filterCake);
+        }
+        product.setFilterCakeList(filterCakeList);
+
+        // todo 现在只做了增加product，还缺少将p_rm , p_fc对应关系也增加的部分
+        return product;
+    }
+
+    public Product addProduct(ProductStandard productStandard) {
+        Product product = deStandardizeProduct(productStandard);
         return productRepository.save(product);
     }
 

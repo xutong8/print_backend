@@ -115,7 +115,7 @@ public class FilterCakeService {
     }
 
     // FilterCake 标准化形式类
-    public class FilterCakeStandard{
+    public static class FilterCakeStandard{
         private Long filterCakeId;
         private String filterCakeName;
         private String filterCakeIndex;
@@ -209,9 +209,14 @@ public class FilterCakeService {
         filterCakeStandard.setFilterCakeRemarks(filterCake.getFilterCakeRemarks());
         return filterCakeStandard;
     }
-
+    public FilterCake deSimplifyFilterCake(FilterCakeSimple filterCakeSimple, Long productId) {
+        FilterCake filterCake = new FilterCake();
+        filterCake = findFilterCakeByFilterCakeName(filterCakeSimple.filterCakeName);
+        //todo : 用料量信息在简化的原料信息里面
+        return filterCake;
+    }
     // 用于返回滤饼简单信息
-    public class FilterCakeSimple{
+    public static class FilterCakeSimple{
         private Long filterCakeId;
         private String filterCakeName;
         private Double inventory;
