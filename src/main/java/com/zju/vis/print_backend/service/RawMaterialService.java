@@ -3,6 +3,7 @@ package com.zju.vis.print_backend.service;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.RawMaterial;
+import com.zju.vis.print_backend.entity.RelFilterCakeRawMaterial;
 import com.zju.vis.print_backend.entity.RelProductRawMaterial;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -243,6 +244,15 @@ public class RawMaterialService {
         }
         return -1.0;
     }
+    public Double getInventoryF(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList, Long filterCakeId, Long rawMaterialId){
+        for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: relFilterCakeRawMaterialList){
+            if((relFilterCakeRawMaterial.getId().getFilterCakeId().longValue() == filterCakeId.longValue()) && (relFilterCakeRawMaterial.getId().getRawMaterialId().longValue() == rawMaterialId.longValue())){
+                System.out.println("返回的Inventory:" + relFilterCakeRawMaterial.getInventory());
+                return relFilterCakeRawMaterial.getInventory();
+            }
+        }
+        return -1.0;
+    }
     // 简单原料信息封装
     public RawMaterialSimple simplifyRawMaterial(RawMaterial rawMaterial,Long productId){
         RawMaterialSimple rawMaterialSimple = new RawMaterialSimple();
@@ -252,7 +262,14 @@ public class RawMaterialService {
                 productId,rawMaterial.getRawMaterialId()));
         return rawMaterialSimple;
     }
-
+    public RawMaterialSimple simplifyRawMaterialF(RawMaterial rawMaterial,Long filterCakeId){
+        RawMaterialSimple rawMaterialSimple = new RawMaterialSimple();
+        rawMaterialSimple.setRawMaterialId(rawMaterial.getRawMaterialId());
+        rawMaterialSimple.setRawMaterialName(rawMaterial.getRawMaterialName());
+        rawMaterialSimple.setInventory(getInventoryF(rawMaterial.getRelFilterCakeRawMaterialList(),
+                filterCakeId,rawMaterial.getRawMaterialId()));
+        return rawMaterialSimple;
+    }
 
     //查
     //-------------------------------------------------------------------------

@@ -40,6 +40,22 @@ public class RawMaterial {
     @JsonIgnore
     private List<Product> productList=new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "rel_rm_fc",
+            joinColumns = {@JoinColumn(name = "raw_material_id")},
+            inverseJoinColumns = {@JoinColumn(name="filter_cake_id")
+            })
+    @JsonIgnore
+    private List<FilterCake> filterCakeList=new ArrayList<>();
+
+    public List<FilterCake> getFilterCakeList() {
+        return filterCakeList;
+    }
+
+    public void setFilterCakeList(List<FilterCake> filterCakeList) {
+        this.filterCakeList = filterCakeList;
+    }
+
     public List<RelProductRawMaterial> getRelProductRawMaterialList() {
         return relProductRawMaterialList;
     }
@@ -50,6 +66,18 @@ public class RawMaterial {
 
     @OneToMany(mappedBy = "rawMaterial")
     List<RelProductRawMaterial> relProductRawMaterialList;
+
+    public List<RelFilterCakeRawMaterial> getRelFilterCakeRawMaterialList() {
+        return relFilterCakeRawMaterialList;
+    }
+
+    public void setRelFilterCakeRawMaterialList(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList) {
+        this.relFilterCakeRawMaterialList = relFilterCakeRawMaterialList;
+    }
+
+    @OneToMany(mappedBy = "rawMaterial")
+    List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
+
 
     public Long getRawMaterialId() {
         return rawMaterialId;

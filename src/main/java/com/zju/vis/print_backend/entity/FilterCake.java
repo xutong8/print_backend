@@ -45,8 +45,51 @@ public class FilterCake {
     @JsonIgnore
     private List<Product> productList = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "rel_fc_fc",
+            joinColumns = {@JoinColumn(name = "filter_cake_id")},
+            inverseJoinColumns = {@JoinColumn(name = "filter_cake_id_used")
+            })
+    @JsonIgnore
+    private List<FilterCake> filterCakeList = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "rel_rm_fc",
+            joinColumns = {@JoinColumn(name = "filter_cake_id")},
+            inverseJoinColumns = {@JoinColumn(name = "raw_material_id")
+            })
+    @JsonIgnore
+    private List<RawMaterial> rawMaterialList = new ArrayList<>();
+
+    public List<RawMaterial> getRawMaterialList() {
+        return rawMaterialList;
+    }
+
+    public void setRawMaterialList(List<RawMaterial> rawMaterialList) {
+        this.rawMaterialList = rawMaterialList;
+    }
+
+    public List<FilterCake> getFilterCakeList() {
+        return filterCakeList;
+    }
+
+    public void setFilterCakeList(List<FilterCake> filterCakeList) {
+        this.filterCakeList = filterCakeList;
+    }
+
     @OneToMany(mappedBy = "filterCake")
     List<RelProductFilterCake> relProductFilterCakeList;
+
+    @OneToMany(mappedBy = "filterCake")
+    List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList;
+
+    public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeList() {
+        return relFilterCakeFilterCakeList;
+    }
+
+    public void setRelFilterCakeFilterCakeList(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList) {
+        this.relFilterCakeFilterCakeList = relFilterCakeFilterCakeList;
+    }
 
     public Long getFilterCakeId() {
         return filterCakeId;

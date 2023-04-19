@@ -1,45 +1,34 @@
 package com.zju.vis.print_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zju.vis.print_backend.compositekey.RelProductFilterCakeKey;
+import com.zju.vis.print_backend.compositekey.RelFilterCakeFilterCakeKey;
 
 import javax.persistence.*;
-
 @Entity
-@Table(name = "rel_p_fc")
-public class RelProductFilterCake {
+@Table(name = "rel_fc_fc")
+public class RelFilterCakeFilterCake {
     @EmbeddedId
-    RelProductFilterCakeKey id;
-
-    @ManyToOne
-    @MapsId("productId")
-    @JoinColumn(name = "product_id")
-    @JsonIgnore
-    Product product;
+    RelFilterCakeFilterCakeKey id;
 
     @ManyToOne
     @MapsId("filterCakeId")
     @JoinColumn(name = "filter_cake_id")
     @JsonIgnore
     FilterCake filterCake;
-
+    @ManyToOne
+    @MapsId("filterCakeIdUsed")
+    @JoinColumn(name = "filter_cake_id_used")
+    @JsonIgnore
+    FilterCake filterCakeUsed;
     @Column(name = "inventory")
     Double inventory;
 
-    public RelProductFilterCakeKey getId() {
+    public RelFilterCakeFilterCakeKey getId() {
         return id;
     }
 
-    public void setId(RelProductFilterCakeKey id) {
+    public void setId(RelFilterCakeFilterCakeKey id) {
         this.id = id;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
     }
 
     public FilterCake getFilterCake() {
@@ -48,6 +37,14 @@ public class RelProductFilterCake {
 
     public void setFilterCake(FilterCake filterCake) {
         this.filterCake = filterCake;
+    }
+
+    public FilterCake getFilterCakeUsed() {
+        return filterCakeUsed;
+    }
+
+    public void setFilterCakeUsed(FilterCake filterCakeUsed) {
+        this.filterCakeUsed = filterCakeUsed;
     }
 
     public Double getInventory() {

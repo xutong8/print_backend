@@ -85,8 +85,8 @@ public class FilterCakeController {
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "根据 ID 返回原料")
-    @RequestMapping(value = "/findFilterCakeByRawMaterialId", method = RequestMethod.GET)
+    @ApiOperation(value = "根据 ID 返回滤饼")
+    @RequestMapping(value = "/findFilterCakeByFilterCakeId", method = RequestMethod.GET)
     @ResponseBody
     public FilterCakeService.FilterCakeStandard findFilterCakeByFilterCakeId(
             @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId
