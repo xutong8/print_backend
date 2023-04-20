@@ -7,12 +7,15 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 
+import com.zju.vis.print_backend.compositekey.RelProductFilterCakeKey;
+import com.zju.vis.print_backend.compositekey.RelProductRawMaterialKey;
 import com.zju.vis.print_backend.dao.RelProductFilterCakeRepository;
 import com.zju.vis.print_backend.dao.RelProductRawMaterialRepository;
 import com.zju.vis.print_backend.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import com.zju.vis.print_backend.dao.ProductRepository;
@@ -37,6 +40,11 @@ public class ProductService {
     @Resource
     private ProductSeriesService productSeriesService;
 
+    @Resource
+    private RelProductRawMaterialService relProductRawMaterialService;
+
+    @Resource
+    private RelProductFilterCakeService relProductFilterCakeService;
     // Product 结果封装
     public class ProductPackage {
         // 附加信息
@@ -442,8 +450,43 @@ public class ProductService {
 
     //增
     //-------------------------------------------------------------------------
+    public static class DeStandardizeResult {
+        private Product product;
+        private List<RelProductRawMaterial> relProductRawMaterials=new ArrayList<>();
+        private List<RelProductFilterCake> relProductFilterCakes=new ArrayList<>();
 
-    public Product deStandardizeProduct(ProductStandard productStandard) {
+        // 构造函数
+        public DeStandardizeResult(Product product, List<RelProductRawMaterial> relProductRawMaterials, List<RelProductFilterCake> relProductFilterCakes) {
+            this.product = product;
+            this.relProductRawMaterials = relProductRawMaterials;
+            this.relProductFilterCakes = relProductFilterCakes;
+        }
+
+        public Product getProduct() {
+            return product;
+        }
+
+        public void setProduct(Product product) {
+            this.product = product;
+        }
+
+        public List<RelProductRawMaterial> getRelProductRawMaterials() {
+            return relProductRawMaterials;
+        }
+
+        public void setRelProductRawMaterials(List<RelProductRawMaterial> relProductRawMaterials) {
+            this.relProductRawMaterials = relProductRawMaterials;
+        }
+
+        public List<RelProductFilterCake> getRelProductFilterCakes() {
+            return relProductFilterCakes;
+        }
+
+        public void setRelProductFilterCakes(List<RelProductFilterCake> relProductFilterCakes) {
+            this.relProductFilterCakes = relProductFilterCakes;
+        }
+    }
+    public DeStandardizeResult deStandardizeProduct(ProductStandard productStandard) {
         Product product = new Product();
         product.setProductId(productStandard.getProductId());
         product.setProductName(productStandard.getProductName());
@@ -476,13 +519,62 @@ public class ProductService {
         }
         product.setFilterCakeList(filterCakeList);
 
-        // todo 现在只做了增加product，还缺少将p_rm , p_fc对应关系也增加的部分
-        return product;
+        List<RelProductRawMaterial> relProductRawMaterials = new ArrayList<>();
+        for (RawMaterialService.RawMaterialSimple rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
+            Long rawMaterialId = rawMaterialSimple.getRawMaterialId();
+            Double inventory = rawMaterialSimple.getInventory();
+
+            RelProductRawMaterial relProductRawMaterial = new RelProductRawMaterial();
+            RelProductRawMaterialKey relProductRawMaterialKey = new RelProductRawMaterialKey();
+            relProductRawMaterialKey.setProductId(product.getProductId());
+            relProductRawMaterialKey.setRawMaterialId(rawMaterialId);
+            relProductRawMaterial.setId(relProductRawMaterialKey);
+            relProductRawMaterial.setInventory(inventory);
+
+            relProductRawMaterials.add(relProductRawMaterial);
+        }
+        List<RelProductFilterCake> relProductFilterCakes = new ArrayList<>();
+        for (FilterCakeService.FilterCakeSimple filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
+            Long filterCakeId = filterCakeSimple.getFilterCakeId();
+            Double inventory = filterCakeSimple.getInventory();
+
+            RelProductFilterCake relProductFilterCake = new RelProductFilterCake();
+            RelProductFilterCakeKey relProductFilterCakeKey = new RelProductFilterCakeKey();
+            relProductFilterCakeKey.setProductId(product.getProductId());
+            relProductFilterCakeKey.setFilterCakeId(filterCakeId);
+            relProductFilterCake.setId(relProductFilterCakeKey);
+            relProductFilterCake.setInventory(inventory);
+
+            relProductFilterCakes.add(relProductFilterCake);
+        }
+
+        return new DeStandardizeResult(product, relProductRawMaterials, relProductFilterCakes);
+    }
+    private void saveRelProductRawMaterials(Product savedProduct, List<RelProductRawMaterial> relProductRawMaterials) {
+        for (RelProductRawMaterial relProductRawMaterial : relProductRawMaterials) {
+            relProductRawMaterial.getId().setProductId(savedProduct.getProductId());
+            relProductRawMaterial.setProduct(savedProduct);
+            relProductRawMaterialService.addRelProductRawMaterial(relProductRawMaterial);
+        }
     }
 
+    private void saveRelProductFilterCakes(Product savedProduct, List<RelProductFilterCake> relProductFilterCakes) {
+        for (RelProductFilterCake relProductFilterCake : relProductFilterCakes) {
+            relProductFilterCake.getId().setProductId(savedProduct.getProductId());
+            relProductFilterCake.setProduct(savedProduct);
+            relProductFilterCakeService.addRelProductFilterCake(relProductFilterCake);
+        }
+    }
     public Product addProduct(ProductStandard productStandard) {
-        Product product = deStandardizeProduct(productStandard);
-        return productRepository.save(product);
+        DeStandardizeResult result = deStandardizeProduct(productStandard);
+        Product product = result.getProduct();
+        List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
+        List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
+
+        Product savedProduct = productRepository.save(product);
+        saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
+        saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
+        return savedProduct;
     }
 
     //update product data

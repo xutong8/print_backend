@@ -12,4 +12,12 @@ public class RelFilterCakeRawMaterialService {
     public RelFilterCakeRawMaterial addRelFilterCakeRawMaterial(RelFilterCakeRawMaterial relFilterCakeRawMaterial) {
         return relFilterCakeRawMaterialRepository.save(relFilterCakeRawMaterial);
     }
+
+    public RelFilterCakeRawMaterialRepository getRelFilterCakeRawMaterialRepository() {
+        return relFilterCakeRawMaterialRepository;
+    }
+
+    public void setRelFilterCakeRawMaterialRepository(RelFilterCakeRawMaterialRepository relFilterCakeRawMaterialRepository) {
+        this.relFilterCakeRawMaterialRepository = relFilterCakeRawMaterialRepository;
+    }
 }

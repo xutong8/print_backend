@@ -13,4 +13,12 @@ public class RelProductFilterCakeService {
     public RelProductFilterCake addRelProductFilterCake(RelProductFilterCake relProductFilterCake) {
         return relProductFilterCakeRepository.save(relProductFilterCake);
     }
+
+    public RelProductFilterCakeRepository getRelProductFilterCakeRepository() {
+        return relProductFilterCakeRepository;
+    }
+
+    public void setRelProductFilterCakeRepository(RelProductFilterCakeRepository relProductFilterCakeRepository) {
+        this.relProductFilterCakeRepository = relProductFilterCakeRepository;
+    }
 }

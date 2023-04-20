@@ -12,4 +12,12 @@ public class RelFilterCakeFilterCakeService {
     public RelFilterCakeFilterCake addRelFilterCakeFilterCake(RelFilterCakeFilterCake relFilterCakeFilterCake) {
         return relFilterCakeFilterCakeRepository.save(relFilterCakeFilterCake);
     }
+
+    public RelFilterCakeFilterCakeRepository getRelFilterCakeFilterCakeRepository() {
+        return relFilterCakeFilterCakeRepository;
+    }
+
+    public void setRelFilterCakeFilterCakeRepository(RelFilterCakeFilterCakeRepository relFilterCakeFilterCakeRepository) {
+        this.relFilterCakeFilterCakeRepository = relFilterCakeFilterCakeRepository;
+    }
 }

@@ -14,4 +14,12 @@ public class RelProductRawMaterialService {
     public RelProductRawMaterial addRelProductRawMaterial(RelProductRawMaterial relProductRawMaterial) {
         return relProductRawMaterialRepository.save(relProductRawMaterial);
     }
+
+    public RelProductRawMaterialRepository getRelProductRawMaterialRepository() {
+        return relProductRawMaterialRepository;
+    }
+
+    public void setRelProductRawMaterialRepository(RelProductRawMaterialRepository relProductRawMaterialRepository) {
+        this.relProductRawMaterialRepository = relProductRawMaterialRepository;
+    }
 }
