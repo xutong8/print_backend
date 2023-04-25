@@ -15,6 +15,7 @@ public class UserService {
     public class UserStandard{
         Integer status;
         String userName;
+        String userType;
         Integer authority;
 
         public Integer getStatus() {
@@ -33,6 +34,14 @@ public class UserService {
             this.userName = userName;
         }
 
+        public String getUserType() {
+            return userType;
+        }
+
+        public void setUserType(String userType) {
+            this.userType = userType;
+        }
+
         public Integer getAuthority() {
             return authority;
         }
@@ -49,6 +58,19 @@ public class UserService {
             return userStandard;
         }
         userStandard.setUserName(user.getUserName());
+        switch (user.getUserType()){
+            case 0 :
+                userStandard.setUserType("owner");
+                break;
+            case 1 :
+                userStandard.setUserType("administrator");
+                break;
+            case 2 :
+                userStandard.setUserType("user");
+                break;
+            default:
+                userStandard.setUserType("no such person");
+        }
         userStandard.setAuthority(user.getAuthority());
         userStandard.setStatus(1);
         return userStandard;

@@ -21,6 +21,10 @@ public class User {
     private String password;
 
     @NotNull
+    @Column(name = "user_type")
+    private Integer userType;
+
+    @NotNull
     @Column(name = "authority")
     private Integer authority;
 
@@ -46,6 +50,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Integer getUserType() {
+        return userType;
+    }
+
+    public void setUserType(Integer userType) {
+        this.userType = userType;
     }
 
     public Integer getAuthority() {
