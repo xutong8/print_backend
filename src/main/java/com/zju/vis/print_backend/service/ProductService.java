@@ -339,7 +339,6 @@ public class ProductService {
         return productStandard;
     }
 
-
     //查
     //-------------------------------------------------------------------------
     public ProductPackage findAll(Integer pageNo,

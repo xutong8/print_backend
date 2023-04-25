@@ -197,6 +197,7 @@ public class RawMaterialService {
         rawMaterialStandard.setRawMaterialSpecification(rawMaterial.getRawMaterialSpecification());
         return rawMaterialStandard;
     }
+
     public RawMaterial deSimplifyRawMaterial(RawMaterialSimple rawMaterialSimple, Long productId) {
         RawMaterial rawMaterial = new RawMaterial();
         rawMaterial = findRawMaterialByRawMaterialName(rawMaterialSimple.rawMaterialName);
