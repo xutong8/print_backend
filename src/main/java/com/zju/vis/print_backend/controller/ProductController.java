@@ -101,12 +101,12 @@ public class ProductController {
     @ApiOperation(value = "更新产品信息")
     @RequestMapping(value = "/updateProduct", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<Product> updateProduct(
-            @RequestParam(value = "productId") Long productId,
-            @Valid @RequestBody Product updatedProduct
+    public ResponseEntity<String> updateProduct(
+            // @RequestParam(value = "productId") Long productId,
+            @Valid @RequestBody ProductService.ProductStandard updatedProduct
     ) {
-        Product updated = productService.updateProduct(productId, updatedProduct);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
+        String result = productService.updateProduct(updatedProduct);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @ApiOperation(value = "根据 ID 返回产品")
@@ -119,11 +119,5 @@ public class ProductController {
         return productService.findProductByProductId(productId);
     }
 
-    // test
-    @ApiOperation(value = "测试用接口")
-    @RequestMapping(value = "/findAllRel", method = RequestMethod.GET)
-    @ResponseBody
-    public List<RelProductFilterCake> findAllRel(){
-        return productService.findAllRel();
-    }
+
 }

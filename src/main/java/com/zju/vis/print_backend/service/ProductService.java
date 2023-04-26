@@ -49,6 +49,7 @@ public class ProductService {
 
     @Resource
     private RelProductFilterCakeService relProductFilterCakeService;
+
     // Product 结果封装
     public class ProductPackage {
         // 附加信息
@@ -290,15 +291,6 @@ public class ProductService {
     public void setProductSeriesService(ProductSeriesService productSeriesService) {
         this.productSeriesService = productSeriesService;
     }
-
-    public RelProductFilterCakeRepository getRelProductFilterCakeRepository() {
-        return relProductFilterCakeRepository;
-    }
-
-    public void setRelProductFilterCakeRepository(RelProductFilterCakeRepository relProductFilterCakeRepository) {
-        this.relProductFilterCakeRepository = relProductFilterCakeRepository;
-    }
-
 
     // Product 转化为标准对象 ProductStandard
     public ProductStandard ProductStandardization(Product product) {
@@ -555,7 +547,6 @@ public class ProductService {
     }
     private void saveRelProductRawMaterials(Product savedProduct, List<RelProductRawMaterial> relProductRawMaterials) {
         for (RelProductRawMaterial relProductRawMaterial : relProductRawMaterials) {
-            System.out.println(relProductRawMaterials.size());
             // 使用自增id而非原id
             relProductRawMaterial.getId().setProductId(savedProduct.getProductId());
             // System.out.println("pid: " + savedProduct.getProductId() + "   rid: " + relProductRawMaterial.getId().getRawMaterialId());
@@ -568,7 +559,6 @@ public class ProductService {
 
     private void saveRelProductFilterCakes(Product savedProduct, List<RelProductFilterCake> relProductFilterCakes) {
         for (RelProductFilterCake relProductFilterCake : relProductFilterCakes) {
-            System.out.println(relProductFilterCakes.size());
             // 使用自增id而非原id
             relProductFilterCake.getId().setProductId(savedProduct.getProductId());
             // System.out.println("pid: " + savedProduct.getProductId() + "  fid: " + relProductFilterCake.getId().getFilterCakeId());
@@ -576,6 +566,28 @@ public class ProductService {
             relProductFilterCake.setProduct(savedProduct);
             relProductFilterCake.setFilterCake(filterCakeRepository.findFilterCakeByFilterCakeId(relProductFilterCake.getId().getFilterCakeId()));
             relProductFilterCakeService.addRelProductFilterCake(relProductFilterCake);
+        }
+    }
+
+    // 根据Product 删除所有原料关联
+    private void deleteRelProductRawMaterials(Product product){
+        for(RawMaterial rawMaterial: product.getRawMaterialList()){
+            RelProductRawMaterialKey id = new RelProductRawMaterialKey();
+            id.setProductId(product.getProductId());
+            id.setRawMaterialId(rawMaterial.getRawMaterialId());
+            RelProductRawMaterial relProductRawMaterial = relProductRawMaterialService.findRelProductRawMaterialById(id);
+            relProductRawMaterialService.deleteRelProductRawMaterial(relProductRawMaterial);
+        }
+    }
+
+    // 根据Product 删除所有滤饼关联
+    private void deleteRelProductFilterCakes(Product product){
+        for(FilterCake filterCake: product.getFilterCakeList()){
+            RelProductFilterCakeKey id = new RelProductFilterCakeKey();
+            id.setProductId(product.getProductId());
+            id.setFilterCakeId(filterCake.getFilterCakeId());
+            RelProductFilterCake relProductFilterCake = relProductFilterCakeService.findRelProductFilterCakeById(id);
+            relProductFilterCakeService.deleteRelProductFilterCake(relProductFilterCake);
         }
     }
 
@@ -593,31 +605,25 @@ public class ProductService {
         return savedProduct;
     }
 
+    //改
+    //-------------------------------------------------------------------------
     //update product data
-    public Product updateProduct(Long productId, Product updatedProduct) {
-        return productRepository.findById(productId)
-                .map(product -> {
-                    product.setProductName(updatedProduct.getProductName());
-                    product.setProductIndex(updatedProduct.getProductIndex());
-                    product.setProductCode(updatedProduct.getProductCode());
-                    product.setProductColor(updatedProduct.getProductColor());
-                    product.setProductProcessingCost(updatedProduct.getProductProcessingCost());
-                    product.setProductAccountingQuantity(updatedProduct.getProductAccountingQuantity());
-                    product.setProductSeriesId(updatedProduct.getProductSeriesId());
-                    product.setProductFactoryName(updatedProduct.getProductFactoryName());
-                    product.setProductRemarks(updatedProduct.getProductRemarks());
-                    return productRepository.save(product);
-                })
-                .orElseThrow(() -> new NoSuchElementException("Product not found with id " + productId));
-    }
+    public String updateProduct(ProductStandard updatedProduct) {
+        // 先删掉原先的关系
+        Product originProduct = productRepository.findProductByProductId(updatedProduct.getProductId());
+        deleteRelProductRawMaterials(originProduct);
+        deleteRelProductFilterCakes(originProduct);
 
+        // 重新添加关系以及修改内容
+        DeStandardizeResult result = deStandardizeProduct(updatedProduct);
+        Product product = result.getProduct();
+        List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
+        List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
 
-    // test
-    @Resource
-    RelProductFilterCakeRepository relProductFilterCakeRepository;
-
-    public List<RelProductFilterCake> findAllRel() {
-        return relProductFilterCakeRepository.findAll();
+        Product savedProduct = productRepository.save(product);
+        saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
+        saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
+        return "Product " + originProduct.getProductName() + "has been changed";
     }
 
 }
