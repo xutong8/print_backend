@@ -153,7 +153,7 @@ public class UserService {
         user.setUserName(userName);
         user.setPassword(password);
         user.setUserType(2);
-        user.setAuthority(1);
+        user.setAuthority(0);
         return packUser(userRepository.save(user));
     }
 

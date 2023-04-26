@@ -21,7 +21,7 @@ public class RelFilterCakeRawMaterial {
     @MapsId("rawMaterialId")
     @JoinColumn(name = "raw_material_id")
     @JsonIgnore
-    FilterCake rawMaterial;
+    RawMaterial rawMaterial;
 
     @Column(name = "inventory")
     Double inventory;
@@ -42,11 +42,11 @@ public class RelFilterCakeRawMaterial {
         this.filterCake = filterCake;
     }
 
-    public FilterCake getRawMaterial() {
+    public RawMaterial getRawMaterial() {
         return rawMaterial;
     }
 
-    public void setRawMaterial(FilterCake rawMaterial) {
+    public void setRawMaterial(RawMaterial rawMaterial) {
         this.rawMaterial = rawMaterial;
     }
 

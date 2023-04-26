@@ -9,8 +9,7 @@ import javax.annotation.Resource;
 
 import com.zju.vis.print_backend.compositekey.RelProductFilterCakeKey;
 import com.zju.vis.print_backend.compositekey.RelProductRawMaterialKey;
-import com.zju.vis.print_backend.dao.RelProductFilterCakeRepository;
-import com.zju.vis.print_backend.dao.RelProductRawMaterialRepository;
+import com.zju.vis.print_backend.dao.*;
 import com.zju.vis.print_backend.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import com.zju.vis.print_backend.dao.ProductRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -26,6 +24,12 @@ public class ProductService {
     //
     @Resource
     private ProductRepository productRepository;
+
+    @Resource
+    private RawMaterialRepository rawMaterialRepository;
+
+    @Resource
+    private FilterCakeRepository filterCakeRepository;
 
     // 调用一般方法
     Utils utils = new Utils();
@@ -551,25 +555,38 @@ public class ProductService {
     }
     private void saveRelProductRawMaterials(Product savedProduct, List<RelProductRawMaterial> relProductRawMaterials) {
         for (RelProductRawMaterial relProductRawMaterial : relProductRawMaterials) {
+            System.out.println(relProductRawMaterials.size());
+            // 使用自增id而非原id
             relProductRawMaterial.getId().setProductId(savedProduct.getProductId());
+            // System.out.println("pid: " + savedProduct.getProductId() + "   rid: " + relProductRawMaterial.getId().getRawMaterialId());
+
             relProductRawMaterial.setProduct(savedProduct);
+            relProductRawMaterial.setRawMaterial(rawMaterialRepository.findRawMaterialByRawMaterialId(relProductRawMaterial.getId().getRawMaterialId()));
             relProductRawMaterialService.addRelProductRawMaterial(relProductRawMaterial);
         }
     }
 
     private void saveRelProductFilterCakes(Product savedProduct, List<RelProductFilterCake> relProductFilterCakes) {
         for (RelProductFilterCake relProductFilterCake : relProductFilterCakes) {
+            System.out.println(relProductFilterCakes.size());
+            // 使用自增id而非原id
             relProductFilterCake.getId().setProductId(savedProduct.getProductId());
+            // System.out.println("pid: " + savedProduct.getProductId() + "  fid: " + relProductFilterCake.getId().getFilterCakeId());
+
             relProductFilterCake.setProduct(savedProduct);
+            relProductFilterCake.setFilterCake(filterCakeRepository.findFilterCakeByFilterCakeId(relProductFilterCake.getId().getFilterCakeId()));
             relProductFilterCakeService.addRelProductFilterCake(relProductFilterCake);
         }
     }
+
+    // @Transactional
     public Product addProduct(ProductStandard productStandard) {
         DeStandardizeResult result = deStandardizeProduct(productStandard);
         Product product = result.getProduct();
         List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
         List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
-
+        // 添加时指定一个不存在的id进而使用自增id
+        product.setProductId(new Long(0));
         Product savedProduct = productRepository.save(product);
         saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
         saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
