@@ -52,10 +52,10 @@ public class ProductController {
         return productService.getProductAndRawMaterial(productId);
     }
 
-  @ApiOperation(value = "根据条件返回对应的产品(滤饼名、原料名、系列名)")
-  @RequestMapping(value = "/findAllByCondition", method = RequestMethod.GET)
+  @ApiOperation(value = "根据关联条件返回对应的产品(滤饼名、原料名、系列名)")
+  @RequestMapping(value = "/findAllByRelCondition", method = RequestMethod.GET)
   @ResponseBody
-  public ProductService.ProductPackage findAllByCondition(
+  public ProductService.ProductPackage findAllByRelCondition(
           @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName,
           @RequestParam(value = "filterCakeName", defaultValue = "") String filterCakeName,
           @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName,
@@ -71,14 +71,33 @@ public class ProductController {
             "  productSeriesName: " + productSeriesName);
 
       long s = System.currentTimeMillis();
-      ProductService.ProductPackage list = productService.findAllByCondition(rawMaterialName,filterCakeName,productSeriesName,pageNo-1,pageSize);
+      ProductService.ProductPackage list = productService.findAllByRelCondition(rawMaterialName,filterCakeName,productSeriesName,pageNo-1,pageSize);
       long e = System.currentTimeMillis();
       System.out.println("findbycondition开始的时间：" + s);
       System.out.println("findbycondition结束的时间：" + e);
       System.out.println("findbycondition查询的时间差为：" + (e - s));
 
-    return list;
+      return list;
   }
+
+    @ApiOperation(value = "Product直接查询")
+    @RequestMapping(value = "/findAllByDirectCondition", method = RequestMethod.GET)
+    @ResponseBody
+    public ProductService.ProductPackage findAllByDirectCondition(
+            @RequestParam(value = "typeOfQuery", defaultValue = "产品名称") String typeOfQuery,
+            @RequestParam(value = "conditionOfQuery", defaultValue = "") String conditionOfQuery,
+            // @Valid @RequestBody ,
+            @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+    ){
+        long s = System.currentTimeMillis();
+        ProductService.ProductPackage list = productService.findAllByDirectCondition(typeOfQuery,conditionOfQuery,pageNo-1,pageSize);
+        long e = System.currentTimeMillis();
+        System.out.println("findbycondition开始的时间：" + s);
+        System.out.println("findbycondition结束的时间：" + e);
+        System.out.println("findbycondition查询的时间差为：" + (e - s));
+        return list;
+    }
 
     @ApiOperation(value = "通过 productId 删除记录")
     @RequestMapping(value = "/deleteByProductId", method = RequestMethod.DELETE)

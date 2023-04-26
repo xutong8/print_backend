@@ -11,6 +11,7 @@ import com.zju.vis.print_backend.compositekey.RelProductFilterCakeKey;
 import com.zju.vis.print_backend.compositekey.RelProductRawMaterialKey;
 import com.zju.vis.print_backend.dao.*;
 import com.zju.vis.print_backend.entity.*;
+import io.swagger.models.auth.In;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -111,6 +112,7 @@ public class ProductService {
             productStandardList.add(ProductStandardization(product));
         }
         ProductPackage productPackage = new ProductPackage();
+        // 前端page从1开始，返回时+1
         productPackage.setPageNo(pageNo + 1);
         productPackage.setPageSize(pageSize);
         productPackage.setPageNum(
@@ -388,24 +390,50 @@ public class ProductService {
         return resultSet;
     }
 
-    public class ProductCondition {
-        private String rawMaterialName;
-        private String filterCakeName;
-        private String productSeriesName;
-        private Integer pageNo;
-        private Integer pageSize;
+    public ProductPackage findAllByDirectCondition(
+            String typeOfQuery,
+            String conditionOfQuery,
+            Integer pageNo,
+            Integer pageSize
+    ){
+        List<Product> resultList = new ArrayList<>();
+        if(utils.isEmptyString(conditionOfQuery)){
+            System.out.println("M1 findAll");
+            return findAll(pageNo, pageSize);
+        }
+
+        switch (typeOfQuery){
+            case "产品名称":
+                resultList = productRepository.findAllByProductNameContaining(conditionOfQuery);
+                break;
+            case "产品编号":
+                resultList = productRepository.findAllByProductIndexContaining(conditionOfQuery);
+                break;
+            case "产品代码":
+                resultList = productRepository.findAllByProductCodeContaining(conditionOfQuery);
+                break;
+            case "产品颜色":
+                resultList = productRepository.findAllByProductColorContaining(conditionOfQuery);
+                break;
+        }
+        System.out.println("resultList 大小" + resultList.size());
+        List<Product> subList = utils.pageList(resultList, pageNo, pageSize);
+        Integer productNum = resultList.size();
+        return packProduct(subList, pageNo, pageSize, productNum);
     }
 
-    public ProductPackage findAllByCondition(String rawMaterialName,
-                                             String filterCakeName,
-                                             String productSeriesName,
-                                             Integer pageNo,
-                                             Integer pageSize
+    public ProductPackage findAllByRelCondition(
+            String rawMaterialName,
+            String filterCakeName,
+            String productSeriesName,
+            Integer pageNo,
+            Integer pageSize
     ) {
+        List<Product> resultList = new ArrayList<>();
+
         if (utils.isEmptyString(rawMaterialName) && utils.isEmptyString(filterCakeName) && utils.isEmptyString(productSeriesName)) {
-            System.out.println("findAllNND");
+            System.out.println("M0 findAll");
             return findAll(pageNo, pageSize);
-            // return null;
         }
         Set<Product> rawMaterialProductSet = new HashSet<>();
         Set<Product> filterCakeProductSet = new HashSet<>();
@@ -423,13 +451,11 @@ public class ProductService {
             System.out.println("productSeriesProductSet 大小" + productSeriesProductSet.size());
         }
 
-        Set<Product> resultSet = mixedSet(rawMaterialProductSet, mixedSet(filterCakeProductSet, productSeriesProductSet));
-        System.out.println("resultSet 大小" + resultSet.size());
-        List<Product> resultList = new ArrayList<>();
+        // Set<Product> resultSet = mixedSet(rawMaterialProductSet, mixedSet(filterCakeProductSet, productSeriesProductSet));
+        // System.out.println("resultSet 大小" + resultSet.size());
         resultList.addAll(mixedSet(rawMaterialProductSet, mixedSet(filterCakeProductSet, productSeriesProductSet)));
+
         System.out.println("resultList 大小" + resultList.size());
-
-
         List<Product> subList = utils.pageList(resultList, pageNo, pageSize);
         Integer productNum = resultList.size();
         return packProduct(subList, pageNo, pageSize, productNum);

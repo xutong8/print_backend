@@ -13,15 +13,13 @@ import com.zju.vis.print_backend.entity.Product;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findAll();
+    List<Product> findAllByProductNameContaining(String productName);
+    List<Product> findAllByProductIndexContaining(String productIndex);
+    List<Product> findAllByProductCodeContaining(String productCode);
+    List<Product> findAllByProductColorContaining(String productColor);
+
 
     Product findProductByProductId(Long productId);
-
-    // static <T> Page<T> empty() {
-    //     return empty(Pageable.unpaged());
-    // }
-
-
-    // <T> toArray(T[] a);
 
     //根据productId 删除记录
     void deleteByProductId(Long productId);
