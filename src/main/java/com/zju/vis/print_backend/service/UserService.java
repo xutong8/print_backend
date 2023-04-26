@@ -59,6 +59,7 @@ public class UserService {
     public class UserSimple{
         String userName;
         String userType;
+        Integer authority;
 
         public String getUserName() {
             return userName;
@@ -74,6 +75,14 @@ public class UserService {
 
         public void setUserType(String userType) {
             this.userType = userType;
+        }
+
+        public Integer getAuthority() {
+            return authority;
+        }
+
+        public void setAuthority(Integer authority) {
+            this.authority = authority;
         }
     }
 
@@ -122,6 +131,7 @@ public class UserService {
                 default:
                     userSimple.setUserType("no such person");
             }
+            userSimple.setAuthority(user.getAuthority());
             userSimpleList.add(userSimple);
         }
         return userSimpleList;
@@ -151,7 +161,6 @@ public class UserService {
     //-------------------------------------------------------------------------
 
     /**
-     *
      * @param applicant     申请修改的用户名
      * @param userModified  被修改人的用户名
      * @param userType      被修改人的目标类型
@@ -177,16 +186,41 @@ public class UserService {
         if(uApplicant.getUserType() > uModified.getUserType() || uType < uApplicant.getUserType() || ((uApplicant.getAuthority()&4) == 0)){
             return "权限不足";
         }
+        // 如果被修改为用户则失去修改他人权限的权限
+        if(uType == 2){
+            uModified.setAuthority(uModified.getAuthority()%4);
+        }
         uModified.setUserType(uType);
         userRepository.save(uModified);
         // 如果是更改owner则视为转让owner降级为administrator
         if(uType == 0 && uApplicant.getUserType() == 0){
+            // 被转让者获得所有权限
+            updateUserAuthority(uApplicant.getUserName(),uModified.getUserName(),7);
             updateUserType(uApplicant.getUserName(),uApplicant.getUserName(),"administrator");
         }
-
-        return userModified + "权限被修改为" + userType;
+        return userModified + "用户类别被修改为" + userType;
     }
 
+    public String updateUserAuthority(String applicant,String userModified,Integer userAuthority){
+        User uApplicant = userRepository.findUserByUserName(applicant);
+        if(uApplicant == null) {
+            return "申请人不存在";
+        }
+        User uModified = userRepository.findUserByUserName(userModified);
+        if(uModified == null){
+            return "被修改人不存在";
+        }
+        // 1.权限小于被修改人 2.用户无权修改他人 3.没有修改权限
+        if(uApplicant.getUserType() > uModified.getUserType()|| uApplicant.getUserType() > 1 || (uApplicant.getAuthority()&4) == 0){
+            return "权限不足";
+        }
+        if(uModified.getUserType() > 1 && (userAuthority&4) == 1){
+            return "用户不能拥有修改权限";
+        }
+        uModified.setAuthority(userAuthority);
+        userRepository.save(uModified);
+        return userModified + "用户权限被修改为" + userAuthority;
+    }
 
     //删
     //-------------------------------------------------------------------------

@@ -77,4 +77,16 @@ public class UserController {
         String result = userService.updateUserType(applicant,userModified,userType);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @ApiOperation(value = "更改用户权限")
+    @RequestMapping(value = "/updateUserAuthority", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity<String> updateUserAuthority(
+            @RequestParam(value = "applicant") String applicant,
+            @RequestParam(value = "userModified") String userModified,
+            @RequestParam(value = "userAuthority") Integer userAuthority
+    ) {
+        String result = userService.updateUserAuthority(applicant,userModified,userAuthority);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }
