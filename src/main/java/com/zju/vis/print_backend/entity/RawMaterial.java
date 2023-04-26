@@ -67,6 +67,9 @@ public class RawMaterial {
     @OneToMany(mappedBy = "rawMaterial")
     List<RelProductRawMaterial> relProductRawMaterialList;
 
+    @OneToMany(mappedBy = "rawMaterial")
+    List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
+
     public List<RelFilterCakeRawMaterial> getRelFilterCakeRawMaterialList() {
         return relFilterCakeRawMaterialList;
     }
@@ -74,10 +77,6 @@ public class RawMaterial {
     public void setRelFilterCakeRawMaterialList(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList) {
         this.relFilterCakeRawMaterialList = relFilterCakeRawMaterialList;
     }
-
-    @OneToMany(mappedBy = "rawMaterial")
-    List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
-
 
     public Long getRawMaterialId() {
         return rawMaterialId;

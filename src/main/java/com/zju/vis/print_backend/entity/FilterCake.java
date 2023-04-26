@@ -77,11 +77,17 @@ public class FilterCake {
         this.filterCakeList = filterCakeList;
     }
 
+    // 关联表
+
     @OneToMany(mappedBy = "filterCake")
     List<RelProductFilterCake> relProductFilterCakeList;
 
-    @OneToMany(mappedBy = "filterCake")
+    // 这里改成被使用的滤饼对应列表，因为获取投料量的时候都是根据被使用的一方出发的
+    @OneToMany(mappedBy = "filterCakeUsed")
     List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList;
+
+    @OneToMany(mappedBy = "filterCake")
+    List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
 
     public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeList() {
         return relFilterCakeFilterCakeList;
@@ -89,6 +95,14 @@ public class FilterCake {
 
     public void setRelFilterCakeFilterCakeList(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList) {
         this.relFilterCakeFilterCakeList = relFilterCakeFilterCakeList;
+    }
+
+    public List<RelFilterCakeRawMaterial> getRelFilterCakeRawMaterialList() {
+        return relFilterCakeRawMaterialList;
+    }
+
+    public void setRelFilterCakeRawMaterialList(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList) {
+        this.relFilterCakeRawMaterialList = relFilterCakeRawMaterialList;
     }
 
     public Long getFilterCakeId() {

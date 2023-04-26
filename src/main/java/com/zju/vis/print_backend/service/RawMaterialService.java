@@ -239,7 +239,7 @@ public class RawMaterialService {
     public Double getInventory(List<RelProductRawMaterial> relProductRawMaterialList, Long productId, Long rawMaterialId){
         for(RelProductRawMaterial relProductRawMaterial: relProductRawMaterialList){
             if((relProductRawMaterial.getId().getProductId().longValue() == productId.longValue()) && (relProductRawMaterial.getId().getRawMaterialId().longValue() == rawMaterialId.longValue())){
-                System.out.println("返回的Inventory:" + relProductRawMaterial.getInventory());
+                System.out.println("返回原料产品的Inventory:" + relProductRawMaterial.getInventory());
                 return relProductRawMaterial.getInventory();
             }
         }
@@ -248,21 +248,31 @@ public class RawMaterialService {
     public Double getInventoryF(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList, Long filterCakeId, Long rawMaterialId){
         for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: relFilterCakeRawMaterialList){
             if((relFilterCakeRawMaterial.getId().getFilterCakeId().longValue() == filterCakeId.longValue()) && (relFilterCakeRawMaterial.getId().getRawMaterialId().longValue() == rawMaterialId.longValue())){
-                System.out.println("返回的Inventory:" + relFilterCakeRawMaterial.getInventory());
+                System.out.println("返回原料滤饼的Inventory:" + relFilterCakeRawMaterial.getInventory());
                 return relFilterCakeRawMaterial.getInventory();
             }
         }
         return -1.0;
     }
+
+    /**
+     *
+     * @param rawMaterial 被封装的原料对象
+     * @param productId   调用简化的Product的id
+     * @return
+     */
     // 简单原料信息封装
     public RawMaterialSimple simplifyRawMaterial(RawMaterial rawMaterial,Long productId){
         RawMaterialSimple rawMaterialSimple = new RawMaterialSimple();
         rawMaterialSimple.setRawMaterialId(rawMaterial.getRawMaterialId());
         rawMaterialSimple.setRawMaterialName(rawMaterial.getRawMaterialName());
+        // 被封装对象的关系列表中查找，id与两个都对应的项
         rawMaterialSimple.setInventory(getInventory(rawMaterial.getRelProductRawMaterialList(),
                 productId,rawMaterial.getRawMaterialId()));
         return rawMaterialSimple;
     }
+
+    // 滤饼类的简单原料信息封装
     public RawMaterialSimple simplifyRawMaterialF(RawMaterial rawMaterial,Long filterCakeId){
         RawMaterialSimple rawMaterialSimple = new RawMaterialSimple();
         rawMaterialSimple.setRawMaterialId(rawMaterial.getRawMaterialId());
