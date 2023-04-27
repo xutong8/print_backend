@@ -1,17 +1,26 @@
 package com.zju.vis.print_backend.service;
 
+import com.zju.vis.print_backend.compositekey.RelDateRawMaterialKay;
 import com.zju.vis.print_backend.dao.RelDateRawMaterialRepository;
 import com.zju.vis.print_backend.entity.RelDateRawMaterial;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+@Service
 public class RelDateRawMaterialService {
     @Resource
-    private RelDateRawMaterialRepository rawMaterialRepository;
+    private RelDateRawMaterialRepository relDateRawMaterialRepository;
 
     public RelDateRawMaterial addRelDateRawMaterial(RelDateRawMaterial relDateRawMaterial){
-        return rawMaterialRepository.save(relDateRawMaterial);
+        return relDateRawMaterialRepository.save(relDateRawMaterial);
     }
 
+    public void delete(RelDateRawMaterial relDateRawMaterial){
+        relDateRawMaterialRepository.delete(relDateRawMaterial);
+    }
 
+    public void deleteById(RelDateRawMaterialKay id){
+        relDateRawMaterialRepository.deleteById(id);
+    }
 }

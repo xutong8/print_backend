@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -15,6 +16,16 @@ import java.util.*;
 public class RawMaterialService {
     @Resource
     private RawMaterialRepository rawMaterialRepository;
+
+    // 关联表调用
+    @Resource
+    private RelDateRawMaterialService relDateRawMaterialService;
+
+    @Resource
+    private RelFilterCakeRawMaterialService relFilterCakeRawMaterialService;
+
+    @Resource
+    private RelProductRawMaterialService relProductRawMaterialService;
 
     // 用于调用一般方法
     Utils utils = new Utils();
@@ -417,4 +428,37 @@ public class RawMaterialService {
                 .orElseThrow(() -> new NoSuchElementException("RawMaterial not found with id " + rawMaterialId));
     }
 
+    //删
+    //-------------------------------------------------------------------------
+    // @Transactional
+    public void deleteByRawMaterialId(Long rawMaterialId){
+        deleteRelByRawMaterialId(rawMaterialId);
+        deleteRawMaterialByRawMaterialId(rawMaterialId);
+    }
+    @Transactional
+    public void deleteRelByRawMaterialId(Long rawMaterialId){
+        // 级联删除
+        RawMaterial rawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(rawMaterialId);
+
+        // 删除时间关系表项
+        for(RelDateRawMaterial relDateRawMaterial: rawMaterial.getRelDateRawMaterialList()){
+            relDateRawMaterialService.delete(relDateRawMaterial);
+        }
+
+        // 删除滤饼关联表项
+        for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: rawMaterial.getRelFilterCakeRawMaterialList()){
+            relFilterCakeRawMaterialService.delete(relFilterCakeRawMaterial);
+        }
+
+        // 删除产品关联表项
+        for(RelProductRawMaterial relProductRawMaterial: rawMaterial.getRelProductRawMaterialList()){
+            relProductRawMaterialService.delete(relProductRawMaterial);
+        }
+    }
+
+    @Transactional
+    public void deleteRawMaterialByRawMaterialId(Long rawMaterialId){
+        RawMaterial rawMaterialToDelete = rawMaterialRepository.findRawMaterialByRawMaterialId(rawMaterialId);
+        rawMaterialRepository.delete(rawMaterialToDelete);
+    }
 }

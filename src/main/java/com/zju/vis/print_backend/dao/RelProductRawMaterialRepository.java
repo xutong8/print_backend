@@ -12,4 +12,6 @@ import com.zju.vis.print_backend.compositekey.RelProductRawMaterialKey;
 public interface RelProductRawMaterialRepository extends JpaRepository<RelProductRawMaterial, RelProductRawMaterialKey> {
     RelProductRawMaterial findRelProductRawMaterialByProductAndRawMaterial(Product product, RawMaterial rawMaterial);
     RelProductRawMaterial findRelProductRawMaterialByIdEquals(RelProductRawMaterialKey id);
+
+    void deleteByIdEquals(RelProductRawMaterialKey id);
 }

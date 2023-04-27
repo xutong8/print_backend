@@ -6,10 +6,12 @@ import com.zju.vis.print_backend.entity.RelProductRawMaterial;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 @Service
 public class RelProductRawMaterialService {
 
-    @Autowired
+    @Resource
     private RelProductRawMaterialRepository relProductRawMaterialRepository;
 
     public RelProductRawMaterial findRelProductRawMaterialById(RelProductRawMaterialKey id){
@@ -30,5 +32,13 @@ public class RelProductRawMaterialService {
 
     public void setRelProductRawMaterialRepository(RelProductRawMaterialRepository relProductRawMaterialRepository) {
         this.relProductRawMaterialRepository = relProductRawMaterialRepository;
+    }
+
+    public void delete(RelProductRawMaterial relProductRawMaterial){
+        relProductRawMaterialRepository.delete(relProductRawMaterial);
+    }
+
+    public void deleteById(RelProductRawMaterialKey id){
+        relProductRawMaterialRepository.deleteById(id);
     }
 }

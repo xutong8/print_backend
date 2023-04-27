@@ -85,4 +85,14 @@ public class RawMaterialController {
         RawMaterial updated = rawMaterialService.updateRawMaterial(rawMaterialId, updatedRawMaterial);
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
+
+    @ApiOperation(value = "通过 RawMaterialId删除记录")
+    @RequestMapping(value = "/deleteByRawMaterialId", method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity<String> deleteByRawMaterialId(
+            @RequestParam(value = "rawMaterialId") Long rawMaterialId
+    ) {
+        rawMaterialService.deleteByRawMaterialId(rawMaterialId);
+        return ResponseEntity.ok("RawMaterial with ID: " + rawMaterialId + " has been deleted.");
+    }
 }
