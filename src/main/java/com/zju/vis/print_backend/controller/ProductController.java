@@ -1,11 +1,15 @@
 package com.zju.vis.print_backend.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
 
+import com.zju.vis.print_backend.dao.ProductRepository;
+import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.entity.RelProductFilterCake;
 import com.zju.vis.print_backend.service.RawMaterialService;
@@ -138,5 +142,25 @@ public class ProductController {
         return productService.findProductByProductId(productId);
     }
 
+    @Resource
+    private ProductRepository productRepository;
+
+    @ApiOperation(value = "测试商品历史价格用接口")
+    @RequestMapping(value = "/findFilterCakeHistoryPriceTest", method = RequestMethod.GET)
+    @ResponseBody
+    public Double testHistoryPrice(
+            @RequestParam(value = "productId", defaultValue = "") Long productId,
+            @RequestParam(value = "testDate", defaultValue = "2022-12-20") String testDate
+    ) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        try{
+            date = sdf.parse(testDate);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        System.out.println(date);
+        return productService.calculateProductHistoryPrice(productRepository.findProductByProductId(productId),date);
+    }
 
 }

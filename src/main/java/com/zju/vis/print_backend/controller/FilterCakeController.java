@@ -3,9 +3,8 @@ package com.zju.vis.print_backend.controller;
 
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
-import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.service.FilterCakeService;
-import com.zju.vis.print_backend.service.RawMaterialService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -101,9 +100,9 @@ public class FilterCakeController {
     private FilterCakeRepository filterCakeRepository;
 
     @ApiOperation(value = "测试滤饼历史价格用接口")
-    @RequestMapping(value = "/findFilterCakeTest", method = RequestMethod.GET)
+    @RequestMapping(value = "/findFilterCakeHistoryPriceTest", method = RequestMethod.GET)
     @ResponseBody
-    public Double Test(
+    public Double testHistoryPrice(
             @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId,
             @RequestParam(value = "testDate", defaultValue = "2022-12-20") String testDate
             // @RequestParam(value = "year") Integer year,

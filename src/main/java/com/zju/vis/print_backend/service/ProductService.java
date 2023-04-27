@@ -462,7 +462,7 @@ public class ProductService {
         return packProduct(subList, pageNo, pageSize, productNum);
     }
 
-    // todo 测试
+    // 计算当期价格
     public Double calculateProductPrice(Product product){
         // 设置返回的简单滤饼表
         List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
@@ -486,6 +486,51 @@ public class ProductService {
         for(RawMaterialService.RawMaterialSimple rawMaterialSimple:rawMaterialSimpleList){
             sum += rawMaterialSimple.getInventory() * rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialUnitPrice();
         }
+        return sum / product.getProductAccountingQuantity();
+    }
+
+    // 计算历史价格
+    public Double calculateProductHistoryPrice(Product product, Date historyDate){
+        // 设置返回的简单滤饼表
+        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        for (FilterCake filterCake : product.getFilterCakeList()) {
+            filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake, product.getProductId()));
+        }
+
+        // 设置返回的简单原料表
+        List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+        for (RawMaterial rawMaterial : product.getRawMaterialList()) {
+            rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
+        }
+        Double sum = 0.0;
+        sum += product.getProductProcessingCost();
+        // 获取滤饼历史价格
+        if(filterCakeSimpleList.size()!=0){
+            for(FilterCakeService.FilterCakeSimple filterCakeSimple:filterCakeSimpleList){
+                sum += filterCakeSimple.getInventory() *
+                        filterCakeService.calculateFilterCakeHistoryPrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeSimple.getFilterCakeId()),historyDate);
+            }
+        }
+        // 获取原料历史价格
+        for(RawMaterialService.RawMaterialSimple rawMaterialSimple: rawMaterialSimpleList){
+            List<Utils.HistoryPrice> historyPriceList = rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialHistoryPrice();
+            if(historyPriceList.size()!=0){
+                boolean flag = false;
+                Collections.reverse(historyPriceList);
+                for(Utils.HistoryPrice historyPrice: historyPriceList){
+                    if(historyPrice.getDate().getTime() - (86400*1000) <= historyDate.getTime()){
+                        System.out.println("选取的时间:" + historyPrice.getDate());
+                        sum += rawMaterialSimple.getInventory() * historyPrice.getPrice();
+                        flag = true;
+                        break;
+                    }
+                }
+                if(!flag){
+                    sum += rawMaterialSimple.getInventory() * historyPriceList.get(historyPriceList.size() - 1).getPrice();
+                }
+            }
+        }
+        System.out.println("sum: " + sum + "\nfilterCake.getFilterCakeAccountingQuantity(): " + product.getProductAccountingQuantity());
         return sum / product.getProductAccountingQuantity();
     }
 
