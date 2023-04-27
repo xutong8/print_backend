@@ -219,8 +219,9 @@ public class FilterCakeService {
         filterCakeStandard.setFilterCakeColor(filterCake.getFilterCakeColor());
         // 设置滤饼单价 当前为假数据 todo：递归计算真实数据
         filterCakeStandard.setFilterCakeUnitPrice(
-                calculateFilterCakePrice(filterCake)
-                // Math.random() * (500.0 - 10.0) + 10.0
+                // 真实数据测试无问题
+                // calculateFilterCakePrice(filterCake)
+                Math.random() * (500.0 - 10.0) + 10.0
         );
         // 设置滤饼价格涨幅 当前为假数据 todo：递归计算真实数据
         filterCakeStandard.setFilterCakePriceIncreasePercent(
@@ -328,7 +329,6 @@ public class FilterCakeService {
 
     public Double calculateFilterCakePrice(FilterCake filterCake){
         // 标准化获取简化列表
-        // FilterCakeStandard filterCakeStandard = filterCakeStandardization(filterCake);
         List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
         for (FilterCake filterCake1 : filterCake.getFilterCakeList()) {
             filterCakeSimpleList.add(simplifyFilterCakeF(filterCake1, filterCake.getFilterCakeId()));

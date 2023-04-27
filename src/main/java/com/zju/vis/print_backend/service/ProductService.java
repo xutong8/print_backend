@@ -306,7 +306,8 @@ public class ProductService {
         productStandard.setProductProcessingCost(product.getProductProcessingCost());
         // 设置产品单价 当前为假数据 todo：递归计算真实数据
         productStandard.setProductUnitPrice(
-                // new BigDecimal(Math.random() * (500.0 - 10.0) + 10.0).setScale(2).doubleValue()
+                // 真实数据测试无问题
+                // calculateProductPrice(product)
                 Math.random() * (500.0 - 10.0) + 10.0
         );
         // 设置产品价格涨幅 当前为假数据 todo：递归计算真实数据
@@ -459,6 +460,33 @@ public class ProductService {
         List<Product> subList = utils.pageList(resultList, pageNo, pageSize);
         Integer productNum = resultList.size();
         return packProduct(subList, pageNo, pageSize, productNum);
+    }
+
+    // todo 测试
+    public Double calculateProductPrice(Product product){
+        // 设置返回的简单滤饼表
+        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        for (FilterCake filterCake : product.getFilterCakeList()) {
+            filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake, product.getProductId()));
+        }
+
+        // 设置返回的简单原料表
+        List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+        for (RawMaterial rawMaterial : product.getRawMaterialList()) {
+            rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
+        }
+
+        Double sum = 0.0;
+        sum += product.getProductProcessingCost();
+        if(filterCakeSimpleList.size() != 0){
+            for(FilterCakeService.FilterCakeSimple filterCakeSimple: filterCakeSimpleList){
+                sum +=  filterCakeSimple.getInventory() * filterCakeService.calculateFilterCakePrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeSimple.getFilterCakeId()));
+            }
+        }
+        for(RawMaterialService.RawMaterialSimple rawMaterialSimple:rawMaterialSimpleList){
+            sum += rawMaterialSimple.getInventory() * rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialUnitPrice();
+        }
+        return sum / product.getProductAccountingQuantity();
     }
 
     //删

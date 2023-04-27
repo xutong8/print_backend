@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RelProductFilterCakeRepository extends JpaRepository<RelProductFilterCake, Long> {
+public interface RelProductFilterCakeRepository extends JpaRepository<RelProductFilterCake, RelProductFilterCakeKey> {
     RelProductFilterCake findRelProductFilterCakeByProductAndFilterCake(Product product, FilterCake filterCake);
     RelProductFilterCake findRelProductFilterCakeByIdEquals(RelProductFilterCakeKey id);
 }
