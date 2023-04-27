@@ -1,10 +1,7 @@
 package com.zju.vis.print_backend.service;
 
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
-import com.zju.vis.print_backend.entity.Product;
-import com.zju.vis.print_backend.entity.RawMaterial;
-import com.zju.vis.print_backend.entity.RelFilterCakeRawMaterial;
-import com.zju.vis.print_backend.entity.RelProductRawMaterial;
+import com.zju.vis.print_backend.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -115,6 +112,29 @@ public class RawMaterialService {
         return rawMaterialPackage;
     }
 
+    // 日期类
+    public class RawMaterialDate{
+        private Date date;
+        private Float price;
+
+        public Date getDate() {
+            return date;
+        }
+
+        public void setDate(Date date) {
+            this.date = date;
+        }
+
+        public Float getPrice() {
+            return price;
+        }
+
+        public void setPrice(Float price) {
+            this.price = price;
+        }
+    }
+
+
     // RawMaterial 标准化形式类
     public static class RawMaterialStandard{
         private Long rawMaterialId;
@@ -124,6 +144,7 @@ public class RawMaterialService {
         private Integer rawMaterialIncreasePercent;
         private String rawMaterialConventional;
         private String rawMaterialSpecification;
+        private List<RawMaterialDate> rawMaterialDateList;
 
         public Long getRawMaterialId() {
             return rawMaterialId;
@@ -180,6 +201,14 @@ public class RawMaterialService {
         public void setRawMaterialSpecification(String rawMaterialSpecification) {
             this.rawMaterialSpecification = rawMaterialSpecification;
         }
+
+        public List<RawMaterialDate> getRawMaterialDateList() {
+            return rawMaterialDateList;
+        }
+
+        public void setRawMaterialDateList(List<RawMaterialDate> rawMaterialDateList) {
+            this.rawMaterialDateList = rawMaterialDateList;
+        }
     }
 
     // RawMaterial 转化为标准对象 RawMaterialStandard
@@ -195,6 +224,15 @@ public class RawMaterialService {
         );
         rawMaterialStandard.setRawMaterialConventional(rawMaterial.getRawMaterialConventional());
         rawMaterialStandard.setRawMaterialSpecification(rawMaterial.getRawMaterialSpecification());
+        // 设置历史价格
+        List<RawMaterialDate> rawMaterialDateList = new ArrayList<>();
+        for(RelDateRawMaterial relDateRawMaterial: rawMaterial.getRelDateRawMaterialList()){
+            RawMaterialDate rawMaterialDate = new RawMaterialDate();
+            rawMaterialDate.setDate(relDateRawMaterial.getId().getRawMaterialDate());
+            rawMaterialDate.setPrice(relDateRawMaterial.getPrice());
+            rawMaterialDateList.add(rawMaterialDate);
+        }
+        rawMaterialStandard.setRawMaterialDateList(rawMaterialDateList);
         return rawMaterialStandard;
     }
 

@@ -12,7 +12,7 @@ public class RelDateRawMaterialKay implements Serializable {
     Long rawMaterialId;
 
     @Column(name = "raw_material_date")
-    Date rawMaterialData;
+    Date rawMaterialDate;
 
     public Long getRawMaterialId() {
         return rawMaterialId;
@@ -22,12 +22,12 @@ public class RelDateRawMaterialKay implements Serializable {
         this.rawMaterialId = rawMaterialId;
     }
 
-    public Date getRawMaterialData() {
-        return rawMaterialData;
+    public Date getRawMaterialDate() {
+        return rawMaterialDate;
     }
 
-    public void setRawMaterialData(Date rawMaterialData) {
-        this.rawMaterialData = rawMaterialData;
+    public void setRawMaterialDate(Date rawMaterialDate) {
+        this.rawMaterialDate = rawMaterialDate;
     }
 
     @Override
@@ -35,11 +35,11 @@ public class RelDateRawMaterialKay implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RelDateRawMaterialKay that = (RelDateRawMaterialKay) o;
-        return Objects.equals(rawMaterialId, that.rawMaterialId) && Objects.equals(rawMaterialData, that.rawMaterialData);
+        return Objects.equals(rawMaterialId, that.rawMaterialId) && Objects.equals(rawMaterialDate, that.rawMaterialDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(rawMaterialId, rawMaterialData);
+        return Objects.hash(rawMaterialId, rawMaterialDate);
     }
 }

@@ -48,6 +48,7 @@ public class RawMaterial {
     @JsonIgnore
     private List<FilterCake> filterCakeList=new ArrayList<>();
 
+
     public List<FilterCake> getFilterCakeList() {
         return filterCakeList;
     }
@@ -55,6 +56,17 @@ public class RawMaterial {
     public void setFilterCakeList(List<FilterCake> filterCakeList) {
         this.filterCakeList = filterCakeList;
     }
+
+
+
+    @OneToMany(mappedBy = "rawMaterial")
+    private List<RelProductRawMaterial> relProductRawMaterialList;
+
+    @OneToMany(mappedBy = "rawMaterial")
+    private List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
+
+    @OneToMany(mappedBy = "rawMaterial")
+    private List<RelDateRawMaterial> relDateRawMaterialList;
 
     public List<RelProductRawMaterial> getRelProductRawMaterialList() {
         return relProductRawMaterialList;
@@ -64,18 +76,20 @@ public class RawMaterial {
         this.relProductRawMaterialList = relProductRawMaterialList;
     }
 
-    @OneToMany(mappedBy = "rawMaterial")
-    List<RelProductRawMaterial> relProductRawMaterialList;
-
-    @OneToMany(mappedBy = "rawMaterial")
-    List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
-
     public List<RelFilterCakeRawMaterial> getRelFilterCakeRawMaterialList() {
         return relFilterCakeRawMaterialList;
     }
 
     public void setRelFilterCakeRawMaterialList(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList) {
         this.relFilterCakeRawMaterialList = relFilterCakeRawMaterialList;
+    }
+
+    public List<RelDateRawMaterial> getRelDateRawMaterialList() {
+        return relDateRawMaterialList;
+    }
+
+    public void setRelDateRawMaterialList(List<RelDateRawMaterial> relDateRawMaterialList) {
+        this.relDateRawMaterialList = relDateRawMaterialList;
     }
 
     public Long getRawMaterialId() {
