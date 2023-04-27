@@ -112,28 +112,6 @@ public class RawMaterialService {
         return rawMaterialPackage;
     }
 
-    // 日期类
-    public class RawMaterialDate{
-        private Date date;
-        private Float price;
-
-        public Date getDate() {
-            return date;
-        }
-
-        public void setDate(Date date) {
-            this.date = date;
-        }
-
-        public Float getPrice() {
-            return price;
-        }
-
-        public void setPrice(Float price) {
-            this.price = price;
-        }
-    }
-
 
     // RawMaterial 标准化形式类
     public static class RawMaterialStandard{
@@ -144,7 +122,7 @@ public class RawMaterialService {
         private Integer rawMaterialIncreasePercent;
         private String rawMaterialConventional;
         private String rawMaterialSpecification;
-        private List<RawMaterialDate> rawMaterialDateList;
+        private List<Utils.HistoryPrice> rawMaterialHistoryPrice;
 
         public Long getRawMaterialId() {
             return rawMaterialId;
@@ -202,12 +180,12 @@ public class RawMaterialService {
             this.rawMaterialSpecification = rawMaterialSpecification;
         }
 
-        public List<RawMaterialDate> getRawMaterialDateList() {
-            return rawMaterialDateList;
+        public List<Utils.HistoryPrice> getRawMaterialHistoryPrice() {
+            return rawMaterialHistoryPrice;
         }
 
-        public void setRawMaterialDateList(List<RawMaterialDate> rawMaterialDateList) {
-            this.rawMaterialDateList = rawMaterialDateList;
+        public void setRawMaterialHistoryPrice(List<Utils.HistoryPrice> rawMaterialHistoryPrice) {
+            this.rawMaterialHistoryPrice = rawMaterialHistoryPrice;
         }
     }
 
@@ -225,14 +203,14 @@ public class RawMaterialService {
         rawMaterialStandard.setRawMaterialConventional(rawMaterial.getRawMaterialConventional());
         rawMaterialStandard.setRawMaterialSpecification(rawMaterial.getRawMaterialSpecification());
         // 设置历史价格
-        List<RawMaterialDate> rawMaterialDateList = new ArrayList<>();
+        List<Utils.HistoryPrice> historyPriceList = new ArrayList<>();
         for(RelDateRawMaterial relDateRawMaterial: rawMaterial.getRelDateRawMaterialList()){
-            RawMaterialDate rawMaterialDate = new RawMaterialDate();
-            rawMaterialDate.setDate(relDateRawMaterial.getId().getRawMaterialDate());
-            rawMaterialDate.setPrice(relDateRawMaterial.getPrice());
-            rawMaterialDateList.add(rawMaterialDate);
+            Utils.HistoryPrice historyPrice = new Utils.HistoryPrice();
+            historyPrice.setDate(relDateRawMaterial.getId().getRawMaterialDate());
+            historyPrice.setPrice(relDateRawMaterial.getPrice());
+            historyPriceList.add(historyPrice);
         }
-        rawMaterialStandard.setRawMaterialDateList(rawMaterialDateList);
+        rawMaterialStandard.setRawMaterialHistoryPrice(historyPriceList);
         return rawMaterialStandard;
     }
 

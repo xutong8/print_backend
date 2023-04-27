@@ -1,6 +1,7 @@
 package com.zju.vis.print_backend.controller;
 
 
+import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.service.FilterCakeService;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -92,5 +95,29 @@ public class FilterCakeController {
             @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId
     ) {
         return filterCakeService.findFilterCakeByFilterCakeId(filterCakeId);
+    }
+
+    @Resource
+    private FilterCakeRepository filterCakeRepository;
+
+    @ApiOperation(value = "测试滤饼历史价格用接口")
+    @RequestMapping(value = "/findFilterCakeTest", method = RequestMethod.GET)
+    @ResponseBody
+    public Double Test(
+            @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId,
+            @RequestParam(value = "testDate", defaultValue = "2022-12-20") String testDate
+            // @RequestParam(value = "year") Integer year,
+            // @RequestParam(value = "month") Integer month,
+            // @RequestParam(value = "date") Integer date
+    ) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        try{
+            date = sdf.parse(testDate);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        System.out.println(date);
+        return filterCakeService.calculateFilterCakeHistoryPrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId),date);
     }
 }

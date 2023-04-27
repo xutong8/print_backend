@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 
 import java.util.*;
 
@@ -340,7 +341,6 @@ public class FilterCakeService {
             rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterialF(rawMaterial, filterCake.getFilterCakeId()));
         }
 
-
         Double sum = 0.0;
         sum += filterCake.getFilterCakeProcessingCost();
         if(filterCakeSimpleList.size() != 0){
@@ -354,6 +354,75 @@ public class FilterCakeService {
         }
         return sum / filterCake.getFilterCakeAccountingQuantity();
     }
+
+    public Double calculateFilterCakeHistoryPrice(FilterCake filterCake, Date historyDate){
+        // 标准化获取简化列表
+        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        for (FilterCake filterCake1 : filterCake.getFilterCakeList()) {
+            filterCakeSimpleList.add(simplifyFilterCakeF(filterCake1, filterCake.getFilterCakeId()));
+        }
+        // 设置返回的简单原料表
+        List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+        for (RawMaterial rawMaterial : filterCake.getRawMaterialList()) {
+            rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterialF(rawMaterial, filterCake.getFilterCakeId()));
+        }
+        Double sum = 0.0;
+        sum += filterCake.getFilterCakeProcessingCost();
+        // 获取滤饼历史价格
+        if(filterCakeSimpleList.size()!=0){
+            for(FilterCakeSimple filterCakeSimple: filterCakeSimpleList){
+                sum +=  filterCakeSimple.getInventory() * calculateFilterCakeHistoryPrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeSimple.getFilterCakeId()),historyDate);
+            }
+        }
+        // 获取原料历史价格
+        for(RawMaterialService.RawMaterialSimple rawMaterialSimple: rawMaterialSimpleList){
+            List<Utils.HistoryPrice> historyPriceList = rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialHistoryPrice();
+            if(historyPriceList.size()!=0){
+                // 标识是否有增加过历史数据，没有则说明最早没有当时的历史数据则取当前原料最早的数据作为当时的虚拟数据
+                boolean flag = false;
+
+                // 逆序日期从大到小排序 2023.01.15 > 2022.12.31
+                Collections.reverse(historyPriceList);
+                for(Utils.HistoryPrice historyPrice: historyPriceList){
+                    // System.out.println("----------------------------------------------------------------------------------");
+                    // System.out.println("historyPrice.getDate():" + historyPrice.getDate() + "  HistoryDate:" + historyDate);
+                    // System.out.println("historyPrice.getDate().getTime()" + historyPrice.getDate().getTime() + "HistoryDate.getTime()" + historyDate.getTime());
+                    // 只有日期默认是 8.00 开始算，因此默认减一天时间进行比较
+                    // 取第一个小于当前日期的价格
+                    if(historyPrice.getDate().getTime() - (86400*1000) <= historyDate.getTime()){
+                        System.out.println("选取的时间:" + historyPrice.getDate());
+                        sum += rawMaterialSimple.getInventory() * historyPrice.getPrice();
+                        flag = true;
+                        break;
+                    }
+                }
+                if(!flag){
+                    sum += rawMaterialSimple.getInventory() * historyPriceList.get(historyPriceList.size() - 1).getPrice();
+                }
+            }
+        }
+        System.out.println("sum: " + sum + "\nfilterCake.getFilterCakeAccountingQuantity(): " + filterCake.getFilterCakeAccountingQuantity());
+        return sum / filterCake.getFilterCakeAccountingQuantity();
+    }
+
+    // public List<Utils.HistoryPrice> calculateFilterCakeHistoryPrice(FilterCake filterCake){
+    //     // 标准化获取简化列表
+    //     List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+    //     for (FilterCake filterCake1 : filterCake.getFilterCakeList()) {
+    //         filterCakeSimpleList.add(simplifyFilterCakeF(filterCake1, filterCake.getFilterCakeId()));
+    //     }
+    //     // 设置返回的简单原料表
+    //     List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+    //     for (RawMaterial rawMaterial : filterCake.getRawMaterialList()) {
+    //         rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterialF(rawMaterial, filterCake.getFilterCakeId()));
+    //     }
+    //     if(rawMaterialSimpleList.size() == 0){
+    //         return new ArrayList<>();
+    //     }
+    //
+    //
+    //     return null;
+    // }
 
     //查
     //-------------------------------------------------------------------------
