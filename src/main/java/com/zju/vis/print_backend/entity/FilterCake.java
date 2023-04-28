@@ -80,21 +80,40 @@ public class FilterCake {
     // 关联表
 
     @OneToMany(mappedBy = "filterCake")
-    List<RelProductFilterCake> relProductFilterCakeList;
+    private List<RelProductFilterCake> relProductFilterCakeList;
 
     // 这里改成被使用的滤饼对应列表，因为获取投料量的时候都是根据被使用的一方出发的
     @OneToMany(mappedBy = "filterCakeUsed")
-    List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList;
+    private List<RelFilterCakeFilterCake> relFilterCakeFilterCakeListUsed;
 
     @OneToMany(mappedBy = "filterCake")
-    List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
+    private List<RelFilterCakeFilterCake> relFilterCakeFilterCakeListUser;
 
-    public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeList() {
-        return relFilterCakeFilterCakeList;
+    @OneToMany(mappedBy = "filterCake")
+    private List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
+
+    public List<RelProductFilterCake> getRelProductFilterCakeList() {
+        return relProductFilterCakeList;
     }
 
-    public void setRelFilterCakeFilterCakeList(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList) {
-        this.relFilterCakeFilterCakeList = relFilterCakeFilterCakeList;
+    public void setRelProductFilterCakeList(List<RelProductFilterCake> relProductFilterCakeList) {
+        this.relProductFilterCakeList = relProductFilterCakeList;
+    }
+
+    public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeListUsed() {
+        return relFilterCakeFilterCakeListUsed;
+    }
+
+    public void setRelFilterCakeFilterCakeListUsed(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeListUsed) {
+        this.relFilterCakeFilterCakeListUsed = relFilterCakeFilterCakeListUsed;
+    }
+
+    public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeListUser() {
+        return relFilterCakeFilterCakeListUser;
+    }
+
+    public void setRelFilterCakeFilterCakeListUser(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeListUser) {
+        this.relFilterCakeFilterCakeListUser = relFilterCakeFilterCakeListUser;
     }
 
     public List<RelFilterCakeRawMaterial> getRelFilterCakeRawMaterialList() {
@@ -104,6 +123,16 @@ public class FilterCake {
     public void setRelFilterCakeRawMaterialList(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList) {
         this.relFilterCakeRawMaterialList = relFilterCakeRawMaterialList;
     }
+
+    // public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeList() {
+    //     return relFilterCakeFilterCakeList;
+    // }
+    //
+    // public void setRelFilterCakeFilterCakeList(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList) {
+    //     this.relFilterCakeFilterCakeList = relFilterCakeFilterCakeList;
+    // }
+
+
 
     public Long getFilterCakeId() {
         return filterCakeId;
@@ -177,11 +206,5 @@ public class FilterCake {
         this.productList = productList;
     }
 
-    public List<RelProductFilterCake> getRelProductFilterCakeList() {
-        return relProductFilterCakeList;
-    }
 
-    public void setRelProductFilterCakeList(List<RelProductFilterCake> relProductFilterCakeList) {
-        this.relProductFilterCakeList = relProductFilterCakeList;
-    }
 }

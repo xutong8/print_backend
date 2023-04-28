@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
@@ -19,6 +20,16 @@ public class FilterCakeService {
 
     @Resource
     private RawMaterialService rawMaterialService;
+
+    // 关联表
+    @Resource
+    private RelProductFilterCakeService relProductFilterCakeService;
+
+    @Resource
+    private RelFilterCakeFilterCakeService relFilterCakeFilterCakeService;
+
+    @Resource
+    private RelFilterCakeRawMaterialService relFilterCakeRawMaterialService;
 
 
     // 调用一般方法
@@ -323,7 +334,7 @@ public class FilterCakeService {
         FilterCakeSimple filterCakeSimple = new FilterCakeSimple();
         filterCakeSimple.setFilterCakeId(filterCake.getFilterCakeId());
         filterCakeSimple.setFilterCakeName(filterCake.getFilterCakeName());
-        filterCakeSimple.setInventory(getInventoryF(filterCake.getRelFilterCakeFilterCakeList(),
+        filterCakeSimple.setInventory(getInventoryF(filterCake.getRelFilterCakeFilterCakeListUsed(),
                 filterCakeId,filterCake.getFilterCakeId()));
         return filterCakeSimple;
     }
@@ -531,5 +542,40 @@ public class FilterCakeService {
     //        filterCakeRepository.deleteByFilterCakeId(filterCakeId);
     //    }
 
+    //删
+    //-------------------------------------------------------------------------
+    public void deleteByFilterCakeId(Long filterCakeId){
+        deleteRelByFilterCakeId(filterCakeId);
+        deleteFilterCakeByFilterCakeId(filterCakeId);
+    }
+    @Transactional
+    public void deleteRelByFilterCakeId(Long filterCakeId){
+        // 级联删除
+        FilterCake filterCake = filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId);
+        // 删除原料关联表
+        for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: filterCake.getRelFilterCakeRawMaterialList()){
+            relFilterCakeRawMaterialService.delete(relFilterCakeRawMaterial);
+        }
 
+        // 删除产品关联表
+        for(RelProductFilterCake relProductFilterCake: filterCake.getRelProductFilterCakeList()){
+            relProductFilterCakeService.delete(relProductFilterCake);
+        }
+
+        // 删除滤饼关联表
+        for(RelFilterCakeFilterCake relFilterCakeFilterCake: filterCake.getRelFilterCakeFilterCakeListUser()){
+            relFilterCakeFilterCakeService.delete(relFilterCakeFilterCake);
+        }
+
+        // 删除滤饼被关联表
+        for(RelFilterCakeFilterCake relFilterCakeFilterCake: filterCake.getRelFilterCakeFilterCakeListUsed()){
+            relFilterCakeFilterCakeService.delete(relFilterCakeFilterCake);
+        }
+    }
+
+    @Transactional
+    public void deleteFilterCakeByFilterCakeId(Long filterCakeId){
+        FilterCake filterCakeToDelete = filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId);
+        filterCakeRepository.delete(filterCakeToDelete);
+    }
 }

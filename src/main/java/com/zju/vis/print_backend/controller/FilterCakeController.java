@@ -119,4 +119,14 @@ public class FilterCakeController {
         System.out.println(date);
         return filterCakeService.calculateFilterCakeHistoryPrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId),date);
     }
+
+    @ApiOperation(value = "通过 filterCakeId删除记录")
+    @RequestMapping(value = "/deleteByRawMaterialId", method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity<String> deleteByFilterCakeId(
+            @RequestParam(value = "filterCakeId") Long filterCakeId
+    ) {
+        filterCakeService.deleteByFilterCakeId(filterCakeId);
+        return ResponseEntity.ok("FilterCake with ID: " + filterCakeId + " has been deleted.");
+    }
 }
