@@ -66,27 +66,37 @@ public class UserController {
         return userService.findAllUserSimple();
     }
 
-    @ApiOperation(value = "更改用户类型")
-    @RequestMapping(value = "/updateUserType", method = RequestMethod.PUT)
-    @ResponseBody
-    public ResponseEntity<String> updateUserType(
-            @RequestParam(value = "applicant") String applicant,
-            @RequestParam(value = "userModified") String userModified,
-            @RequestParam(value = "userType") String userType
-    ) {
-        String result = userService.updateUserType(applicant,userModified,userType);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
+    // @ApiOperation(value = "更改用户类型")
+    // @RequestMapping(value = "/updateUserType", method = RequestMethod.PUT)
+    // @ResponseBody
+    // public ResponseEntity<String> updateUserType(
+    //         @RequestParam(value = "applicant") String applicant,
+    //         @RequestParam(value = "userModified") String userModified,
+    //         @RequestParam(value = "userType") String userType
+    // ) {
+    //     String result = userService.updateUserType(applicant,userModified,userType);
+    //     return new ResponseEntity<>(result, HttpStatus.OK);
+    // }
 
-    @ApiOperation(value = "更改用户权限")
-    @RequestMapping(value = "/updateUserAuthority", method = RequestMethod.PUT)
+    // @ApiOperation(value = "更改用户权限")
+    // @RequestMapping(value = "/updateUserAuthority", method = RequestMethod.PUT)
+    // @ResponseBody
+    // public ResponseEntity<String> updateUserAuthority(
+    //         @RequestParam(value = "applicant") String applicant,
+    //         @RequestParam(value = "userModified") String userModified,
+    //         @RequestParam(value = "userAuthority") Integer userAuthority
+    // ) {
+    //     String result = userService.updateUserAuthority(applicant,userModified,userAuthority);
+    //     return new ResponseEntity<>(result, HttpStatus.OK);
+    // }
+
+    @ApiOperation(value = "用户管理")
+    @RequestMapping(value = "/manageUser", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<String> updateUserAuthority(
-            @RequestParam(value = "applicant") String applicant,
-            @RequestParam(value = "userModified") String userModified,
-            @RequestParam(value = "userAuthority") Integer userAuthority
+    public ResponseEntity<String> manageUser(
+            @Valid @RequestBody UserService.UserModify userModify
     ) {
-        String result = userService.updateUserAuthority(applicant,userModified,userAuthority);
+        String result = userService.manageUser(userModify);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
