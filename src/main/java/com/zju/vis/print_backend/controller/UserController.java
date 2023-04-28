@@ -99,4 +99,16 @@ public class UserController {
         String result = userService.manageUser(userModify);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @ApiOperation(value = "更改用户密码")
+    @RequestMapping(value = "/updatePassword", method = RequestMethod.PUT)
+    @ResponseBody
+    public ResponseEntity<String> updatePassword(
+            @RequestParam(value = "applicant") String applicant,
+            @RequestParam(value = "userModified") String userModified,
+            @RequestParam(value = "password") String password
+    ) {
+        String result = userService.updatePassword(applicant,userModified,password);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }

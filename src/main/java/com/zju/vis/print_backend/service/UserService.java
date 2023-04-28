@@ -271,6 +271,23 @@ public class UserService {
         return uModified.getUserName() + "用户权限被修改为 " + userAuthority;
     }
 
+    public String updatePassword(String applicant,String userModified,String password){
+        User uApplicant = userRepository.findUserByUserName(applicant);
+        if(uApplicant == null) {
+            return "申请人不存在";
+        }
+        User uModified = userRepository.findUserByUserName(userModified);
+        if(uModified == null){
+            return "被修改人不存在";
+        }
+        if(uApplicant.getUserType() > uModified.getUserType() || ((uApplicant.getUserType().equals(uModified.getUserType())) && uApplicant != uModified)){
+            return "您无权修改该用户密码";
+        }
+        uModified.setPassword(password);
+        userRepository.save(uModified);
+        return "密码已修改";
+    }
+
     //删
     //-------------------------------------------------------------------------
     @Transactional
