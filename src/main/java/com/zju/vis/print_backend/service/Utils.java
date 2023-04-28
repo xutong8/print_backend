@@ -4,7 +4,7 @@ import com.zju.vis.print_backend.Utils.UtilsService;
 import com.zju.vis.print_backend.entity.Product;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 

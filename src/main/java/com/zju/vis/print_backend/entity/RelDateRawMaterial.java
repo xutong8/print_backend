@@ -1,16 +1,15 @@
 package com.zju.vis.print_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zju.vis.print_backend.compositekey.RelDateRawMaterialKay;
+import com.zju.vis.print_backend.compositekey.RelDateRawMaterialKey;
 
 import javax.persistence.*;
-import java.sql.Date;
 
 @Entity
 @Table(name = "rel_date_rm")
 public class RelDateRawMaterial {
     @EmbeddedId
-    RelDateRawMaterialKay id;
+    RelDateRawMaterialKey id;
 
     @ManyToOne
     @MapsId("rawMaterialId")
@@ -21,11 +20,11 @@ public class RelDateRawMaterial {
     @Column(name = "price")
     Float price;
 
-    public RelDateRawMaterialKay getId() {
+    public RelDateRawMaterialKey getId() {
         return id;
     }
 
-    public void setId(RelDateRawMaterialKay id) {
+    public void setId(RelDateRawMaterialKey id) {
         this.id = id;
     }
 

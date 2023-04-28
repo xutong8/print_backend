@@ -1,5 +1,6 @@
 package com.zju.vis.print_backend.service;
 
+import com.zju.vis.print_backend.compositekey.RelDateRawMaterialKey;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.*;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 
 import java.util.*;
+import java.sql.Date;
 
 @Service
 public class RawMaterialService {
@@ -409,8 +411,79 @@ public class RawMaterialService {
 
     //增
     //-------------------------------------------------------------------------
-    public RawMaterial addRawMaterial(RawMaterial rawMaterial) {
-        return rawMaterialRepository.save(rawMaterial);
+    public static class DeStandardizeResult{
+        private RawMaterial rawMaterial;
+        private List<RelDateRawMaterial> relDateRawMaterialList;
+
+        //构造函数
+        public DeStandardizeResult(RawMaterial rawMaterial, List<RelDateRawMaterial> relDateRawMaterialList) {
+            this.rawMaterial = rawMaterial;
+            this.relDateRawMaterialList = relDateRawMaterialList;
+        }
+
+        public RawMaterial getRawMaterial() {
+            return rawMaterial;
+        }
+
+        public void setRawMaterial(RawMaterial rawMaterial) {
+            this.rawMaterial = rawMaterial;
+        }
+
+        public List<RelDateRawMaterial> getRelDateRawMaterialList() {
+            return relDateRawMaterialList;
+        }
+
+        public void setRelDateRawMaterialList(List<RelDateRawMaterial> relDateRawMaterialList) {
+            this.relDateRawMaterialList = relDateRawMaterialList;
+        }
+    }
+
+    public DeStandardizeResult deStandardizeRawMaterial(RawMaterialStandard rawMaterialStandard){
+        RawMaterial rawMaterial = new RawMaterial();
+        rawMaterial.setRawMaterialId(rawMaterialStandard.getRawMaterialId());
+        rawMaterial.setRawMaterialName(rawMaterialStandard.getRawMaterialName());
+        rawMaterial.setRawMaterialIndex(rawMaterialStandard.getRawMaterialIndex());
+        rawMaterial.setRawMaterialPrice(rawMaterialStandard.getRawMaterialUnitPrice());
+        rawMaterial.setRawMaterialConventional(rawMaterialStandard.getRawMaterialConventional());
+        rawMaterial.setRawMaterialSpecification(rawMaterialStandard.getRawMaterialSpecification());
+
+        // 关系表设置
+        List<RelDateRawMaterial> relDateRawMaterialList = new ArrayList<>();
+        for(Utils.HistoryPrice historyPrice: rawMaterialStandard.getRawMaterialHistoryPrice()){
+            Date rawMaterialDate = historyPrice.getDate();
+            Float price = historyPrice.getPrice();
+
+            RelDateRawMaterial relDateRawMaterial = new RelDateRawMaterial();
+            RelDateRawMaterialKey relDateRawMaterialKey = new RelDateRawMaterialKey();
+            relDateRawMaterialKey.setRawMaterialId(rawMaterial.getRawMaterialId());
+            relDateRawMaterialKey.setRawMaterialDate(rawMaterialDate);
+            relDateRawMaterial.setId(relDateRawMaterialKey);
+            relDateRawMaterial.setPrice(price);
+
+            relDateRawMaterialList.add(relDateRawMaterial);
+        }
+        return new DeStandardizeResult(rawMaterial,relDateRawMaterialList);
+    }
+
+    private void saveRelDateRawMaterials(RawMaterial savedRawMaterial, List<RelDateRawMaterial> relDateRawMaterialList){
+        for(RelDateRawMaterial relDateRawMaterial: relDateRawMaterialList){
+            // 使用调用者id不一定与原id相等
+            relDateRawMaterial.getId().setRawMaterialId(savedRawMaterial.getRawMaterialId());
+
+            relDateRawMaterial.setRawMaterial(savedRawMaterial);
+            relDateRawMaterialService.addRelDateRawMaterial(relDateRawMaterial);
+        }
+    }
+
+    public RawMaterial addRawMaterial(RawMaterialStandard rawMaterialStandard) {
+        DeStandardizeResult result = deStandardizeRawMaterial(rawMaterialStandard);
+        RawMaterial rawMaterial = result.getRawMaterial();
+        List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
+
+        rawMaterial.setRawMaterialId(new Long(0));
+        RawMaterial savedRawMaterial = rawMaterialRepository.save(rawMaterial);
+        saveRelDateRawMaterials(savedRawMaterial, relDateRawMaterialList);
+        return savedRawMaterial;
     }
 
     //改

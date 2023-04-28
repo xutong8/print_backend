@@ -71,8 +71,9 @@ public class RawMaterialController {
     @ApiOperation(value = "新增原料")
     @RequestMapping(value = "/addRawMaterial", method = RequestMethod.POST)
     @ResponseBody
-    public RawMaterial addRawMaterial(@Valid @RequestBody RawMaterial rawMaterial) {
-        return rawMaterialService.addRawMaterial(rawMaterial);
+    public ResponseEntity<RawMaterial> addRawMaterial(@Valid @RequestBody RawMaterialService.RawMaterialStandard rawMaterialStandard) {
+        RawMaterial rawMaterial = rawMaterialService.addRawMaterial(rawMaterialStandard);
+        return new ResponseEntity<>(rawMaterial, HttpStatus.OK);
     }
 
     @ApiOperation(value = "更新原料信息")

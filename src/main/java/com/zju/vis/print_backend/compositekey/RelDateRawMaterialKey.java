@@ -7,7 +7,7 @@ import java.sql.Date;
 import java.util.Objects;
 
 @Embeddable
-public class RelDateRawMaterialKay implements Serializable {
+public class RelDateRawMaterialKey implements Serializable {
     @Column(name = "raw_material_id")
     Long rawMaterialId;
 
@@ -34,7 +34,7 @@ public class RelDateRawMaterialKay implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RelDateRawMaterialKay that = (RelDateRawMaterialKay) o;
+        RelDateRawMaterialKey that = (RelDateRawMaterialKey) o;
         return Objects.equals(rawMaterialId, that.rawMaterialId) && Objects.equals(rawMaterialDate, that.rawMaterialDate);
     }
 
