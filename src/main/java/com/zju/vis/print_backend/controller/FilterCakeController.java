@@ -17,7 +17,6 @@ import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Api(description = "滤饼管理")
 @RequestMapping("/filterCake")
@@ -71,8 +70,8 @@ public class FilterCakeController {
     @ApiOperation(value = "添加新滤饼")
     @RequestMapping(value = "/addFilterCake", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<FilterCake> addFilterCake(@Valid @RequestBody FilterCake filterCake) {
-        FilterCake savedFilterCake = filterCakeService.addFilterCake(filterCake);
+    public ResponseEntity<FilterCake> addFilterCake(@Valid @RequestBody FilterCakeService.FilterCakeStandard filterCakeStandard) {
+        FilterCake savedFilterCake = filterCakeService.addFilterCake(filterCakeStandard);
         return new ResponseEntity<>(savedFilterCake, HttpStatus.CREATED);
     }
 

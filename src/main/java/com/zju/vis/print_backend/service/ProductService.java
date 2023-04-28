@@ -580,6 +580,7 @@ public class ProductService {
             this.relProductFilterCakes = relProductFilterCakes;
         }
     }
+
     public DeStandardizeResult deStandardizeProduct(ProductStandard productStandard) {
         Product product = new Product();
         product.setProductId(productStandard.getProductId());
@@ -644,6 +645,7 @@ public class ProductService {
 
         return new DeStandardizeResult(product, relProductRawMaterials, relProductFilterCakes);
     }
+
     private void saveRelProductRawMaterials(Product savedProduct, List<RelProductRawMaterial> relProductRawMaterials) {
         for (RelProductRawMaterial relProductRawMaterial : relProductRawMaterials) {
             // 使用自增id而非原id
