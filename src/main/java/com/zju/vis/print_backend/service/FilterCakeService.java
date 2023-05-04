@@ -442,6 +442,7 @@ public class FilterCakeService {
         return sum / filterCake.getFilterCakeAccountingQuantity();
     }
 
+    // 列表形式返回历史价格，不过由于当前返回形式未确定因此这部分暂时空置
     // public List<Utils.HistoryPrice> calculateFilterCakeHistoryPrice(FilterCake filterCake){
     //     // 标准化获取简化列表
     //     List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
@@ -644,6 +645,8 @@ public class FilterCakeService {
         }
     }
 
+
+
     public FilterCake addFilterCake(FilterCakeStandard filterCakeStandard) {
         DeStandardizeResult result = deStandardizeFilterCake(filterCakeStandard);
         FilterCake filterCake = result.getFiltercake();
@@ -661,25 +664,30 @@ public class FilterCakeService {
     //改
     //-------------------------------------------------------------------------
     // update FilterCake data
-    public FilterCake updateFilterCake(Long filterCakeId, FilterCake updatedFilterCake) {
-        return filterCakeRepository.findById(filterCakeId)
-                .map(filterCake -> {
-                    filterCake.setFilterCakeName(updatedFilterCake.getFilterCakeName());
-                    filterCake.setFilterCakeIndex(updatedFilterCake.getFilterCakeIndex());
-                    filterCake.setFilterCakeColor(updatedFilterCake.getFilterCakeColor());
-                    filterCake.setFilterCakeProcessingCost(updatedFilterCake.getFilterCakeProcessingCost());
-                    filterCake.setFilterCakeAccountingQuantity(updatedFilterCake.getFilterCakeAccountingQuantity());
-                    filterCake.setFilterCakeSpecification(updatedFilterCake.getFilterCakeSpecification());
-                    filterCake.setFilterCakeRemarks(updatedFilterCake.getFilterCakeRemarks());
-                    return filterCakeRepository.save(filterCake);
-                })
-                .orElseThrow(() -> new NoSuchElementException("FilterCake not found with id " + filterCakeId));
-    }
+    public String updateFilterCake(FilterCakeStandard updatedFilterCake) {
 
-    //    @Transactional
-    //    public void deleteByFilterCakeId(Long filterCakeId) {
-    //        filterCakeRepository.deleteByFilterCakeId(filterCakeId);
-    //    }
+        // 先删掉原先的关系删除单向关系
+        FilterCake originFilterCake = filterCakeRepository.findFilterCakeByFilterCakeId(updatedFilterCake.getFilterCakeId());
+        // 删除原料关联表
+        for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: originFilterCake.getRelFilterCakeRawMaterialList()){
+            relFilterCakeRawMaterialService.delete(relFilterCakeRawMaterial);
+        }
+        // 删除滤饼关联表
+        for(RelFilterCakeFilterCake relFilterCakeFilterCake: originFilterCake.getRelFilterCakeFilterCakeListUser()){
+            relFilterCakeFilterCakeService.delete(relFilterCakeFilterCake);
+        }
+
+        // 重新添加关系以修改内容
+        DeStandardizeResult result = deStandardizeFilterCake(updatedFilterCake);
+        FilterCake filterCake = result.getFiltercake();
+        List<RelFilterCakeFilterCake> relFilterCakeFilterCakeLList = result.getRelFilterCakeFilterCakeList();
+        List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = result.getRelFilterCakeRawMaterialList();
+
+        FilterCake savedFilterCake = filterCakeRepository.save(filterCake);
+        saveRelFilterCakeFilterCakes(savedFilterCake,relFilterCakeFilterCakeLList);
+        saveRelFilterCakeRawMaterials(savedFilterCake,relFilterCakeRawMaterialList);
+        return "FilterCake " + originFilterCake.getFilterCakeName() + " has been changed";
+    }
 
     //删
     //-------------------------------------------------------------------------
@@ -687,6 +695,7 @@ public class FilterCakeService {
         deleteRelByFilterCakeId(filterCakeId);
         deleteFilterCakeByFilterCakeId(filterCakeId);
     }
+
     @Transactional
     public void deleteRelByFilterCakeId(Long filterCakeId){
         // 级联删除

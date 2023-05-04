@@ -78,12 +78,11 @@ public class FilterCakeController {
     @ApiOperation(value = "更新滤饼信息")
     @RequestMapping(value = "/updateFilterCake", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<FilterCake> updateFilterCake(
-            @RequestParam(value = "filterCakeId") Long filterCakeId,
-            @Valid @RequestBody FilterCake updatedFilterCake
+    public ResponseEntity<String> updateFilterCake(
+            @Valid @RequestBody FilterCakeService.FilterCakeStandard updatedFilterCake
     ) {
-        FilterCake updated = filterCakeService.updateFilterCake(filterCakeId, updatedFilterCake);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
+        String result = filterCakeService.updateFilterCake(updatedFilterCake);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @ApiOperation(value = "根据 ID 返回滤饼")
