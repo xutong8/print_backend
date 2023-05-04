@@ -79,12 +79,11 @@ public class RawMaterialController {
     @ApiOperation(value = "更新原料信息")
     @RequestMapping(value = "/updateRawMaterial", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<RawMaterial> updateRawMaterial(
-            @RequestParam(value = "rawMaterialId") Long rawMaterialId,
-            @Valid @RequestBody RawMaterial updatedRawMaterial
+    public ResponseEntity<String> updateRawMaterial(
+            @Valid @RequestBody RawMaterialService.RawMaterialStandard updatedRawMaterial
     ) {
-        RawMaterial updated = rawMaterialService.updateRawMaterial(rawMaterialId, updatedRawMaterial);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
+        String result = rawMaterialService.updateRawMaterial(updatedRawMaterial);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @ApiOperation(value = "通过 RawMaterialId删除记录")

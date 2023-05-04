@@ -488,17 +488,21 @@ public class RawMaterialService {
 
     //改
     //-------------------------------------------------------------------------
-    public RawMaterial updateRawMaterial(Long rawMaterialId, RawMaterial updatedRawMaterial) {
-        return rawMaterialRepository.findById(rawMaterialId)
-                .map(rawMaterial -> {
-                    rawMaterial.setRawMaterialName(updatedRawMaterial.getRawMaterialName());
-                    rawMaterial.setRawMaterialIndex(updatedRawMaterial.getRawMaterialIndex());
-                    rawMaterial.setRawMaterialPrice(updatedRawMaterial.getRawMaterialPrice());
-                    rawMaterial.setRawMaterialConventional(updatedRawMaterial.getRawMaterialConventional());
-                    rawMaterial.setRawMaterialSpecification(updatedRawMaterial.getRawMaterialSpecification());
-                    return rawMaterialRepository.save(rawMaterial);
-                })
-                .orElseThrow(() -> new NoSuchElementException("RawMaterial not found with id " + rawMaterialId));
+    public String updateRawMaterial(RawMaterialStandard updatedRawMaterial) {
+        RawMaterial originRawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(updatedRawMaterial.getRawMaterialId());
+        // 删除原先单向时间关系
+        for(RelDateRawMaterial relDateRawMaterial: originRawMaterial.getRelDateRawMaterialList()){
+            relDateRawMaterialService.delete(relDateRawMaterial);
+        }
+
+        // 重新添加关系以修改内容
+        DeStandardizeResult result = deStandardizeRawMaterial(updatedRawMaterial);
+        RawMaterial rawMaterial = result.getRawMaterial();
+        List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
+
+        RawMaterial savedRawMaterial = rawMaterialRepository.save(rawMaterial);
+        saveRelDateRawMaterials(savedRawMaterial,relDateRawMaterialList);
+        return "RawMaterial " + originRawMaterial.getRawMaterialName() + " has been changed";
     }
 
     //删

@@ -724,7 +724,7 @@ public class ProductService {
         Product savedProduct = productRepository.save(product);
         saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
         saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
-        return "Product " + originProduct.getProductName() + "has been changed";
+        return "Product " + originProduct.getProductName() + " has been changed";
     }
 
 }
