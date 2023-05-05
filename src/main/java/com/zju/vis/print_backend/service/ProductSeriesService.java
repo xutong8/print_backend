@@ -235,7 +235,19 @@ public class ProductSeriesService {
     //增
     //-------------------------------------------------------------------------
     //add productSeries data
-    public ProductSeries addProductSeries(ProductSeries productSeries) {
+    public ProductSeries deStandardizeProductSeries(ProductSeriesStandard productSeriesStandard){
+        ProductSeries productSeries = new ProductSeries();
+        productSeries.setProductSeriesId(productSeriesStandard.getProductSeriesId());
+        productSeries.setProductSeriesName(productSeriesStandard.getProductSeriesName());
+        productSeries.setProductSeriesFunction(productSeriesStandard.getProductSeriesFunction());
+
+        return productSeries;
+    }
+
+    public ProductSeries addProductSeries(ProductSeriesStandard productSeriesStandard) {
+        ProductSeries productSeries = deStandardizeProductSeries(productSeriesStandard);
+        // 添加时指定一个不存在的id进而使用自增id
+        productSeries.setProductSeriesId(new Long(0));
         return productSeriesRepository.save(productSeries);
     }
 

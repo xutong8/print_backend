@@ -52,7 +52,7 @@ public class ProductService {
     private RelProductFilterCakeService relProductFilterCakeService;
 
     // 用于返回产品列表名
-    public class ProductSimple{
+    public static class ProductSimple{
         private Long productId;
         private String productName;
 
@@ -69,6 +69,11 @@ public class ProductService {
         }
 
         public void setProductName(String productName) {
+            this.productName = productName;
+        }
+
+        public ProductSimple(Long productId, String productName) {
+            this.productId = productId;
             this.productName = productName;
         }
     }
@@ -332,9 +337,9 @@ public class ProductService {
     }
 
     public ProductSimple simplifyProduct(Product product){
-        ProductSimple productSimple = new ProductSimple();
-        productSimple.setProductId(product.getProductId());
-        productSimple.setProductName(product.getProductName());
+        ProductSimple productSimple = new ProductSimple(product.getProductId(),product.getProductName());
+        // productSimple.setProductId(product.getProductId());
+        // productSimple.setProductName(product.getProductName());
         return productSimple;
     }
 

@@ -271,19 +271,50 @@ public class UserService {
         return uModified.getUserName() + "用户权限被修改为 " + userAuthority;
     }
 
-    public String updatePassword(String applicant,String userModified,String password){
-        User uApplicant = userRepository.findUserByUserName(applicant);
+    public static class PasswordModify{
+        private String applicant;
+        private String userModified;
+        private String password;
+
+        public String getApplicant() {
+            return applicant;
+        }
+
+        public void setApplicant(String applicant) {
+            this.applicant = applicant;
+        }
+
+        public String getUserModified() {
+            return userModified;
+        }
+
+        public void setUserModified(String userModified) {
+            this.userModified = userModified;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+    }
+
+    // public String updatePassword(String applicant,String userModified,String password){
+    public String updatePassword(PasswordModify passwordModify){
+        User uApplicant = userRepository.findUserByUserName(passwordModify.getApplicant());
         if(uApplicant == null) {
             return "申请人不存在";
         }
-        User uModified = userRepository.findUserByUserName(userModified);
+        User uModified = userRepository.findUserByUserName(passwordModify.getUserModified());
         if(uModified == null){
             return "被修改人不存在";
         }
         if(uApplicant.getUserType() > uModified.getUserType() || ((uApplicant.getUserType().equals(uModified.getUserType())) && uApplicant != uModified)){
             return "您无权修改该用户密码";
         }
-        uModified.setPassword(password);
+        uModified.setPassword(passwordModify.getPassword());
         userRepository.save(uModified);
         return "密码已修改";
     }

@@ -1,6 +1,7 @@
 package com.zju.vis.print_backend.controller;
 
 
+import com.zju.vis.print_backend.entity.User;
 import com.zju.vis.print_backend.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -101,11 +102,12 @@ public class UserController {
     @RequestMapping(value = "/updatePassword", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> updatePassword(
-            @RequestParam(value = "applicant") String applicant,
-            @RequestParam(value = "userModified") String userModified,
-            @RequestParam(value = "password") String password
-    ) {
-        String result = userService.updatePassword(applicant,userModified,password);
+            // @RequestParam(value = "applicant") String applicant,
+            // @RequestParam(value = "userModified") String userModified,
+            // @RequestParam(value = "password") String password
+            @Valid @RequestBody UserService.PasswordModify passwordModify
+            ) {
+        String result = userService.updatePassword(passwordModify);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
