@@ -103,6 +103,14 @@ public class ProductController {
         return list;
     }
 
+    // 产品系列映射关系根据产品系列生成，此接口暂时废弃
+    // @ApiOperation(value = "获取所有产品名称")
+    // @RequestMapping(value = "/findAllProductName", method = RequestMethod.GET)
+    // @ResponseBody
+    // public List<ProductService.ProductSimple> findAllProductName() {
+    //     return productService.findAllProductName();
+    // }
+
     @ApiOperation(value = "通过 productId 删除记录")
     @RequestMapping(value = "/deleteByProductId", method = RequestMethod.DELETE)
     @ResponseBody

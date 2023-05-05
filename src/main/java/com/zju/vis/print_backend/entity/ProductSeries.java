@@ -14,7 +14,7 @@ public class ProductSeries {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_series_id", nullable = false)
-    private Long productSeriesId ;
+    private Long productSeriesId;
 
     @NotNull
     @Column(name = "product_series_name", nullable = false)
@@ -26,7 +26,7 @@ public class ProductSeries {
     // 产品列表
     @OneToMany
     @JoinColumn(name = "product_series_id")
-    private List<Product> productList=new ArrayList<>();
+    private List<Product> productList;
 
     public Long getProductSeriesId() {
         return productSeriesId;

@@ -295,7 +295,8 @@ public class RawMaterialService {
         RawMaterialSimple rawMaterialSimple = new RawMaterialSimple();
         rawMaterialSimple.setRawMaterialId(rawMaterial.getRawMaterialId());
         rawMaterialSimple.setRawMaterialName(rawMaterial.getRawMaterialName());
-        // 被封装对象的关系列表中查找，id与两个都对应的项
+        // 获取投料量信息
+        // 被封装对象的关系列表中查找，id与两个都对应的
         rawMaterialSimple.setInventory(getInventory(rawMaterial.getRelProductRawMaterialList(),
                 productId,rawMaterial.getRawMaterialId()));
         return rawMaterialSimple;

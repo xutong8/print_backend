@@ -3,6 +3,7 @@ package com.zju.vis.print_backend.controller;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
 import com.zju.vis.print_backend.service.ProductSeriesService;
+import com.zju.vis.print_backend.service.RawMaterialService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class ProductSeriesController {
     @ApiOperation(value = "获取所有的产品系列")
     @RequestMapping(value = "/findAllProductSeries", method = RequestMethod.GET)
     @ResponseBody
-    public List<ProductSeries> findAll(
+    public ProductSeriesService.ProductSeriesPackage findAll(
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ){
@@ -39,6 +40,15 @@ public class ProductSeriesController {
     @ResponseBody
     public List<ProductSeriesService.ProductSeriesName> findAllProductSeriesName(){
         return productSeriesService.findAllProductSeriesName();
+    }
+
+    @ApiOperation(value = "根据 ID 返回产品系列")
+    @RequestMapping(value = "/findProductSeriesByProductSeriesId", method = RequestMethod.GET)
+    @ResponseBody
+    public ProductSeriesService.ProductSeriesStandard findProductSeriesByProductSeriesId(
+            @RequestParam(value = "productSeriesId", defaultValue = "") Long productSeriesId
+    ) {
+        return productSeriesService.findProductSeriesByProductSeriesId(productSeriesId);
     }
 
     @ApiOperation(value = "根据系列名称返回对应的产品")

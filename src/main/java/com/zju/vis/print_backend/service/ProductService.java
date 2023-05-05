@@ -51,6 +51,28 @@ public class ProductService {
     @Resource
     private RelProductFilterCakeService relProductFilterCakeService;
 
+    // 用于返回产品列表名
+    public class ProductSimple{
+        private Long productId;
+        private String productName;
+
+        public Long getProductId() {
+            return productId;
+        }
+
+        public void setProductId(Long productId) {
+            this.productId = productId;
+        }
+
+        public String getProductName() {
+            return productName;
+        }
+
+        public void setProductName(String productName) {
+            this.productName = productName;
+        }
+    }
+
     // Product 结果封装
     public class ProductPackage {
         // 附加信息
@@ -254,46 +276,6 @@ public class ProductService {
         }
     }
 
-    public ProductRepository getProductRepository() {
-        return productRepository;
-    }
-
-    public void setProductRepository(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
-
-    public Utils getUtils() {
-        return utils;
-    }
-
-    public void setUtils(Utils utils) {
-        this.utils = utils;
-    }
-
-    public RawMaterialService getRawMaterialService() {
-        return rawMaterialService;
-    }
-
-    public void setRawMaterialService(RawMaterialService rawMaterialService) {
-        this.rawMaterialService = rawMaterialService;
-    }
-
-    public FilterCakeService getFilterCakeService() {
-        return filterCakeService;
-    }
-
-    public void setFilterCakeService(FilterCakeService filterCakeService) {
-        this.filterCakeService = filterCakeService;
-    }
-
-    public ProductSeriesService getProductSeriesService() {
-        return productSeriesService;
-    }
-
-    public void setProductSeriesService(ProductSeriesService productSeriesService) {
-        this.productSeriesService = productSeriesService;
-    }
-
     // Product 转化为标准对象 ProductStandard
     public ProductStandard ProductStandardization(Product product) {
         ProductStandard productStandard = new ProductStandard();
@@ -348,6 +330,22 @@ public class ProductService {
         Page<Product> page = productRepository.findAll(pageable);
         return packProduct(page.toList(), pageNo, pageSize, productNum);
     }
+
+    public ProductSimple simplifyProduct(Product product){
+        ProductSimple productSimple = new ProductSimple();
+        productSimple.setProductId(product.getProductId());
+        productSimple.setProductName(product.getProductName());
+        return productSimple;
+    }
+
+
+    // public List<ProductSimple> findAllProductName(){
+    //     List<ProductSimple> productSimpleList = new ArrayList<>();
+    //     for (Product product: productRepository.findAll()){
+    //         productSimpleList.add(simplifyProduct(product));
+    //     }
+    //     return productSimpleList;
+    // }
 
 
     public ProductService.ProductStandard findProductByProductId(Long productId) {
