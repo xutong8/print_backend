@@ -81,13 +81,12 @@ public class ProductSeriesController {
     @ApiOperation(value = "更新产品系列信息")
     @RequestMapping(value = "/updateProductSeries", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<ProductSeries> updateProductSeries(
-            @RequestParam(value = "productSeriesId") Long productSeriesId,
-            @Valid @RequestBody ProductSeries updatedProductSeries
+    public ResponseEntity<String> updateProductSeries(
+            @Valid @RequestBody ProductSeriesService.ProductSeriesStandard updatedProductSeries
     ) {
         try {
-            ProductSeries updatedSeries = productSeriesService.updateProductSeries(productSeriesId, updatedProductSeries);
-            return new ResponseEntity<>(updatedSeries, HttpStatus.OK);
+            String result = productSeriesService.updateProductSeries(updatedProductSeries);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

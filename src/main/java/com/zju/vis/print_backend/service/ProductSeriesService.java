@@ -254,14 +254,10 @@ public class ProductSeriesService {
     //改
     //-------------------------------------------------------------------------
     //update product data
-    public ProductSeries updateProductSeries(Long productSeriesId, ProductSeries updatedProductSeries) {
-        return productSeriesRepository.findById(productSeriesId)
-                .map(productSeries -> {
-                    productSeries.setProductSeriesName(updatedProductSeries.getProductSeriesName());
-                    productSeries.setProductSeriesFunction(updatedProductSeries.getProductSeriesFunction());
-                    return productSeriesRepository.save(productSeries);
-                })
-                .orElseThrow(() -> new NoSuchElementException("Product Series not found with id " + productSeriesId));
+    public String updateProductSeries(ProductSeriesStandard updatedProductSeries) {
+        ProductSeries productSeries = deStandardizeProductSeries(updatedProductSeries);
+        productSeriesRepository.save(productSeries);
+        return "ProductSeries " + productSeries.getProductSeriesName() + " has been changed";
     }
 
 }
