@@ -20,6 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     Product findProductByProductId(Long productId);
+    Product findProductByProductIndex(String productIndex);
 
     //根据productId 删除记录
     void deleteByProductId(Long productId);

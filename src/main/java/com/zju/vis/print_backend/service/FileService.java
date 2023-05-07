@@ -2,6 +2,7 @@ package com.zju.vis.print_backend.service;
 
 import com.alibaba.fastjson.JSON;
 import com.zju.vis.print_backend.Utils.*;
+import com.zju.vis.print_backend.vo.ExcelProductVo;
 import com.zju.vis.print_backend.vo.ExcelVo;
 import com.zju.vis.print_backend.vo.ExcelWriteVo;
 import com.zju.vis.print_backend.vo.ResultVo;
@@ -102,6 +103,9 @@ public class FileService {
     @Resource
     private ExcelUtil excelUtil;
 
+    // 表格操作
+    //-------------------------------------------------------------------------
+    // 测试导入表格
     public ResultVo importExcel(MultipartFile file) {
         // 1.入参校验
         ResultVo<String> checkExcelParam = checkExcelParam(file);
@@ -138,6 +142,7 @@ public class FileService {
             return ResultVoUtil.error("删除临时文件失败");
         }
         log.info("【导入Excel文件】删除临时文件成功，临时文件路径为：{}", filePath);
+        System.out.println(excelVos);
         return ResultVoUtil.success(excelVos);
     }
 
@@ -193,6 +198,48 @@ public class FileService {
         excelWriteVos.add(new ExcelWriteVo("wxc", "男", "2021-11-14 20:00:00"));
         return excelWriteVos;
     }
+
+    // 导入产品表
+    public ResultVo importProductExcel(MultipartFile file){
+        // 1.入参校验
+        ResultVo<String> checkExcelParam = checkExcelParam(file);
+        if(!checkExcelParam.checkSuccess()){
+            log.error(checkExcelParam.getMsg());
+            return checkExcelParam;
+        }
+        // 2.上传到服务器某路径下
+        ResultVo resultVo = uploadFile(file);
+        if(!resultVo.checkSuccess()){
+            return resultVo;
+        }
+        String filePath = (String)resultVo.getData();
+        if (StringUtil.isBlank(filePath)) {
+            return ResultVoUtil.error("【导入Excel文件】生成的Excel文件的路径为空");
+        }
+        // 3.读取excel文件
+        List<ExcelProductVo> excelProductVos = excelUtil.simpleExcelRead(filePath, ExcelProductVo.class);
+        if (CollectionUtil.isEmpty(excelProductVos) || excelProductVos.size() < 2) {
+            log.error("【导入Excel文件】上传Excel文件{}为空", file.getOriginalFilename());
+            return ResultVoUtil.error("上传Excel文件为空");
+        }
+        // 4.通过线程池开启一个线程去执行数据库操作，主线程继续往下执行
+        // 4.1开启一个线程
+        TaskCenterUtil taskCenterUtil = TaskCenterUtil.getTaskCenterUtil();
+        taskCenterUtil.submitTask(() -> {
+            log.info("【批量添加】批量添加数据：{}", JSON.toJSONString(excelProductVos));
+            return null;
+        });
+        // 4.2删除临时文件
+        boolean deleteFile = FileUtil.deleteFile(new File(filePath));
+        if (!deleteFile) {
+            log.error("【导入Excel文件】删除临时文件失败，临时文件路径为{}", filePath);
+            return ResultVoUtil.error("删除临时文件失败");
+        }
+        log.info("【导入Excel文件】删除临时文件成功，临时文件路径为：{}", filePath);
+        return ResultVoUtil.success(excelProductVos);
+    }
+
+
 
     public ResultVo<String> getDownLoadPath(Class<ExcelWriteVo> clazz, List<ExcelWriteVo> excelWriteVos) {
         String downLoadPath = FileUtil.getDownLoadPath();

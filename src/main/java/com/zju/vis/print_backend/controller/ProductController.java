@@ -14,6 +14,7 @@ import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.entity.RelProductFilterCake;
 import com.zju.vis.print_backend.service.RawMaterialService;
+import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.models.auth.In;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,7 +34,7 @@ import springfox.documentation.spring.web.json.Json;
 @Api(description = "产品管理")
 @RequestMapping("/product")
 @CrossOrigin
-@Controller
+@RestController
 public class ProductController {
     @Resource
     private ProductService productService;
@@ -180,4 +181,11 @@ public class ProductController {
     // public ResultVo importExcel(@RequestParam("file") MultipartFile excel) {
     //     return fileService.importExcel(excel);
     // }
+
+    @ApiOperation(value = "上传Product文件并持久化")
+    @RequestMapping(value = "/upload")
+    public ResultVo importProductExcel(@RequestParam("file") MultipartFile excel) {
+        return productService.importProductExcelAndPersistence(excel);
+    }
+
 }

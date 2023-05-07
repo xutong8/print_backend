@@ -6,18 +6,26 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zju.vis.print_backend.Utils.ResultVoUtil;
 import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.compositekey.RelProductFilterCakeKey;
 import com.zju.vis.print_backend.compositekey.RelProductRawMaterialKey;
 import com.zju.vis.print_backend.dao.*;
 import com.zju.vis.print_backend.entity.*;
+import com.zju.vis.print_backend.vo.ExcelProductVo;
+import com.zju.vis.print_backend.vo.ResultVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 public class ProductService {
     //
@@ -48,6 +56,9 @@ public class ProductService {
 
     @Resource
     private RelProductFilterCakeService relProductFilterCakeService;
+
+    @Resource
+    private FileService fileService;
 
     // 用于返回产品列表名
     public static class ProductSimple{
@@ -601,49 +612,56 @@ public class ProductService {
         }
         // Convert the simplified raw material list back to its original format
         List<RawMaterial> rawMaterialList = new ArrayList<>();
-        for (RawMaterialService.RawMaterialSimple rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
-            RawMaterial rawMaterial = rawMaterialService.deSimplifyRawMaterial(rawMaterialSimple, productStandard.getProductId());
-            rawMaterialList.add(rawMaterial);
+        if(productStandard.getRawMaterialSimpleList() != null){
+            for (RawMaterialService.RawMaterialSimple rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
+                RawMaterial rawMaterial = rawMaterialService.deSimplifyRawMaterial(rawMaterialSimple, productStandard.getProductId());
+                rawMaterialList.add(rawMaterial);
+            }
         }
         product.setRawMaterialList(rawMaterialList);
 
         // Convert the simplified filter cake list back to its original format
         List<FilterCake> filterCakeList = new ArrayList<>();
-        for (FilterCakeService.FilterCakeSimple filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
-            FilterCake filterCake = filterCakeService.deSimplifyFilterCake(filterCakeSimple, productStandard.getProductId());
-            filterCakeList.add(filterCake);
+        if(productStandard.getFilterCakeSimpleList()!=null){
+            for (FilterCakeService.FilterCakeSimple filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
+                FilterCake filterCake = filterCakeService.deSimplifyFilterCake(filterCakeSimple, productStandard.getProductId());
+                filterCakeList.add(filterCake);
+            }
         }
         product.setFilterCakeList(filterCakeList);
 
         List<RelProductRawMaterial> relProductRawMaterials = new ArrayList<>();
-        for (RawMaterialService.RawMaterialSimple rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
-            Long rawMaterialId = rawMaterialSimple.getRawMaterialId();
-            Double inventory = rawMaterialSimple.getInventory();
+        if(productStandard.getRawMaterialSimpleList()!=null){
+            for (RawMaterialService.RawMaterialSimple rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
+                Long rawMaterialId = rawMaterialSimple.getRawMaterialId();
+                Double inventory = rawMaterialSimple.getInventory();
 
-            RelProductRawMaterial relProductRawMaterial = new RelProductRawMaterial();
-            RelProductRawMaterialKey relProductRawMaterialKey = new RelProductRawMaterialKey();
-            relProductRawMaterialKey.setProductId(product.getProductId());
-            relProductRawMaterialKey.setRawMaterialId(rawMaterialId);
-            relProductRawMaterial.setId(relProductRawMaterialKey);
-            relProductRawMaterial.setInventory(inventory);
+                RelProductRawMaterial relProductRawMaterial = new RelProductRawMaterial();
+                RelProductRawMaterialKey relProductRawMaterialKey = new RelProductRawMaterialKey();
+                relProductRawMaterialKey.setProductId(product.getProductId());
+                relProductRawMaterialKey.setRawMaterialId(rawMaterialId);
+                relProductRawMaterial.setId(relProductRawMaterialKey);
+                relProductRawMaterial.setInventory(inventory);
 
-            relProductRawMaterials.add(relProductRawMaterial);
+                relProductRawMaterials.add(relProductRawMaterial);
+            }
         }
         List<RelProductFilterCake> relProductFilterCakes = new ArrayList<>();
-        for (FilterCakeService.FilterCakeSimple filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
-            Long filterCakeId = filterCakeSimple.getFilterCakeId();
-            Double inventory = filterCakeSimple.getInventory();
+        if(productStandard.getFilterCakeSimpleList()!=null){
+            for (FilterCakeService.FilterCakeSimple filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
+                Long filterCakeId = filterCakeSimple.getFilterCakeId();
+                Double inventory = filterCakeSimple.getInventory();
 
-            RelProductFilterCake relProductFilterCake = new RelProductFilterCake();
-            RelProductFilterCakeKey relProductFilterCakeKey = new RelProductFilterCakeKey();
-            relProductFilterCakeKey.setProductId(product.getProductId());
-            relProductFilterCakeKey.setFilterCakeId(filterCakeId);
-            relProductFilterCake.setId(relProductFilterCakeKey);
-            relProductFilterCake.setInventory(inventory);
+                RelProductFilterCake relProductFilterCake = new RelProductFilterCake();
+                RelProductFilterCakeKey relProductFilterCakeKey = new RelProductFilterCakeKey();
+                relProductFilterCakeKey.setProductId(product.getProductId());
+                relProductFilterCakeKey.setFilterCakeId(filterCakeId);
+                relProductFilterCake.setId(relProductFilterCakeKey);
+                relProductFilterCake.setInventory(inventory);
 
-            relProductFilterCakes.add(relProductFilterCake);
+                relProductFilterCakes.add(relProductFilterCake);
+            }
         }
-
         return new DeStandardizeResult(product, relProductRawMaterials, relProductFilterCakes);
     }
 
@@ -673,6 +691,7 @@ public class ProductService {
 
     // 根据Product 删除所有原料关联
     private void deleteRelProductRawMaterials(Product product){
+        if(product == null) return;
         for(RawMaterial rawMaterial: product.getRawMaterialList()){
             RelProductRawMaterialKey id = new RelProductRawMaterialKey();
             id.setProductId(product.getProductId());
@@ -684,6 +703,7 @@ public class ProductService {
 
     // 根据Product 删除所有滤饼关联
     private void deleteRelProductFilterCakes(Product product){
+        if(product == null) return;
         for(FilterCake filterCake: product.getFilterCakeList()){
             RelProductFilterCakeKey id = new RelProductFilterCakeKey();
             id.setProductId(product.getProductId());
@@ -711,6 +731,10 @@ public class ProductService {
     //-------------------------------------------------------------------------
     //update product data
     public String updateProduct(ProductStandard updatedProduct) {
+        if(productRepository.findProductByProductId(updatedProduct.getProductId()) == null){
+            Product addedProduct = addProduct(updatedProduct);
+            return "数据库中不存在对应数据,已添加Id为" + addedProduct.getProductId() + "条目" ;
+        }
         // 先删掉原先的关系
         Product originProduct = productRepository.findProductByProductId(updatedProduct.getProductId());
         deleteRelProductRawMaterials(originProduct);
@@ -728,4 +752,43 @@ public class ProductService {
         return "Product " + originProduct.getProductName() + " has been changed";
     }
 
+    // 导入文件
+    //-------------------------------------------------------------------------
+    public ResultVo importProductExcelAndPersistence(MultipartFile file){
+        ResultVo<List<ExcelProductVo>> importResult = fileService.importProductExcel(file);
+        if(!importResult.checkSuccess()){
+            log.error(importResult.getMsg());
+            return importResult;
+        }
+        List<ExcelProductVo> excelProductVos = importResult.getData();
+        for(ExcelProductVo excelProductVo: excelProductVos){
+            // excel信息转化为标准类
+            ProductStandard productStandard = transExcelToStandard(excelProductVo);
+            // 更新数据库，已经存在的则会直接修改，为更新关联数据已存在的关联数据会被删除
+            updateProduct(productStandard);
+        }
+        System.out.println(excelProductVos);
+        return ResultVoUtil.success(excelProductVos);
+    }
+
+    public ProductStandard transExcelToStandard(ExcelProductVo excelProductVo){
+        ProductStandard productStandard = new ProductStandard();
+        // 如果已经存在了则修改，否则则添加
+        if(productRepository.findProductByProductIndex(excelProductVo.getProductIndex()) == null){
+            // 表示添加
+            productStandard.setProductId(new Long(0));
+        }else{
+            productStandard.setProductId(productRepository.findProductByProductIndex(excelProductVo.getProductIndex()).getProductId());
+        }
+        productStandard.setProductName(excelProductVo.getProductName());
+        productStandard.setProductIndex(excelProductVo.getProductIndex());
+        productStandard.setProductCode(excelProductVo.getProductCode());
+        productStandard.setProductColor(excelProductVo.getProductColor());
+        productStandard.setProductSeriesName(excelProductVo.getProductSeriesName());
+        productStandard.setProductFactoryName(excelProductVo.getProductFactoryName());
+        productStandard.setProductRemarks("");
+        productStandard.setProductProcessingCost(excelProductVo.getProductProcessingCost());
+        productStandard.setProductAccountingQuantity(excelProductVo.getProductAccountingQuantity());
+        return productStandard;
+    }
 }
