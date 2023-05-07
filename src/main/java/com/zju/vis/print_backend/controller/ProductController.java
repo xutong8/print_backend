@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 
@@ -186,6 +187,13 @@ public class ProductController {
     @RequestMapping(value = "/upload")
     public ResultVo importProductExcel(@RequestParam("file") MultipartFile excel) {
         return productService.importProductExcelAndPersistence(excel);
+    }
+
+
+    @ApiOperation(value = "下载Product文件")
+    @PostMapping("/exportExcel")
+    public ResultVo exportProductExcel(final HttpServletResponse response) {
+        return productService.exportProductExcel(response);
     }
 
 }

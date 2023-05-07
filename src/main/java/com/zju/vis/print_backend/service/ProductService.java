@@ -1,20 +1,23 @@
 package com.zju.vis.print_backend.service;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.zju.vis.print_backend.Utils.ResultVoUtil;
-import com.zju.vis.print_backend.Utils.Utils;
+import com.zju.vis.print_backend.Utils.*;
 import com.zju.vis.print_backend.compositekey.RelProductFilterCakeKey;
 import com.zju.vis.print_backend.compositekey.RelProductRawMaterialKey;
 import com.zju.vis.print_backend.dao.*;
 import com.zju.vis.print_backend.entity.*;
 import com.zju.vis.print_backend.vo.ExcelProductVo;
+import com.zju.vis.print_backend.vo.ExcelProductWriteVo;
+import com.zju.vis.print_backend.vo.ExcelWriteVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,6 +43,10 @@ public class ProductService {
 
     // 调用一般方法
     Utils utils = new Utils();
+
+    // 导入excel文件
+    @Resource
+    private ExcelUtil excelUtil;
 
     // 调用其他Service的方法
     @Resource
@@ -790,5 +797,91 @@ public class ProductService {
         productStandard.setProductProcessingCost(excelProductVo.getProductProcessingCost());
         productStandard.setProductAccountingQuantity(excelProductVo.getProductAccountingQuantity());
         return productStandard;
+    }
+
+    // 导出文件
+    //-------------------------------------------------------------------------
+    public ResultVo<String> exportProductExcel(HttpServletResponse response){
+        // 1.根据查询条件获取结果集
+        List<ExcelProductWriteVo> excelProductWriteVos = getExcelProductWriteVoListByCondition();
+        if (CollectionUtil.isEmpty(excelProductWriteVos)) {
+            log.info("【导出Excel文件】要导出的数据为空，无法导出！");
+            return ResultVoUtil.success("数据为空");
+        }
+        // 2.获取要下载Excel文件的路径
+        ResultVo<String> resultVo = getDownLoadPath(ExcelProductWriteVo.class, excelProductWriteVos);
+        if (!resultVo.checkSuccess()) {
+            log.error("【导出Excel文件】获取要下载Excel文件的路径失败");
+            return resultVo;
+        }
+        // 3.下载Excel文件
+        String fileDownLoadPath = resultVo.getData();
+        ResultVo<String> downLoadResultVo = downloadFile(fileDownLoadPath, response);
+        if (null != downLoadResultVo && !downLoadResultVo.checkSuccess()) {
+            log.error("【导出Excel文件】下载文件失败");
+            return downLoadResultVo;
+        }
+        // 4.删除临时文件
+        boolean deleteFile = FileUtil.deleteFile(new File(fileDownLoadPath));
+        if (!deleteFile) {
+            log.error("【导入Excel文件】删除临时文件失败，临时文件路径为{}", fileDownLoadPath);
+            return ResultVoUtil.error("删除临时文件失败");
+        }
+        log.info("【导入Excel文件】删除临时文件成功，临时文件路径为：{}", fileDownLoadPath);
+        return null;
+    }
+
+    public List<ExcelProductWriteVo> getExcelProductWriteVoListByCondition(){
+        List<ExcelProductWriteVo> excelProductWriteVos = new ArrayList<>();
+        for(Product product: productRepository.findAll()){
+            excelProductWriteVos.add(transProductToExcel(product));
+        }
+        return excelProductWriteVos;
+    }
+
+    public ExcelProductWriteVo transProductToExcel(Product product){
+        ExcelProductWriteVo excelProductWriteVo = new ExcelProductWriteVo();
+        excelProductWriteVo.setProductName(product.getProductName());
+        excelProductWriteVo.setProductIndex(product.getProductIndex());
+        excelProductWriteVo.setProductCode(product.getProductCode());
+        excelProductWriteVo.setProductColor(product.getProductColor());
+        // 数字转化为名字
+        excelProductWriteVo.setProductSeriesName(
+                productSeriesService.findProductSeriesByProductSeriesId(
+                        product.getProductSeriesId()
+                ).getProductSeriesName()
+        );
+        excelProductWriteVo.setProductFactoryName(product.getProductFactoryName());
+        excelProductWriteVo.setProductAccountingQuantity(product.getProductAccountingQuantity());
+        excelProductWriteVo.setProductProcessingCost(product.getProductProcessingCost());
+        return excelProductWriteVo;
+    }
+
+    public ResultVo<String> getDownLoadPath(Class<ExcelProductWriteVo> clazz, List<ExcelProductWriteVo> excelWriteVos) {
+        String downLoadPath = FileUtil.getDownLoadPath();
+        if (StringUtil.isBlank(downLoadPath)) {
+            log.error("【导出Excel文件】生成临时文件失败");
+            return ResultVoUtil.error("生成临时文件失败");
+        }
+        // 1.创建一个临时目录
+        FileUtil.mkdirs(downLoadPath);
+        // String fullFilePath = downLoadPath + File.separator + System.currentTimeMillis() + "." + ExcelUtil.EXCEL_2007;
+        String fullFilePath = downLoadPath + File.separator + System.currentTimeMillis() + "." + "xlsx";
+        log.info("【导出Excel文件】文件的临时路径为：{}", fullFilePath);
+        // 2.写入数据
+        excelUtil.simpleExcelWrite(fullFilePath, clazz, excelWriteVos);
+        return ResultVoUtil.success(fullFilePath);
+    }
+
+    public ResultVo<String> downloadFile(String filePath, HttpServletResponse response) {
+        File file = new File(filePath);
+        // 1.参数校验
+        if (!file.exists()) {
+            log.error("【下载文件】文件路径{}不存在", filePath);
+            return ResultVoUtil.error("文件不存在");
+        }
+        // 2.下载文件
+        log.info("【下载文件】下载文件的路径为{}", filePath);
+        return FileUtil.downloadFile(file, response);
     }
 }
