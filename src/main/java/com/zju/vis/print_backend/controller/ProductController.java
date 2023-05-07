@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 
@@ -25,6 +26,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import springfox.documentation.spring.web.json.Json;
 
 @Api(description = "产品管理")
@@ -32,7 +35,6 @@ import springfox.documentation.spring.web.json.Json;
 @CrossOrigin
 @Controller
 public class ProductController {
-
     @Resource
     private ProductService productService;
 
@@ -40,10 +42,10 @@ public class ProductController {
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     @ResponseBody
     public ProductService.ProductPackage findAll(
-            @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
-            @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
+            @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
-        return productService.findAll(pageNo-1,pageSize);
+        return productService.findAll(pageNo - 1, pageSize);
     }
 
 
@@ -56,33 +58,33 @@ public class ProductController {
         return productService.getProductAndRawMaterial(productId);
     }
 
-  @ApiOperation(value = "根据关联条件返回对应的产品(滤饼名、原料名、系列名)")
-  @RequestMapping(value = "/findAllByRelCondition", method = RequestMethod.GET)
-  @ResponseBody
-  public ProductService.ProductPackage findAllByRelCondition(
-          @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName,
-          @RequestParam(value = "filterCakeName", defaultValue = "") String filterCakeName,
-          @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName,
-          // @Valid @RequestBody ,
-          @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
-          @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
-          ){
+    @ApiOperation(value = "根据关联条件返回对应的产品(滤饼名、原料名、系列名)")
+    @RequestMapping(value = "/findAllByRelCondition", method = RequestMethod.GET)
+    @ResponseBody
+    public ProductService.ProductPackage findAllByRelCondition(
+            @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName,
+            @RequestParam(value = "filterCakeName", defaultValue = "") String filterCakeName,
+            @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName,
+            // @Valid @RequestBody ,
+            @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+    ) {
 
-    // findAllByCondition(String rawMaterialName, String filterCakeName, String productSeriesName)
+        // findAllByCondition(String rawMaterialName, String filterCakeName, String productSeriesName)
         System.out.println("List<Product> findAllByCondition   " +
-            "rawMaterialName: " + rawMaterialName +
-            "  filterCakeName: " + filterCakeName +
-            "  productSeriesName: " + productSeriesName);
+                "rawMaterialName: " + rawMaterialName +
+                "  filterCakeName: " + filterCakeName +
+                "  productSeriesName: " + productSeriesName);
 
-      long s = System.currentTimeMillis();
-      ProductService.ProductPackage list = productService.findAllByRelCondition(rawMaterialName,filterCakeName,productSeriesName,pageNo-1,pageSize);
-      long e = System.currentTimeMillis();
-      System.out.println("findbycondition开始的时间：" + s);
-      System.out.println("findbycondition结束的时间：" + e);
-      System.out.println("findbycondition查询的时间差为：" + (e - s));
+        long s = System.currentTimeMillis();
+        ProductService.ProductPackage list = productService.findAllByRelCondition(rawMaterialName, filterCakeName, productSeriesName, pageNo - 1, pageSize);
+        long e = System.currentTimeMillis();
+        System.out.println("findbycondition开始的时间：" + s);
+        System.out.println("findbycondition结束的时间：" + e);
+        System.out.println("findbycondition查询的时间差为：" + (e - s));
 
-      return list;
-  }
+        return list;
+    }
 
     @ApiOperation(value = "Product直接查询")
     @RequestMapping(value = "/findAllByDirectCondition", method = RequestMethod.GET)
@@ -93,9 +95,9 @@ public class ProductController {
             // @Valid @RequestBody ,
             @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
-    ){
+    ) {
         long s = System.currentTimeMillis();
-        ProductService.ProductPackage list = productService.findAllByDirectCondition(typeOfQuery,conditionOfQuery,pageNo-1,pageSize);
+        ProductService.ProductPackage list = productService.findAllByDirectCondition(typeOfQuery, conditionOfQuery, pageNo - 1, pageSize);
         long e = System.currentTimeMillis();
         System.out.println("findbycondition开始的时间：" + s);
         System.out.println("findbycondition结束的时间：" + e);
@@ -162,13 +164,20 @@ public class ProductController {
     ) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date date = null;
-        try{
+        try {
             date = sdf.parse(testDate);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println(date);
-        return productService.calculateProductHistoryPrice(productRepository.findProductByProductId(productId),date);
+        return productService.calculateProductHistoryPrice(productRepository.findProductByProductId(productId), date);
     }
 
+    // 上传文件
+    // @ApiOperation(value = "上传商品文件")
+    // @RequestMapping(value = "/upload")
+    // @ResponseBody
+    // public ResultVo importExcel(@RequestParam("file") MultipartFile excel) {
+    //     return fileService.importExcel(excel);
+    // }
 }
