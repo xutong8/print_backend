@@ -1,20 +1,28 @@
 package com.zju.vis.print_backend.service;
 
+import com.zju.vis.print_backend.Utils.ExcelUtil;
+import com.zju.vis.print_backend.Utils.ResultVoUtil;
 import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.compositekey.RelDateRawMaterialKey;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.*;
+import com.zju.vis.print_backend.vo.ExcelRawMaterialVo;
+import com.zju.vis.print_backend.vo.ResultVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 import java.util.*;
 import java.sql.Date;
 
+@Slf4j
 @Service
 public class RawMaterialService {
     @Resource
@@ -29,6 +37,13 @@ public class RawMaterialService {
 
     @Resource
     private RelProductRawMaterialService relProductRawMaterialService;
+
+    // 导入excel文件
+    @Resource
+    private ExcelUtil excelUtil;
+
+    @Resource
+    private FileService fileService;
 
     // 用于调用一般方法
     Utils utils = new Utils();
@@ -451,18 +466,20 @@ public class RawMaterialService {
 
         // 关系表设置
         List<RelDateRawMaterial> relDateRawMaterialList = new ArrayList<>();
-        for(Utils.HistoryPrice historyPrice: rawMaterialStandard.getRawMaterialHistoryPrice()){
-            Date rawMaterialDate = historyPrice.getDate();
-            Float price = historyPrice.getPrice();
+        if(rawMaterialStandard.getRawMaterialHistoryPrice() != null){
+            for(Utils.HistoryPrice historyPrice: rawMaterialStandard.getRawMaterialHistoryPrice()){
+                Date rawMaterialDate = historyPrice.getDate();
+                Float price = historyPrice.getPrice();
 
-            RelDateRawMaterial relDateRawMaterial = new RelDateRawMaterial();
-            RelDateRawMaterialKey relDateRawMaterialKey = new RelDateRawMaterialKey();
-            relDateRawMaterialKey.setRawMaterialId(rawMaterial.getRawMaterialId());
-            relDateRawMaterialKey.setRawMaterialDate(rawMaterialDate);
-            relDateRawMaterial.setId(relDateRawMaterialKey);
-            relDateRawMaterial.setPrice(price);
+                RelDateRawMaterial relDateRawMaterial = new RelDateRawMaterial();
+                RelDateRawMaterialKey relDateRawMaterialKey = new RelDateRawMaterialKey();
+                relDateRawMaterialKey.setRawMaterialId(rawMaterial.getRawMaterialId());
+                relDateRawMaterialKey.setRawMaterialDate(rawMaterialDate);
+                relDateRawMaterial.setId(relDateRawMaterialKey);
+                relDateRawMaterial.setPrice(price);
 
-            relDateRawMaterialList.add(relDateRawMaterial);
+                relDateRawMaterialList.add(relDateRawMaterial);
+            }
         }
         return new DeStandardizeResult(rawMaterial,relDateRawMaterialList);
     }
@@ -492,6 +509,10 @@ public class RawMaterialService {
     //-------------------------------------------------------------------------
     public String updateRawMaterial(RawMaterialStandard updatedRawMaterial) {
         RawMaterial originRawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(updatedRawMaterial.getRawMaterialId());
+        if(originRawMaterial == null){
+            RawMaterial addedRawMaterial = addRawMaterial(updatedRawMaterial);
+            return "数据库中不存在对应数据,已添加Id为" + addedRawMaterial.getRawMaterialId() + "条目" ;
+        }
         // 删除原先单向时间关系
         for(RelDateRawMaterial relDateRawMaterial: originRawMaterial.getRelDateRawMaterialList()){
             relDateRawMaterialService.delete(relDateRawMaterial);
@@ -539,5 +560,46 @@ public class RawMaterialService {
     public void deleteRawMaterialByRawMaterialId(Long rawMaterialId){
         RawMaterial rawMaterialToDelete = rawMaterialRepository.findRawMaterialByRawMaterialId(rawMaterialId);
         rawMaterialRepository.delete(rawMaterialToDelete);
+    }
+
+    // 导入文件
+    //-------------------------------------------------------------------------
+    public ResultVo importRawMaterialExcelAndPersistence(MultipartFile file){
+        ResultVo<List<ExcelRawMaterialVo>> importResult = fileService.importEntityExcel(file, ExcelRawMaterialVo.class);
+        if(!importResult.checkSuccess()){
+            log.error(importResult.getMsg());
+            return importResult;
+        }
+        List<ExcelRawMaterialVo> excelRawMaterialVos = importResult.getData();
+        for(ExcelRawMaterialVo excelRawMaterialVo: excelRawMaterialVos){
+            // excel信息转化为标准类
+            RawMaterialStandard rawMaterialStandard = transExcelToStandard(excelRawMaterialVo);
+            // 更新数据库，已存在则会直接替换
+            updateRawMaterial(rawMaterialStandard);
+        }
+        return ResultVoUtil.success(excelRawMaterialVos);
+    }
+
+    public RawMaterialStandard transExcelToStandard(ExcelRawMaterialVo excelRawMaterialVo){
+        RawMaterialStandard rawMaterialStandard = new RawMaterialStandard();
+        // 如果已经存在了则修改，否则则添加
+        if(rawMaterialRepository.findRawMaterialByRawMaterialName(excelRawMaterialVo.getRawMaterialName()) == null){
+            // 表示添加
+            rawMaterialStandard.setRawMaterialId(new Long(0));
+        }else{
+            rawMaterialStandard.setRawMaterialId(rawMaterialRepository.findRawMaterialByRawMaterialName(excelRawMaterialVo.getRawMaterialName()).getRawMaterialId());
+        }
+        rawMaterialStandard.setRawMaterialName(excelRawMaterialVo.getRawMaterialName());
+        rawMaterialStandard.setRawMaterialIndex(excelRawMaterialVo.getRawMaterialIndex());
+        rawMaterialStandard.setRawMaterialUnitPrice(excelRawMaterialVo.getRawMaterialPrice());
+        rawMaterialStandard.setRawMaterialConventional(excelRawMaterialVo.getRawMaterialConventional());
+        rawMaterialStandard.setRawMaterialSpecification(excelRawMaterialVo.getRawMaterialSpecification());
+        return rawMaterialStandard;
+    }
+
+    // 导出文件
+    //-------------------------------------------------------------------------
+    public ResultVo<String> exportRawMaterialExcel(HttpServletResponse response){
+        return null;
     }
 }

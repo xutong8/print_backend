@@ -2,6 +2,7 @@ package com.zju.vis.print_backend.controller;
 
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RawMaterialService;
+import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -17,7 +19,7 @@ import java.util.List;
 @Api(description = "原料管理")
 @RequestMapping("/rawMaterial")
 @CrossOrigin
-@Controller
+@RestController
 public class RawMaterialController {
 
     @Resource
@@ -94,5 +96,12 @@ public class RawMaterialController {
     ) {
         rawMaterialService.deleteByRawMaterialId(rawMaterialId);
         return ResponseEntity.ok("RawMaterial with ID: " + rawMaterialId + " has been deleted.");
+    }
+
+    // 文件上传
+    @ApiOperation(value = "上传RawMaterial文件并持久化")
+    @RequestMapping(value = "/upload")
+    public ResultVo importRawMaterialExcel(@RequestParam("file") MultipartFile excel){
+        return rawMaterialService.importRawMaterialExcelAndPersistence(excel);
     }
 }
