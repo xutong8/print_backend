@@ -496,6 +496,7 @@ public class ProductService {
         }
 
         Double sum = 0.0;
+        // 加上批处理价格
         sum += product.getProductProcessingCost();
         if(filterCakeSimpleList.size() != 0){
             for(FilterCakeService.FilterCakeSimple filterCakeSimple: filterCakeSimpleList){
@@ -522,6 +523,7 @@ public class ProductService {
             rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
         }
         Double sum = 0.0;
+        // 加上批处理价格
         sum += product.getProductProcessingCost();
         // 获取滤饼历史价格
         if(filterCakeSimpleList.size()!=0){

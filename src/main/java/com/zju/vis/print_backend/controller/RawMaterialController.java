@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -103,5 +104,12 @@ public class RawMaterialController {
     @RequestMapping(value = "/upload")
     public ResultVo importRawMaterialExcel(@RequestParam("file") MultipartFile excel){
         return rawMaterialService.importRawMaterialExcelAndPersistence(excel);
+    }
+
+    // 下载文件
+    @ApiOperation(value = "下载RawMaterial文件")
+    @PostMapping("/exportExcel")
+    public ResultVo exportRawMaterialExcel(final HttpServletResponse response) {
+        return rawMaterialService.exportRawMaterialExcel(response);
     }
 }

@@ -183,13 +183,14 @@ public class ProductController {
     //     return fileService.importExcel(excel);
     // }
 
+    // 上传文件
     @ApiOperation(value = "上传Product文件并持久化")
     @RequestMapping(value = "/upload")
     public ResultVo importProductExcel(@RequestParam("file") MultipartFile excel) {
         return productService.importProductExcelAndPersistence(excel);
     }
 
-
+    // 下载文件
     @ApiOperation(value = "下载Product文件")
     @PostMapping("/exportExcel")
     public ResultVo exportProductExcel(final HttpServletResponse response) {

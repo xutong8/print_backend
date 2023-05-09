@@ -404,6 +404,7 @@ public class FilterCakeService {
             rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterialF(rawMaterial, filterCake.getFilterCakeId()));
         }
         Double sum = 0.0;
+        // 加上批处理价格
         sum += filterCake.getFilterCakeProcessingCost();
         // 获取滤饼历史价格
         if(filterCakeSimpleList.size()!=0){
