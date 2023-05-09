@@ -1,12 +1,12 @@
 package com.zju.vis.print_backend.service;
 
-import com.zju.vis.print_backend.Utils.ExcelUtil;
-import com.zju.vis.print_backend.Utils.ResultVoUtil;
-import com.zju.vis.print_backend.Utils.Utils;
+import com.zju.vis.print_backend.Utils.*;
 import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
 import com.zju.vis.print_backend.vo.ExcelProductSeriesVo;
+import com.zju.vis.print_backend.vo.ExcelProductSeriesWriteVo;
+import com.zju.vis.print_backend.vo.ExcelRawMaterialWriteVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.*;
 
 @Slf4j
@@ -313,5 +315,51 @@ public class ProductSeriesService {
         return productSeriesStandard;
     }
 
+    // 导出文件
+    //-------------------------------------------------------------------------
+    public ResultVo<String> exportProductSeriesExcel(HttpServletResponse response){
+        // 1.根据查询条件获取结果集
+        List<ExcelProductSeriesWriteVo> excelProductSeriesWriteVos = getExcelProductSeriesWriteVoListByCondition();
+        if (CollectionUtil.isEmpty(excelProductSeriesWriteVos)) {
+            log.info("【导出Excel文件】要导出的数据为空，无法导出！");
+            return ResultVoUtil.success("数据为空");
+        }
+        // 2.获取要下载Excel文件的路径
+        ResultVo<String> resultVo = fileService.getDownLoadPath(ExcelProductSeriesWriteVo.class,excelProductSeriesWriteVos);
+        if (!resultVo.checkSuccess()) {
+            log.error("【导出Excel文件】获取要下载Excel文件的路径失败");
+            return resultVo;
+        }
+        // 3.下载Excel文件
+        String fileDownLoadPath = resultVo.getData();
+        ResultVo<String> downLoadResultVo = fileService.downloadFile(fileDownLoadPath, response);
+        if (null != downLoadResultVo && !downLoadResultVo.checkSuccess()) {
+            log.error("【导出Excel文件】下载文件失败");
+            return downLoadResultVo;
+        }
+        // 4.删除临时文件
+        boolean deleteFile = FileUtil.deleteFile(new File(fileDownLoadPath));
+        if (!deleteFile) {
+            log.error("【导入Excel文件】删除临时文件失败，临时文件路径为{}", fileDownLoadPath);
+            return ResultVoUtil.error("删除临时文件失败");
+        }
+        log.info("【导入Excel文件】删除临时文件成功，临时文件路径为：{}", fileDownLoadPath);
+        return null;
+    }
+
+    public List<ExcelProductSeriesWriteVo> getExcelProductSeriesWriteVoListByCondition(){
+        List<ExcelProductSeriesWriteVo> excelProductSeriesWriteVos = new ArrayList<>();
+        for(ProductSeries productSeries: productSeriesRepository.findAll()){
+            excelProductSeriesWriteVos.add(transProductSeriesToExcel(productSeries));
+        }
+        return excelProductSeriesWriteVos;
+    }
+
+    public ExcelProductSeriesWriteVo transProductSeriesToExcel(ProductSeries productSeries){
+        ExcelProductSeriesWriteVo excelProductSeriesWriteVo = new ExcelProductSeriesWriteVo();
+        excelProductSeriesWriteVo.setProductSeriesName(productSeries.getProductSeriesName());
+        excelProductSeriesWriteVo.setProductSeriesFunction(productSeries.getProductSeriesFunction());
+        return excelProductSeriesWriteVo;
+    }
 
 }

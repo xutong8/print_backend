@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -95,12 +96,17 @@ public class ProductSeriesController {
     }
 
     // 文件上传
-    @ApiOperation(value = "上传RawMaterial文件并持久化")
+    @ApiOperation(value = "上传ProductSeries文件并持久化")
     @RequestMapping(value = "/upload")
     public ResultVo importProductSeriesExcel(@RequestParam("file") MultipartFile excel){
         return productSeriesService.importProductSeriesExcelAndPersistence(excel);
     }
 
     // 文件下载
+    @ApiOperation(value = "下载ProductSeries文件")
+    @PostMapping("/exportExcel")
+    public ResultVo exportProductSeriesExcel(final HttpServletResponse response){
+        return productSeriesService.exportProductSeriesExcel(response);
+    }
 
 }
