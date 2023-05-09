@@ -2,8 +2,11 @@ package com.zju.vis.print_backend.controller;
 
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
+import com.zju.vis.print_backend.entity.RelProductFilterCake;
 import com.zju.vis.print_backend.service.ProductSeriesService;
 import com.zju.vis.print_backend.service.RawMaterialService;
+import com.zju.vis.print_backend.service.RelProductFilterCakeService;
+import com.zju.vis.print_backend.service.RelProductRawMaterialService;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

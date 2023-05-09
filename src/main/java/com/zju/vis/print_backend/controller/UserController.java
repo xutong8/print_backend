@@ -1,7 +1,6 @@
 package com.zju.vis.print_backend.controller;
 
 
-import com.zju.vis.print_backend.entity.User;
 import com.zju.vis.print_backend.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,20 +26,18 @@ public class UserController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
     public UserService.UserStandard doLogin(
-            @RequestParam(value = "userName") String userName,
-            @RequestParam(value = "password") String password
+            @Valid @RequestBody UserService.UserLoginVo userLoginVo
     ){
-        return userService.doLogin(userName,password);
+        return userService.doLogin(userLoginVo);
     };
 
     @ApiOperation(value = "注册新用户")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
     public UserService.UserStandard doRegister(
-            @RequestParam(value = "userName") String userName,
-            @RequestParam(value = "password") String password
+            @Valid @RequestBody UserService.UserLoginVo userLoginVo
     ) {
-        return userService.doRegister(userName,password);
+        return userService.doRegister(userLoginVo);
     }
 
     @ApiOperation(value = "通过用户名删除用户")

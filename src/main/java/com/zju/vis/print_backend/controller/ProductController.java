@@ -15,6 +15,8 @@ import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.entity.RelProductFilterCake;
 import com.zju.vis.print_backend.service.RawMaterialService;
+import com.zju.vis.print_backend.service.RelProductFilterCakeService;
+import com.zju.vis.print_backend.service.RelProductRawMaterialService;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.models.auth.In;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,13 @@ import springfox.documentation.spring.web.json.Json;
 public class ProductController {
     @Resource
     private ProductService productService;
+
+    @Resource
+    RelProductRawMaterialService productRawMaterialService;
+
+    @Resource
+    RelProductFilterCakeService productFilterCakeService;
+
 
     @ApiOperation(value = "获取所有产品")
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
@@ -175,13 +184,6 @@ public class ProductController {
         return productService.calculateProductHistoryPrice(productRepository.findProductByProductId(productId), date);
     }
 
-    // 上传文件
-    // @ApiOperation(value = "上传商品文件")
-    // @RequestMapping(value = "/upload")
-    // @ResponseBody
-    // public ResultVo importExcel(@RequestParam("file") MultipartFile excel) {
-    //     return fileService.importExcel(excel);
-    // }
 
     // 上传文件
     @ApiOperation(value = "上传Product文件并持久化")
@@ -190,11 +192,25 @@ public class ProductController {
         return productService.importProductExcelAndPersistence(excel);
     }
 
+    // 关系表文件上传 ProductRawMaterial
+
+    // 关系表文件上传 ProductFilterCake
+    @ApiOperation(value = "上传Product文件并持久化")
+    @RequestMapping(value = "/uploadRelPF")
+    public ResultVo importRelProductFilterCakeExcel(@RequestParam("file") MultipartFile excel){
+        return productFilterCakeService.importRelProductFilterCakeExcelAndPersistence(excel);
+    }
+
     // 下载文件
     @ApiOperation(value = "下载Product文件")
     @PostMapping("/exportExcel")
     public ResultVo exportProductExcel(final HttpServletResponse response) {
         return productService.exportProductExcel(response);
     }
+
+
+    // 关系表文件下载 ProductRawMaterial
+
+    // 关系表文件下载 ProductFilterCake
 
 }

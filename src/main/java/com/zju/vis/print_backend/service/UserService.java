@@ -2,6 +2,9 @@ package com.zju.vis.print_backend.service;
 
 import com.zju.vis.print_backend.dao.UserRepository;
 import com.zju.vis.print_backend.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -137,21 +140,29 @@ public class UserService {
         return userSimpleList;
     }
 
-    public UserStandard doLogin(String userName, String password){
-        User user = userRepository.findUserByUserNameAndPassword(userName, password);
-        System.out.println("userName: " + userName + " password: " + password);
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserLoginVo {
+        private String userName;
+        private String password;
+    }
+
+    public UserStandard doLogin(UserLoginVo userLoginVo){
+        User user = userRepository.findUserByUserNameAndPassword(userLoginVo.getUserName(), userLoginVo.getPassword());
+        System.out.println("userName: " + userLoginVo.getUserName() + " password: " + userLoginVo.getPassword());
         System.out.println(user == null);
         return packUser(user);
     }
 
-    public UserStandard doRegister(String userName, String password){
+    public UserStandard doRegister(UserLoginVo userLoginVo){
         User user = new User();
-        if (userRepository.findUserByUserName(userName) != null){
+        if (userRepository.findUserByUserName(userLoginVo.getUserName()) != null){
             System.out.println("添加失败");
             return packUser(null);
         }
-        user.setUserName(userName);
-        user.setPassword(password);
+        user.setUserName(userLoginVo.getUserName());
+        user.setPassword(userLoginVo.getPassword());
         user.setUserType(2);
         user.setAuthority(0);
         return packUser(userRepository.save(user));
