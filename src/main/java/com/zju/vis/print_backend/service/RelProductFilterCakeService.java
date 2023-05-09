@@ -1,5 +1,7 @@
 package com.zju.vis.print_backend.service;
 
+import com.zju.vis.print_backend.Utils.CollectionUtil;
+import com.zju.vis.print_backend.Utils.FileUtil;
 import com.zju.vis.print_backend.Utils.ResultVoUtil;
 import com.zju.vis.print_backend.compositekey.RelProductFilterCakeKey;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
@@ -9,7 +11,9 @@ import com.zju.vis.print_backend.dao.RelProductFilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.RelProductFilterCake;
+import com.zju.vis.print_backend.vo.ExcelRawMaterialWriteVo;
 import com.zju.vis.print_backend.vo.ExcelRelProductFilterCakeVo;
+import com.zju.vis.print_backend.vo.ExcelRelProductFilterCakeWriteVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -101,5 +108,49 @@ public class RelProductFilterCakeService {
 
     // 导出文件
     //-------------------------------------------------------------------------
+    public ResultVo<String> exportRelProductFilterCakeExcel(HttpServletResponse response){
+        // 1.根据查询条件获取结果集
+        List<ExcelRelProductFilterCakeWriteVo> excelRelProductFilterCakeWriteVos = getExcelRelProductFilterCakeWriteVoListByCondition();
+        if (CollectionUtil.isEmpty(excelRelProductFilterCakeWriteVos)) {
+            log.info("【导出Excel文件】要导出的数据为空，无法导出！");
+            return ResultVoUtil.success("数据为空");
+        }
+        // 2.获取要下载Excel文件的路径
+        ResultVo<String> resultVo = fileService.getDownLoadPath(ExcelRelProductFilterCakeWriteVo.class,excelRelProductFilterCakeWriteVos);
+        if (!resultVo.checkSuccess()) {
+            log.error("【导出Excel文件】获取要下载Excel文件的路径失败");
+            return resultVo;
+        }
+        // 3.下载Excel文件
+        String fileDownLoadPath = resultVo.getData();
+        ResultVo<String> downLoadResultVo = fileService.downloadFile(fileDownLoadPath, response);
+        if (null != downLoadResultVo && !downLoadResultVo.checkSuccess()) {
+            log.error("【导出Excel文件】下载文件失败");
+            return downLoadResultVo;
+        }
+        // 4.删除临时文件
+        boolean deleteFile = FileUtil.deleteFile(new File(fileDownLoadPath));
+        if (!deleteFile) {
+            log.error("【导入Excel文件】删除临时文件失败，临时文件路径为{}", fileDownLoadPath);
+            return ResultVoUtil.error("删除临时文件失败");
+        }
+        log.info("【导入Excel文件】删除临时文件成功，临时文件路径为：{}", fileDownLoadPath);
+        return null;
+    }
 
+    public List<ExcelRelProductFilterCakeWriteVo> getExcelRelProductFilterCakeWriteVoListByCondition(){
+        List<ExcelRelProductFilterCakeWriteVo> excelRelProductFilterCakeWriteVos = new ArrayList<>();
+        for(RelProductFilterCake relProductFilterCake: relProductFilterCakeRepository.findAll()){
+            excelRelProductFilterCakeWriteVos.add(transRelProductFilterCakeToExcel(relProductFilterCake));
+        }
+        return excelRelProductFilterCakeWriteVos;
+    }
+
+    public ExcelRelProductFilterCakeWriteVo transRelProductFilterCakeToExcel(RelProductFilterCake relProductFilterCake){
+        ExcelRelProductFilterCakeWriteVo excelRelProductFilterCakeWriteVo = new ExcelRelProductFilterCakeWriteVo();
+        excelRelProductFilterCakeWriteVo.setProductName(relProductFilterCake.getProduct().getProductName());
+        excelRelProductFilterCakeWriteVo.setFilterCakeName(relProductFilterCake.getFilterCake().getFilterCakeName());
+        excelRelProductFilterCakeWriteVo.setInventory(relProductFilterCake.getInventory());
+        return excelRelProductFilterCakeWriteVo;
+    }
 }

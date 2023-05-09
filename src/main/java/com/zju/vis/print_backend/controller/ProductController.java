@@ -195,7 +195,7 @@ public class ProductController {
     // 关系表文件上传 ProductRawMaterial
 
     // 关系表文件上传 ProductFilterCake
-    @ApiOperation(value = "上传Product文件并持久化")
+    @ApiOperation(value = "上传RelProductFilterCake文件并持久化")
     @RequestMapping(value = "/uploadRelPF")
     public ResultVo importRelProductFilterCakeExcel(@RequestParam("file") MultipartFile excel){
         return productFilterCakeService.importRelProductFilterCakeExcelAndPersistence(excel);
@@ -208,9 +208,13 @@ public class ProductController {
         return productService.exportProductExcel(response);
     }
 
-
     // 关系表文件下载 ProductRawMaterial
 
     // 关系表文件下载 ProductFilterCake
+    @ApiOperation(value = "下载RelProductFilterCake文件")
+    @PostMapping("/exportRelPFExcel")
+    public ResultVo exportRelProductFilterCakeExcel(final HttpServletResponse response){
+        return productFilterCakeService.exportRelProductFilterCakeExcel(response);
+    }
 
 }
