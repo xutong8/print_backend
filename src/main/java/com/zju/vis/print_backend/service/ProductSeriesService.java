@@ -1,22 +1,36 @@
 package com.zju.vis.print_backend.service;
 
+import com.zju.vis.print_backend.Utils.ExcelUtil;
+import com.zju.vis.print_backend.Utils.ResultVoUtil;
 import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
+import com.zju.vis.print_backend.vo.ExcelProductSeriesVo;
+import com.zju.vis.print_backend.vo.ResultVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.*;
 
+@Slf4j
 @Service
 public class ProductSeriesService {
     @Resource
     ProductSeriesRepository productSeriesRepository;
+
+    // 导入excel文件
+    @Resource
+    private ExcelUtil excelUtil;
+
+    @Resource
+    private FileService fileService;
 
     // 调用一般方法
     Utils utils = new Utils();
@@ -256,9 +270,48 @@ public class ProductSeriesService {
     //-------------------------------------------------------------------------
     //update product data
     public String updateProductSeries(ProductSeriesStandard updatedProductSeries) {
+        if(productSeriesRepository.findProductSeriesByProductSeriesId(updatedProductSeries.getProductSeriesId()) == null){
+            ProductSeries addedProductSeries = addProductSeries(updatedProductSeries);
+            return "数据库中不存在对应数据,已添加Id为" + addedProductSeries.getProductSeriesId() + "的条目" ;
+        }
         ProductSeries productSeries = deStandardizeProductSeries(updatedProductSeries);
         productSeriesRepository.save(productSeries);
         return "ProductSeries " + productSeries.getProductSeriesName() + " has been changed";
     }
+
+    // 导入文件
+    //-------------------------------------------------------------------------
+    public ResultVo importProductSeriesExcelAndPersistence(MultipartFile file){
+        // 1.获取输入结果
+        ResultVo<List<ExcelProductSeriesVo>> importResult = fileService.importEntityExcel(file, ExcelProductSeriesVo.class);
+        if(!importResult.checkSuccess()){
+            log.error(importResult.getMsg());
+            return importResult;
+        }
+        // 2.获取输入类
+        List<ExcelProductSeriesVo> excelProductSeriesVos = importResult.getData();
+        for(ExcelProductSeriesVo excelProductSeriesVo: excelProductSeriesVos){
+            // excel信息转化为标准类
+            ProductSeriesStandard productSeriesStandard = transExcelToStandard(excelProductSeriesVo);
+            // 更新数据库，已存在则会直接替换
+            updateProductSeries(productSeriesStandard);
+        }
+        return ResultVoUtil.success(excelProductSeriesVos);
+    }
+
+    public ProductSeriesStandard transExcelToStandard(ExcelProductSeriesVo excelProductSeriesVo){
+        ProductSeriesStandard productSeriesStandard = new ProductSeriesStandard();
+        // 如果已经存在了则修改，否则则添加
+        if(productSeriesRepository.findProductSeriesByProductSeriesName(excelProductSeriesVo.getProductSeriesName()) == null){
+            // 表示添加
+            productSeriesStandard.setProductSeriesId(new Long(0));
+        }else{
+            productSeriesStandard.setProductSeriesId(productSeriesRepository.findProductSeriesByProductSeriesName(excelProductSeriesVo.getProductSeriesName()).getProductSeriesId());
+        }
+        productSeriesStandard.setProductSeriesName(excelProductSeriesVo.getProductSeriesName());
+        productSeriesStandard.setProductSeriesFunction(excelProductSeriesVo.getProductSeriesFunction());
+        return productSeriesStandard;
+    }
+
 
 }

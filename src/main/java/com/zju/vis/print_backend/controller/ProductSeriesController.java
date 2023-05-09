@@ -4,12 +4,14 @@ import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
 import com.zju.vis.print_backend.service.ProductSeriesService;
 import com.zju.vis.print_backend.service.RawMaterialService;
+import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -20,7 +22,7 @@ import java.util.Set;
 @Api(description = "产品系列管理")
 @RequestMapping("/productSeries")
 @CrossOrigin
-@Controller
+@RestController
 public class ProductSeriesController {
     @Resource
     ProductSeriesService productSeriesService;
@@ -91,5 +93,14 @@ public class ProductSeriesController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    // 文件上传
+    @ApiOperation(value = "上传RawMaterial文件并持久化")
+    @RequestMapping(value = "/upload")
+    public ResultVo importProductSeriesExcel(@RequestParam("file") MultipartFile excel){
+        return productSeriesService.importProductSeriesExcelAndPersistence(excel);
+    }
+
+    // 文件下载
 
 }
