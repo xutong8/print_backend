@@ -1,21 +1,28 @@
 package com.zju.vis.print_backend.service;
 
+import com.zju.vis.print_backend.Utils.ExcelUtil;
+import com.zju.vis.print_backend.Utils.ResultVoUtil;
 import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.compositekey.RelFilterCakeFilterCakeKey;
 import com.zju.vis.print_backend.compositekey.RelFilterCakeRawMaterialKey;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.*;
+import com.zju.vis.print_backend.vo.ExcelFilterCakeVo;
+import com.zju.vis.print_backend.vo.ResultVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
 import java.util.*;
 
+@Slf4j
 @Service
 public class FilterCakeService {
     @Resource
@@ -40,6 +47,13 @@ public class FilterCakeService {
 
     // 调用一般方法
     Utils utils = new Utils();
+
+    // 导入excel文件
+    @Resource
+    private ExcelUtil excelUtil;
+
+    @Resource
+    private FileService fileService;
 
     // 用于返回滤饼列表名
     public class FilterCakeName{
@@ -145,7 +159,7 @@ public class FilterCakeService {
         private Double filterCakeUnitPrice;         //滤饼单位价格
         private Integer filterCakePriceIncreasePercent;//滤饼价格增幅比例
         private String filterCakeSpecification;     //滤饼规格
-        private String filterCakeRemarks;
+        private String filterCakeRemarks;           //备注
         private List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList;
         private List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList;
 
@@ -593,35 +607,39 @@ public class FilterCakeService {
 
         // 关系表设置
         List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = new ArrayList<>();
-        for(RawMaterialService.RawMaterialSimple rawMaterialSimple: filterCakeStandard.getRawMaterialSimpleList()){
-            Long rawMaterialId = rawMaterialSimple.getRawMaterialId();
-            Double inventory = rawMaterialSimple.getInventory();
+        if(filterCakeStandard.getRawMaterialSimpleList()!=null){
+            for(RawMaterialService.RawMaterialSimple rawMaterialSimple: filterCakeStandard.getRawMaterialSimpleList()){
+                Long rawMaterialId = rawMaterialSimple.getRawMaterialId();
+                Double inventory = rawMaterialSimple.getInventory();
 
-            RelFilterCakeRawMaterial relFilterCakeRawMaterial = new RelFilterCakeRawMaterial();
-            RelFilterCakeRawMaterialKey relFilterCakeRawMaterialKey = new RelFilterCakeRawMaterialKey();
-            relFilterCakeRawMaterialKey.setFilterCakeId(filterCake.getFilterCakeId());
-            relFilterCakeRawMaterialKey.setRawMaterialId(rawMaterialId);
-            relFilterCakeRawMaterial.setId(relFilterCakeRawMaterialKey);
-            relFilterCakeRawMaterial.setInventory(inventory);
+                RelFilterCakeRawMaterial relFilterCakeRawMaterial = new RelFilterCakeRawMaterial();
+                RelFilterCakeRawMaterialKey relFilterCakeRawMaterialKey = new RelFilterCakeRawMaterialKey();
+                relFilterCakeRawMaterialKey.setFilterCakeId(filterCake.getFilterCakeId());
+                relFilterCakeRawMaterialKey.setRawMaterialId(rawMaterialId);
+                relFilterCakeRawMaterial.setId(relFilterCakeRawMaterialKey);
+                relFilterCakeRawMaterial.setInventory(inventory);
 
-            relFilterCakeRawMaterialList.add(relFilterCakeRawMaterial);
+                relFilterCakeRawMaterialList.add(relFilterCakeRawMaterial);
+            }
         }
+
 
         List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList = new ArrayList<>();
-        for(FilterCakeSimple filterCakeSimple: filterCakeStandard.getFilterCakeSimpleList()){
-            Long filterCakeUsedId = filterCakeSimple.getFilterCakeId();
-            Double inventory = filterCakeSimple.getInventory();
+        if(filterCakeStandard.getFilterCakeSimpleList()!=null){
+            for(FilterCakeSimple filterCakeSimple: filterCakeStandard.getFilterCakeSimpleList()){
+                Long filterCakeUsedId = filterCakeSimple.getFilterCakeId();
+                Double inventory = filterCakeSimple.getInventory();
 
-            RelFilterCakeFilterCake relFilterCakeFilterCake = new RelFilterCakeFilterCake();
-            RelFilterCakeFilterCakeKey relFilterCakeFilterCakeKey = new RelFilterCakeFilterCakeKey();
-            relFilterCakeFilterCakeKey.setFilterCakeId(filterCake.getFilterCakeId());
-            relFilterCakeFilterCakeKey.setFilterCakeIdUsed(filterCakeUsedId);
-            relFilterCakeFilterCake.setId(relFilterCakeFilterCakeKey);
-            relFilterCakeFilterCake.setInventory(inventory);
+                RelFilterCakeFilterCake relFilterCakeFilterCake = new RelFilterCakeFilterCake();
+                RelFilterCakeFilterCakeKey relFilterCakeFilterCakeKey = new RelFilterCakeFilterCakeKey();
+                relFilterCakeFilterCakeKey.setFilterCakeId(filterCake.getFilterCakeId());
+                relFilterCakeFilterCakeKey.setFilterCakeIdUsed(filterCakeUsedId);
+                relFilterCakeFilterCake.setId(relFilterCakeFilterCakeKey);
+                relFilterCakeFilterCake.setInventory(inventory);
 
-            relFilterCakeFilterCakeList.add(relFilterCakeFilterCake);
+                relFilterCakeFilterCakeList.add(relFilterCakeFilterCake);
+            }
         }
-
         return new DeStandardizeResult(filterCake,relFilterCakeRawMaterialList,relFilterCakeFilterCakeList);
     }
 
@@ -666,9 +684,12 @@ public class FilterCakeService {
     //-------------------------------------------------------------------------
     // update FilterCake data
     public String updateFilterCake(FilterCakeStandard updatedFilterCake) {
-
-        // 先删掉原先的关系删除单向关系
         FilterCake originFilterCake = filterCakeRepository.findFilterCakeByFilterCakeId(updatedFilterCake.getFilterCakeId());
+        if(originFilterCake == null){
+            FilterCake addedFilterCake = addFilterCake(updatedFilterCake);
+            return "数据库中不存在对应数据,已添加Id为" + addedFilterCake.getFilterCakeName() + "的条目" ;
+        }
+        // 先删掉原先的关系删除单向关系
         // 删除原料关联表
         for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: originFilterCake.getRelFilterCakeRawMaterialList()){
             relFilterCakeRawMaterialService.delete(relFilterCakeRawMaterial);
@@ -726,5 +747,42 @@ public class FilterCakeService {
     public void deleteFilterCakeByFilterCakeId(Long filterCakeId){
         FilterCake filterCakeToDelete = filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId);
         filterCakeRepository.delete(filterCakeToDelete);
+    }
+
+    // 导入文件
+    //-------------------------------------------------------------------------
+    public ResultVo importFilterCakeExcelAndPersistence(MultipartFile file){
+        ResultVo<List<ExcelFilterCakeVo>> importResult = fileService.importEntityExcel(file,ExcelFilterCakeVo.class);
+        if(!importResult.checkSuccess()){
+            log.error(importResult.getMsg());
+            return importResult;
+        }
+        List<ExcelFilterCakeVo> excelFilterCakeVos = importResult.getData();
+        for(ExcelFilterCakeVo excelFilterCakeVo: excelFilterCakeVos){
+            // excel信息转化为标准类
+            FilterCakeStandard filterCakeStandard = transExcelToStandard(excelFilterCakeVo);
+            // 更新数据库，已存在则会直接替换
+            updateFilterCake(filterCakeStandard);
+        }
+        return ResultVoUtil.success(excelFilterCakeVos);
+    }
+
+    public FilterCakeStandard transExcelToStandard(ExcelFilterCakeVo excelFilterCakeVo){
+        FilterCakeStandard filterCakeStandard = new FilterCakeStandard();
+        // 如果已经存在了则修改，否则则添加
+        if(filterCakeRepository.findFilterCakeByFilterCakeName(excelFilterCakeVo.getFilterCakeName()) == null){
+            // 表示添加
+            filterCakeStandard.setFilterCakeId(new Long(0));
+        }else{
+            filterCakeStandard.setFilterCakeId(filterCakeRepository.findFilterCakeByFilterCakeName(excelFilterCakeVo.getFilterCakeName()).getFilterCakeId());
+        }
+        filterCakeStandard.setFilterCakeName(excelFilterCakeVo.getFilterCakeName());
+        filterCakeStandard.setFilterCakeIndex(excelFilterCakeVo.getFilterCakeIndex());
+        filterCakeStandard.setFilterCakeColor(excelFilterCakeVo.getFilterCakeColor());
+        filterCakeStandard.setFilterCakeProcessingCost(excelFilterCakeVo.getFilterCakeProcessingCost());
+        filterCakeStandard.setFilterCakeAccountingQuantity(excelFilterCakeVo.getFilterCakeAccountingQuantity());
+        filterCakeStandard.setFilterCakeSpecification(excelFilterCakeVo.getFilterCakeSpecification());
+        filterCakeStandard.setFilterCakeRemarks(excelFilterCakeVo.getFilterCakeRemarks());
+        return filterCakeStandard;
     }
 }

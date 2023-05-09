@@ -512,7 +512,7 @@ public class RawMaterialService {
         RawMaterial originRawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(updatedRawMaterial.getRawMaterialId());
         if(originRawMaterial == null){
             RawMaterial addedRawMaterial = addRawMaterial(updatedRawMaterial);
-            return "数据库中不存在对应数据,已添加Id为" + addedRawMaterial.getRawMaterialId() + "条目" ;
+            return "数据库中不存在对应数据,已添加Id为" + addedRawMaterial.getRawMaterialId() + "的条目" ;
         }
         // 删除原先单向时间关系
         for(RelDateRawMaterial relDateRawMaterial: originRawMaterial.getRelDateRawMaterialList()){

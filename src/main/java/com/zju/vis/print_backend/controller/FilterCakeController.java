@@ -5,12 +5,14 @@ import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.service.FilterCakeService;
 
+import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -21,7 +23,7 @@ import java.util.List;
 @Api(description = "滤饼管理")
 @RequestMapping("/filterCake")
 @CrossOrigin
-@Controller
+@RestController
 public class FilterCakeController {
 
     @Resource
@@ -127,4 +129,15 @@ public class FilterCakeController {
         filterCakeService.deleteByFilterCakeId(filterCakeId);
         return ResponseEntity.ok("FilterCake with ID: " + filterCakeId + " has been deleted.");
     }
+
+    // 文件上传
+    @ApiOperation(value = "上传FilterCake文件并持久化")
+    @RequestMapping(value = "/upload")
+    public ResultVo importFilterCakeExcel(@RequestParam("file") MultipartFile excel){
+        return filterCakeService.importFilterCakeExcelAndPersistence(excel);
+    }
+
+    // 文件下载
+
+    
 }
