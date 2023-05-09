@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -138,6 +139,10 @@ public class FilterCakeController {
     }
 
     // 文件下载
+    @ApiOperation(value = "下载FilterCake文件")
+    @PostMapping("/exportExcel")
+    public ResultVo exportFilterCakeExcel(final HttpServletResponse response){
+        return filterCakeService.exportFilterCakeExcel(response);
+    }
 
-    
 }

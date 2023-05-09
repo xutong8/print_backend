@@ -1,14 +1,14 @@
 package com.zju.vis.print_backend.service;
 
-import com.zju.vis.print_backend.Utils.ExcelUtil;
-import com.zju.vis.print_backend.Utils.ResultVoUtil;
-import com.zju.vis.print_backend.Utils.Utils;
+import com.zju.vis.print_backend.Utils.*;
 import com.zju.vis.print_backend.compositekey.RelFilterCakeFilterCakeKey;
 import com.zju.vis.print_backend.compositekey.RelFilterCakeRawMaterialKey;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.*;
 import com.zju.vis.print_backend.vo.ExcelFilterCakeVo;
+import com.zju.vis.print_backend.vo.ExcelFilterCakeWriteVo;
+import com.zju.vis.print_backend.vo.ExcelRawMaterialWriteVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
+import java.io.File;
 import java.util.*;
 
 @Slf4j
@@ -784,5 +786,57 @@ public class FilterCakeService {
         filterCakeStandard.setFilterCakeSpecification(excelFilterCakeVo.getFilterCakeSpecification());
         filterCakeStandard.setFilterCakeRemarks(excelFilterCakeVo.getFilterCakeRemarks());
         return filterCakeStandard;
+    }
+
+    // 导出文件
+    //-------------------------------------------------------------------------
+    public ResultVo<String> exportFilterCakeExcel(HttpServletResponse response){
+        // 1.根据查询条件获取结果集
+        List<ExcelFilterCakeWriteVo> excelFilterCakeWriteVos = getExcelFilterCakeWriteVoListByCondition();
+        if (CollectionUtil.isEmpty(excelFilterCakeWriteVos)) {
+            log.info("【导出Excel文件】要导出的数据为空，无法导出！");
+            return ResultVoUtil.success("数据为空");
+        }
+        // 2.获取要下载Excel文件的路径
+        ResultVo<String> resultVo = fileService.getDownLoadPath(ExcelFilterCakeWriteVo.class,excelFilterCakeWriteVos);
+        if (!resultVo.checkSuccess()) {
+            log.error("【导出Excel文件】获取要下载Excel文件的路径失败");
+            return resultVo;
+        }
+        // 3.下载Excel文件
+        String fileDownLoadPath = resultVo.getData();
+        ResultVo<String> downLoadResultVo = fileService.downloadFile(fileDownLoadPath, response);
+        if (null != downLoadResultVo && !downLoadResultVo.checkSuccess()) {
+            log.error("【导出Excel文件】下载文件失败");
+            return downLoadResultVo;
+        }
+        // 4.删除临时文件
+        boolean deleteFile = FileUtil.deleteFile(new File(fileDownLoadPath));
+        if (!deleteFile) {
+            log.error("【导入Excel文件】删除临时文件失败，临时文件路径为{}", fileDownLoadPath);
+            return ResultVoUtil.error("删除临时文件失败");
+        }
+        log.info("【导入Excel文件】删除临时文件成功，临时文件路径为：{}", fileDownLoadPath);
+        return null;
+    }
+
+    public List<ExcelFilterCakeWriteVo> getExcelFilterCakeWriteVoListByCondition(){
+        List<ExcelFilterCakeWriteVo> excelFilterCakeWriteVos = new ArrayList<>();
+        for(FilterCake filterCake: filterCakeRepository.findAll()){
+            excelFilterCakeWriteVos.add(transFilterCakeToExcel(filterCake));
+        }
+        return excelFilterCakeWriteVos;
+    }
+
+    public ExcelFilterCakeWriteVo transFilterCakeToExcel(FilterCake filterCake){
+        ExcelFilterCakeWriteVo excelFilterCakeWriteVo = new ExcelFilterCakeWriteVo();
+        excelFilterCakeWriteVo.setFilterCakeName(filterCake.getFilterCakeName());
+        excelFilterCakeWriteVo.setFilterCakeIndex(filterCake.getFilterCakeIndex());
+        excelFilterCakeWriteVo.setFilterCakeColor(filterCake.getFilterCakeColor());
+        excelFilterCakeWriteVo.setFilterCakeAccountingQuantity(filterCake.getFilterCakeAccountingQuantity());
+        excelFilterCakeWriteVo.setFilterCakeProcessingCost(filterCake.getFilterCakeProcessingCost());
+        excelFilterCakeWriteVo.setFilterCakeSpecification(filterCake.getFilterCakeSpecification());
+        excelFilterCakeWriteVo.setFilterCakeRemarks(filterCake.getFilterCakeRemarks());
+        return excelFilterCakeWriteVo;
     }
 }
