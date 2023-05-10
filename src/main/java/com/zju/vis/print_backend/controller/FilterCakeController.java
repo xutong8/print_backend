@@ -157,6 +157,7 @@ public class FilterCakeController {
 
     // 关系表文件上传 RelFilterCakeFilterCake
 
+
     // 文件下载
     @ApiOperation(value = "下载FilterCake文件")
     @PostMapping("/exportExcel")
@@ -165,6 +166,11 @@ public class FilterCakeController {
     }
 
     // 关系表文件下载 RelFilterCakeRawMaterial
+    @ApiOperation(value = "下载RelFilterCakeRawMaterial文件")
+    @PostMapping("/exportRelFRExcel")
+    public ResultVo exportRelFilterCakeRawMaterialExcel(final HttpServletResponse response){
+        return filterCakeRawMaterialService.exportRelFilterCakeRawMaterialExcel(response);
+    }
 
     // 关系表文件下载 RelFilterCakeFilterCake
 
