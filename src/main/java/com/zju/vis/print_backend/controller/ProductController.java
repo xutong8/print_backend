@@ -193,6 +193,11 @@ public class ProductController {
     }
 
     // 关系表文件上传 ProductRawMaterial
+    @ApiOperation(value = "上传RelProductRawMaterial文件并持久化")
+    @RequestMapping(value = "/uploadRelPR")
+    public ResultVo importRelProductRawMaterialExcel(@RequestParam("file") MultipartFile excel){
+        return productRawMaterialService.importRelProductRawMaterialExcelAndPersistence(excel);
+    }
 
     // 关系表文件上传 ProductFilterCake
     @ApiOperation(value = "上传RelProductFilterCake文件并持久化")
@@ -209,6 +214,7 @@ public class ProductController {
     }
 
     // 关系表文件下载 ProductRawMaterial
+
 
     // 关系表文件下载 ProductFilterCake
     @ApiOperation(value = "下载RelProductFilterCake文件")
