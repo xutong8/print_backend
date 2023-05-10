@@ -213,10 +213,14 @@ public class ProductController {
         return productService.exportProductExcel(response);
     }
 
-    // 关系表文件下载 ProductRawMaterial
+    // 关系表文件下载 RelProductRawMaterial
+    @ApiOperation(value = "下载RelProductRawMaterial文件")
+    @PostMapping("/exportRelPRExcel")
+    public ResultVo exportRelProductRawMaterialExcel(final HttpServletResponse response){
+        return productRawMaterialService.exportRelProductRawMaterialExcel(response);
+    }
 
-
-    // 关系表文件下载 ProductFilterCake
+    // 关系表文件下载 RelProductFilterCake
     @ApiOperation(value = "下载RelProductFilterCake文件")
     @PostMapping("/exportRelPFExcel")
     public ResultVo exportRelProductFilterCakeExcel(final HttpServletResponse response){

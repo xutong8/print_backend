@@ -1,5 +1,7 @@
 package com.zju.vis.print_backend.service;
 
+import com.zju.vis.print_backend.Utils.CollectionUtil;
+import com.zju.vis.print_backend.Utils.FileUtil;
 import com.zju.vis.print_backend.Utils.ResultVoUtil;
 import com.zju.vis.print_backend.compositekey.RelProductRawMaterialKey;
 import com.zju.vis.print_backend.dao.ProductRepository;
@@ -8,15 +10,16 @@ import com.zju.vis.print_backend.dao.RelProductRawMaterialRepository;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.entity.RelProductRawMaterial;
-import com.zju.vis.print_backend.vo.ExcelRelProductFilterCakeVo;
-import com.zju.vis.print_backend.vo.ExcelRelProductRawMaterialVo;
-import com.zju.vis.print_backend.vo.ResultVo;
+import com.zju.vis.print_backend.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -100,5 +103,53 @@ public class RelProductRawMaterialService {
         relProductRawMaterial.setRawMaterial(rawMaterial);
         relProductRawMaterial.setInventory(excelRelProductRawMaterialVo.getInventory());
         return relProductRawMaterial;
+    }
+
+    // 导入文件
+    //-------------------------------------------------------------------------
+    public ResultVo<String> exportRelProductRawMaterialExcel(HttpServletResponse response){
+        // 1.根据查询条件获取结果集
+        List<ExcelRelProductRawMaterialWriteVo> excelRelProductRawMaterialWriteVos = getExcelRelProductRawMaterialWriteVoListByCondition();
+        if (CollectionUtil.isEmpty(excelRelProductRawMaterialWriteVos)) {
+            log.info("【导出Excel文件】要导出的数据为空，无法导出！");
+            return ResultVoUtil.success("数据为空");
+        }
+        // 2.获取要下载Excel文件的路径
+        ResultVo<String> resultVo = fileService.getDownLoadPath(ExcelRelProductRawMaterialWriteVo.class,excelRelProductRawMaterialWriteVos);
+        if (!resultVo.checkSuccess()) {
+            log.error("【导出Excel文件】获取要下载Excel文件的路径失败");
+            return resultVo;
+        }
+        // 3.下载Excel文件
+        String fileDownLoadPath = resultVo.getData();
+        ResultVo<String> downLoadResultVo = fileService.downloadFile(fileDownLoadPath, response);
+        if (null != downLoadResultVo && !downLoadResultVo.checkSuccess()) {
+            log.error("【导出Excel文件】下载文件失败");
+            return downLoadResultVo;
+        }
+        // 4.删除临时文件
+        boolean deleteFile = FileUtil.deleteFile(new File(fileDownLoadPath));
+        if (!deleteFile) {
+            log.error("【导入Excel文件】删除临时文件失败，临时文件路径为{}", fileDownLoadPath);
+            return ResultVoUtil.error("删除临时文件失败");
+        }
+        log.info("【导入Excel文件】删除临时文件成功，临时文件路径为：{}", fileDownLoadPath);
+        return null;
+    }
+
+    public List<ExcelRelProductRawMaterialWriteVo> getExcelRelProductRawMaterialWriteVoListByCondition(){
+        List<ExcelRelProductRawMaterialWriteVo> excelRelProductRawMaterialWriteVos = new ArrayList<>();
+        for(RelProductRawMaterial relProductRawMaterial: relProductRawMaterialRepository.findAll()){
+            excelRelProductRawMaterialWriteVos.add(transRelProductRawMaterialToExcel(relProductRawMaterial));
+        }
+        return excelRelProductRawMaterialWriteVos;
+    }
+
+    public ExcelRelProductRawMaterialWriteVo transRelProductRawMaterialToExcel(RelProductRawMaterial relProductRawMaterial){
+        ExcelRelProductRawMaterialWriteVo excelRelProductRawMaterialWriteVo = new ExcelRelProductRawMaterialWriteVo();
+        excelRelProductRawMaterialWriteVo.setProductName(relProductRawMaterial.getProduct().getProductName());
+        excelRelProductRawMaterialWriteVo.setRawMaterialName(relProductRawMaterial.getRawMaterial().getRawMaterialName());
+        excelRelProductRawMaterialWriteVo.setInventory(relProductRawMaterial.getInventory());
+        return excelRelProductRawMaterialWriteVo;
     }
 }
