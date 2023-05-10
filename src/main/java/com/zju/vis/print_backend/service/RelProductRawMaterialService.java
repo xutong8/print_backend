@@ -104,7 +104,7 @@ public class RelProductRawMaterialService {
         return relProductRawMaterial;
     }
 
-    // 导入文件
+    // 导出文件
     //-------------------------------------------------------------------------
     public ResultVo<String> exportRelProductRawMaterialExcel(HttpServletResponse response){
         // 1.根据查询条件获取结果集

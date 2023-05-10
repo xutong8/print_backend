@@ -156,7 +156,11 @@ public class FilterCakeController {
     }
 
     // 关系表文件上传 RelFilterCakeFilterCake
-
+    @ApiOperation(value = "上传RelFilterCakeFilterCake文件并持久化")
+    @RequestMapping(value = "/uploadRelFF")
+    public ResultVo importRelFilterCakeFilterCakeExcel(@RequestParam("file") MultipartFile excel){
+        return filterCakeFilterCakeService.importRelFilterCakeFilterCakeExcelAndPersistence(excel);
+    }
 
     // 文件下载
     @ApiOperation(value = "下载FilterCake文件")
@@ -173,5 +177,9 @@ public class FilterCakeController {
     }
 
     // 关系表文件下载 RelFilterCakeFilterCake
-
+    @ApiOperation(value = "下载RelFilterCakeFilterCake文件")
+    @PostMapping("/exportRelFFExcel")
+    public ResultVo exportRelFilterCakeFilterCakeExcel(final HttpServletResponse response){
+        return filterCakeFilterCakeService.exportRelFilterCakeFilterCakeExcel(response);
+    }
 }
