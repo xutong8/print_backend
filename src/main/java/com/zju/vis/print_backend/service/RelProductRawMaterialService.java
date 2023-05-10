@@ -86,12 +86,11 @@ public class RelProductRawMaterialService {
         return ResultVoUtil.success(excelRelProductRawMaterialVos);
     }
 
-    // 可能出现不匹配的情况
     public RelProductRawMaterial transExcelToEntity(ExcelRelProductRawMaterialVo excelRelProductRawMaterialVo){
         RelProductRawMaterial relProductRawMaterial = new RelProductRawMaterial();
         Product product = productRepository.findProductByProductName(excelRelProductRawMaterialVo.getProductName());
         RawMaterial rawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialName(excelRelProductRawMaterialVo.getRawMaterialName());
-        // 与数据库当前数据有不匹配的现象
+        // 与数据库当前数据有不匹配则返回空
         if(product == null || rawMaterial == null){
             return null;
         }

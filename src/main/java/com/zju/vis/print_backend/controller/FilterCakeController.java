@@ -3,8 +3,12 @@ package com.zju.vis.print_backend.controller;
 
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
+import com.zju.vis.print_backend.entity.RelFilterCakeFilterCake;
+import com.zju.vis.print_backend.entity.RelFilterCakeRawMaterial;
 import com.zju.vis.print_backend.service.FilterCakeService;
 
+import com.zju.vis.print_backend.service.RelFilterCakeFilterCakeService;
+import com.zju.vis.print_backend.service.RelFilterCakeRawMaterialService;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +33,12 @@ public class FilterCakeController {
 
     @Resource
     private FilterCakeService filterCakeService;
+
+    @Resource
+    private RelFilterCakeRawMaterialService filterCakeRawMaterialService;
+
+    @Resource
+    private RelFilterCakeFilterCakeService filterCakeFilterCakeService;
 
     @ApiOperation(value = "获取所有滤饼")
     @RequestMapping(value = "/findAllFilterCake", method = RequestMethod.GET)
@@ -138,11 +148,24 @@ public class FilterCakeController {
         return filterCakeService.importFilterCakeExcelAndPersistence(excel);
     }
 
+    // 关系表文件上传 RelFilterCakeRawMaterial
+    @ApiOperation(value = "上传RelFilterCakeRawMaterial文件并持久化")
+    @RequestMapping(value = "/uploadRelFR")
+    public ResultVo importRelProductRawMaterialExcel(@RequestParam("file") MultipartFile excel){
+        return filterCakeRawMaterialService.importRelFilterCakeRawMaterialExcelAndPersistence(excel);
+    }
+
+    // 关系表文件上传 RelFilterCakeFilterCake
+
     // 文件下载
     @ApiOperation(value = "下载FilterCake文件")
     @PostMapping("/exportExcel")
     public ResultVo exportFilterCakeExcel(final HttpServletResponse response){
         return filterCakeService.exportFilterCakeExcel(response);
     }
+
+    // 关系表文件下载 RelFilterCakeRawMaterial
+
+    // 关系表文件下载 RelFilterCakeFilterCake
 
 }
