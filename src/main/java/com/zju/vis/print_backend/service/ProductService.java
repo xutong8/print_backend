@@ -8,17 +8,13 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.zju.vis.print_backend.Utils.*;
 import com.zju.vis.print_backend.compositekey.RelProductFilterCakeKey;
 import com.zju.vis.print_backend.compositekey.RelProductRawMaterialKey;
 import com.zju.vis.print_backend.dao.*;
 import com.zju.vis.print_backend.entity.*;
-import com.zju.vis.print_backend.vo.ExcelProductVo;
-import com.zju.vis.print_backend.vo.ExcelProductWriteVo;
-import com.zju.vis.print_backend.vo.ExcelWriteVo;
-import com.zju.vis.print_backend.vo.ResultVo;
+import com.zju.vis.print_backend.vo.*;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,94 +65,15 @@ public class ProductService {
     @Resource
     private FileService fileService;
 
-    // 用于返回产品列表名
-    public static class ProductSimple{
-        private Long productId;
-        private String productName;
-
-        public Long getProductId() {
-            return productId;
-        }
-
-        public void setProductId(Long productId) {
-            this.productId = productId;
-        }
-
-        public String getProductName() {
-            return productName;
-        }
-
-        public void setProductName(String productName) {
-            this.productName = productName;
-        }
-
-        public ProductSimple(Long productId, String productName) {
-            this.productId = productId;
-            this.productName = productName;
-        }
-    }
-
-    // Product 结果封装
-    public class ProductPackage {
-        // 附加信息
-        private Integer pageNo;
-        private Integer pageSize;
-        private Integer pageNum;
-        private Integer total;
-
-        // 返回的标准列表
-        private List<ProductStandard> list;
-
-        public Integer getPageNo() {
-            return pageNo;
-        }
-
-        public void setPageNo(Integer pageNo) {
-            this.pageNo = pageNo;
-        }
-
-        public Integer getPageSize() {
-            return pageSize;
-        }
-
-        public void setPageSize(Integer pageSize) {
-            this.pageSize = pageSize;
-        }
-
-        public Integer getPageNum() {
-            return pageNum;
-        }
-
-        public void setPageNum(Integer pageNum) {
-            this.pageNum = pageNum;
-        }
-
-        public Integer getTotal() {
-            return total;
-        }
-
-        public void setTotal(Integer total) {
-            this.total = total;
-        }
-
-        public List<ProductStandard> getList() {
-            return list;
-        }
-
-        public void setList(List<ProductStandard> list) {
-            this.list = list;
-        }
-    }
-
     // List<Product> 添加额外信息打包发送
-    public ProductPackage packProduct(List<Product> productList,
-                                      Integer pageNo, Integer pageSize,
-                                      Integer productNum) {
-        List<ProductStandard> productStandardList = new ArrayList<>();
+    public ProductPackageVo packProduct(List<Product> productList,
+                                        Integer pageNo, Integer pageSize,
+                                        Integer productNum) {
+        List<ProductStandardVo> productStandardList = new ArrayList<>();
         for (Product product : productList) {
             productStandardList.add(ProductStandardization(product));
         }
-        ProductPackage productPackage = new ProductPackage();
+        ProductPackageVo productPackage = new ProductPackageVo();
         // 前端page从1开始，返回时+1
         productPackage.setPageNo(pageNo + 1);
         productPackage.setPageSize(pageSize);
@@ -168,140 +85,9 @@ public class ProductService {
         return productPackage;
     }
 
-    // Product 标准化形式类 (前端单个节点最终结果
-    public static class ProductStandard {
-        private Long productId;
-        private String productName;
-        private String productIndex;
-        private String productCode;
-        private String productColor;
-        private Double productUnitPrice;
-        private Integer productPriceIncreasePercent;
-        private String productSeriesName;
-        private String productFactoryName;
-        private String productRemarks;
-
-        private Float productProcessingCost;
-        private Integer productAccountingQuantity;
-        private List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList;
-        private List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList;
-
-        public Float getProductProcessingCost() {
-            return productProcessingCost;
-        }
-
-        public void setProductProcessingCost(Float productProcessingCost) {
-            this.productProcessingCost = productProcessingCost;
-        }
-
-        public Integer getProductAccountingQuantity() {
-            return productAccountingQuantity;
-        }
-
-        public void setProductAccountingQuantity(Integer productAccountingQuantity) {
-            this.productAccountingQuantity = productAccountingQuantity;
-        }
-
-        public Long getProductId() {
-            return productId;
-        }
-
-        public void setProductId(Long productId) {
-            this.productId = productId;
-        }
-
-        public String getProductName() {
-            return productName;
-        }
-
-        public void setProductName(String productName) {
-            this.productName = productName;
-        }
-
-        public String getProductIndex() {
-            return productIndex;
-        }
-
-        public void setProductIndex(String productIndex) {
-            this.productIndex = productIndex;
-        }
-
-        public String getProductCode() {
-            return productCode;
-        }
-
-        public void setProductCode(String productCode) {
-            this.productCode = productCode;
-        }
-
-        public String getProductColor() {
-            return productColor;
-        }
-
-        public void setProductColor(String productColor) {
-            this.productColor = productColor;
-        }
-
-        public Double getProductUnitPrice() {
-            return productUnitPrice;
-        }
-
-        public void setProductUnitPrice(Double productUnitPrice) {
-            this.productUnitPrice = productUnitPrice;
-        }
-
-        public Integer getProductPriceIncreasePercent() {
-            return productPriceIncreasePercent;
-        }
-
-        public void setProductPriceIncreasePercent(Integer productPriceIncreasePercent) {
-            this.productPriceIncreasePercent = productPriceIncreasePercent;
-        }
-
-        public String getProductSeriesName() {
-            return productSeriesName;
-        }
-
-        public void setProductSeriesName(String productSeriesName) {
-            this.productSeriesName = productSeriesName;
-        }
-
-        public String getProductFactoryName() {
-            return productFactoryName;
-        }
-
-        public void setProductFactoryName(String productFactoryName) {
-            this.productFactoryName = productFactoryName;
-        }
-
-        public String getProductRemarks() {
-            return productRemarks;
-        }
-
-        public void setProductRemarks(String productRemarks) {
-            this.productRemarks = productRemarks;
-        }
-
-        public List<RawMaterialService.RawMaterialSimple> getRawMaterialSimpleList() {
-            return rawMaterialSimpleList;
-        }
-
-        public void setRawMaterialSimpleList(List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList) {
-            this.rawMaterialSimpleList = rawMaterialSimpleList;
-        }
-
-        public List<FilterCakeService.FilterCakeSimple> getFilterCakeSimpleList() {
-            return filterCakeSimpleList;
-        }
-
-        public void setFilterCakeSimpleList(List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList) {
-            this.filterCakeSimpleList = filterCakeSimpleList;
-        }
-    }
-
     // Product 转化为标准对象 ProductStandard
-    public ProductStandard ProductStandardization(Product product) {
-        ProductStandard productStandard = new ProductStandard();
+    public ProductStandardVo ProductStandardization(Product product) {
+        ProductStandardVo productStandard = new ProductStandardVo();
         productStandard.setProductId(product.getProductId());
         productStandard.setProductName(product.getProductName());
         productStandard.setProductIndex(product.getProductIndex());
@@ -328,14 +114,14 @@ public class ProductService {
         productStandard.setProductRemarks(product.getProductRemarks());
 
         // 设置返回的简单滤饼表
-        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
         for (FilterCake filterCake : product.getFilterCakeList()) {
             filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake, product.getProductId()));
         }
         productStandard.setFilterCakeSimpleList(filterCakeSimpleList);
 
         // 设置返回的简单原料表
-        List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+        List<RawMaterialSimpleVo> rawMaterialSimpleList = new ArrayList<>();
         for (RawMaterial rawMaterial : product.getRawMaterialList()) {
             rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
         }
@@ -345,8 +131,8 @@ public class ProductService {
 
     //查
     //-------------------------------------------------------------------------
-    public ProductPackage findAll(Integer pageNo,
-                                  Integer pageSize
+    public ProductPackageVo findAll(Integer pageNo,
+                                    Integer pageSize
     ) {
         Integer productNum = productRepository.findAll().size();
         Pageable pageable = PageRequest.of(pageNo, pageSize);
@@ -354,33 +140,19 @@ public class ProductService {
         return packProduct(page.toList(), pageNo, pageSize, productNum);
     }
 
-    public ProductSimple simplifyProduct(Product product){
-        ProductSimple productSimple = new ProductSimple(product.getProductId(),product.getProductName());
+    public ProductSimpleVo simplifyProduct(Product product){
+        ProductSimpleVo productSimple = new ProductSimpleVo(product.getProductId(),product.getProductName());
         // productSimple.setProductId(product.getProductId());
         // productSimple.setProductName(product.getProductName());
         return productSimple;
     }
 
-
-    // public List<ProductSimple> findAllProductName(){
-    //     List<ProductSimple> productSimpleList = new ArrayList<>();
-    //     for (Product product: productRepository.findAll()){
-    //         productSimpleList.add(simplifyProduct(product));
-    //     }
-    //     return productSimpleList;
-    // }
-
-
-    public ProductService.ProductStandard findProductByProductId(Long productId) {
+    public ProductStandardVo findProductByProductId(Long productId) {
         if (productRepository.findProductByProductId(productId) == null) {
-            return new ProductStandard();
+            return new ProductStandardVo();
         }
         return ProductStandardization(productRepository.findProductByProductId(productId));
     }
-
-    // public Product findProductByProductId(Long productId){
-    //     return  productRepository.findProductByProductId(productId);
-    // }
 
     public List<RawMaterial> getProductAndRawMaterial(Long productId) {
         Product product = productRepository.findProductByProductId(productId);
@@ -412,7 +184,7 @@ public class ProductService {
         return resultSet;
     }
 
-    public ProductPackage findAllByDirectCondition(
+    public ProductPackageVo findAllByDirectCondition(
             String typeOfQuery,
             String conditionOfQuery,
             Integer pageNo,
@@ -444,7 +216,7 @@ public class ProductService {
         return packProduct(subList, pageNo, pageSize, productNum);
     }
 
-    public ProductPackage findAllByRelCondition(
+    public ProductPackageVo findAllByRelCondition(
             String rawMaterialName,
             String filterCakeName,
             String productSeriesName,
@@ -486,13 +258,13 @@ public class ProductService {
     // 计算当期价格
     public Double calculateProductPrice(Product product){
         // 设置返回的简单滤饼表
-        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
         for (FilterCake filterCake : product.getFilterCakeList()) {
             filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake, product.getProductId()));
         }
 
         // 设置返回的简单原料表
-        List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+        List<RawMaterialSimpleVo> rawMaterialSimpleList = new ArrayList<>();
         for (RawMaterial rawMaterial : product.getRawMaterialList()) {
             rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
         }
@@ -501,11 +273,11 @@ public class ProductService {
         // 加上批处理价格
         sum += product.getProductProcessingCost();
         if(filterCakeSimpleList.size() != 0){
-            for(FilterCakeService.FilterCakeSimple filterCakeSimple: filterCakeSimpleList){
+            for(FilterCakeSimpleVo filterCakeSimple: filterCakeSimpleList){
                 sum +=  filterCakeSimple.getInventory() * filterCakeService.calculateFilterCakePrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeSimple.getFilterCakeId()));
             }
         }
-        for(RawMaterialService.RawMaterialSimple rawMaterialSimple:rawMaterialSimpleList){
+        for(RawMaterialSimpleVo rawMaterialSimple:rawMaterialSimpleList){
             sum += rawMaterialSimple.getInventory() * rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialUnitPrice();
         }
         return sum / product.getProductAccountingQuantity();
@@ -514,13 +286,13 @@ public class ProductService {
     // 计算历史价格
     public Double calculateProductHistoryPrice(Product product, Date historyDate){
         // 设置返回的简单滤饼表
-        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
         for (FilterCake filterCake : product.getFilterCakeList()) {
             filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake, product.getProductId()));
         }
 
         // 设置返回的简单原料表
-        List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+        List<RawMaterialSimpleVo> rawMaterialSimpleList = new ArrayList<>();
         for (RawMaterial rawMaterial : product.getRawMaterialList()) {
             rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
         }
@@ -529,13 +301,13 @@ public class ProductService {
         sum += product.getProductProcessingCost();
         // 获取滤饼历史价格
         if(filterCakeSimpleList.size()!=0){
-            for(FilterCakeService.FilterCakeSimple filterCakeSimple:filterCakeSimpleList){
+            for(FilterCakeSimpleVo filterCakeSimple:filterCakeSimpleList){
                 sum += filterCakeSimple.getInventory() *
                         filterCakeService.calculateFilterCakeHistoryPrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeSimple.getFilterCakeId()),historyDate);
             }
         }
         // 获取原料历史价格
-        for(RawMaterialService.RawMaterialSimple rawMaterialSimple: rawMaterialSimpleList){
+        for(RawMaterialSimpleVo rawMaterialSimple: rawMaterialSimpleList){
             List<Utils.HistoryPrice> historyPriceList = rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialHistoryPrice();
             if(historyPriceList.size()!=0){
                 boolean flag = false;
@@ -572,54 +344,19 @@ public class ProductService {
         return historyPriceList;
     }
 
-    //删
-    //-------------------------------------------------------------------------
-    //根据productId 删除记录
-    @Transactional
-    public void deleteByProductId(Long productId) {
-        productRepository.deleteByProductId(productId);
-    }
-
     //增
     //-------------------------------------------------------------------------
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DeStandardizeResult {
         private Product product;
-        private List<RelProductRawMaterial> relProductRawMaterials=new ArrayList<>();
-        private List<RelProductFilterCake> relProductFilterCakes=new ArrayList<>();
-
-        // 构造函数
-        public DeStandardizeResult(Product product, List<RelProductRawMaterial> relProductRawMaterials, List<RelProductFilterCake> relProductFilterCakes) {
-            this.product = product;
-            this.relProductRawMaterials = relProductRawMaterials;
-            this.relProductFilterCakes = relProductFilterCakes;
-        }
-
-        public Product getProduct() {
-            return product;
-        }
-
-        public void setProduct(Product product) {
-            this.product = product;
-        }
-
-        public List<RelProductRawMaterial> getRelProductRawMaterials() {
-            return relProductRawMaterials;
-        }
-
-        public void setRelProductRawMaterials(List<RelProductRawMaterial> relProductRawMaterials) {
-            this.relProductRawMaterials = relProductRawMaterials;
-        }
-
-        public List<RelProductFilterCake> getRelProductFilterCakes() {
-            return relProductFilterCakes;
-        }
-
-        public void setRelProductFilterCakes(List<RelProductFilterCake> relProductFilterCakes) {
-            this.relProductFilterCakes = relProductFilterCakes;
-        }
+        private List<RelProductRawMaterial> relProductRawMaterials;
+        private List<RelProductFilterCake> relProductFilterCakes;
     }
 
-    public DeStandardizeResult deStandardizeProduct(ProductStandard productStandard) {
+    public DeStandardizeResult deStandardizeProduct(ProductStandardVo productStandard) {
         Product product = new Product();
         product.setProductId(productStandard.getProductId());
         product.setProductName(productStandard.getProductName());
@@ -639,7 +376,7 @@ public class ProductService {
         // Convert the simplified raw material list back to its original format
         List<RawMaterial> rawMaterialList = new ArrayList<>();
         if(productStandard.getRawMaterialSimpleList() != null){
-            for (RawMaterialService.RawMaterialSimple rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
+            for (RawMaterialSimpleVo rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
                 RawMaterial rawMaterial = rawMaterialService.deSimplifyRawMaterial(rawMaterialSimple, productStandard.getProductId());
                 rawMaterialList.add(rawMaterial);
             }
@@ -649,7 +386,7 @@ public class ProductService {
         // Convert the simplified filter cake list back to its original format
         List<FilterCake> filterCakeList = new ArrayList<>();
         if(productStandard.getFilterCakeSimpleList()!=null){
-            for (FilterCakeService.FilterCakeSimple filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
+            for (FilterCakeSimpleVo filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
                 FilterCake filterCake = filterCakeService.deSimplifyFilterCake(filterCakeSimple, productStandard.getProductId());
                 filterCakeList.add(filterCake);
             }
@@ -658,7 +395,7 @@ public class ProductService {
 
         List<RelProductRawMaterial> relProductRawMaterials = new ArrayList<>();
         if(productStandard.getRawMaterialSimpleList()!=null){
-            for (RawMaterialService.RawMaterialSimple rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
+            for (RawMaterialSimpleVo rawMaterialSimple : productStandard.getRawMaterialSimpleList()) {
                 Long rawMaterialId = rawMaterialSimple.getRawMaterialId();
                 Double inventory = rawMaterialSimple.getInventory();
 
@@ -674,7 +411,7 @@ public class ProductService {
         }
         List<RelProductFilterCake> relProductFilterCakes = new ArrayList<>();
         if(productStandard.getFilterCakeSimpleList()!=null){
-            for (FilterCakeService.FilterCakeSimple filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
+            for (FilterCakeSimpleVo filterCakeSimple : productStandard.getFilterCakeSimpleList()) {
                 Long filterCakeId = filterCakeSimple.getFilterCakeId();
                 Double inventory = filterCakeSimple.getInventory();
 
@@ -740,7 +477,7 @@ public class ProductService {
     }
 
     // @Transactional
-    public Product addProduct(ProductStandard productStandard) {
+    public Product addProduct(ProductStandardVo productStandard) {
         DeStandardizeResult result = deStandardizeProduct(productStandard);
         Product product = result.getProduct();
         List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
@@ -755,8 +492,7 @@ public class ProductService {
 
     //改
     //-------------------------------------------------------------------------
-    //update product data
-    public String updateProduct(ProductStandard updatedProduct) {
+    public String updateProduct(ProductStandardVo updatedProduct) {
         if(productRepository.findProductByProductId(updatedProduct.getProductId()) == null){
             Product addedProduct = addProduct(updatedProduct);
             return "数据库中不存在对应数据,已添加Id为" + addedProduct.getProductId() + "条目" ;
@@ -778,6 +514,14 @@ public class ProductService {
         return "Product " + originProduct.getProductName() + " has been changed";
     }
 
+    //删
+    //-------------------------------------------------------------------------
+    //根据productId 删除记录
+    @Transactional
+    public void deleteByProductId(Long productId) {
+        productRepository.deleteByProductId(productId);
+    }
+
     // 导入文件
     //-------------------------------------------------------------------------
     public ResultVo importProductExcelAndPersistence(MultipartFile file){
@@ -789,7 +533,7 @@ public class ProductService {
         List<ExcelProductVo> excelProductVos = importResult.getData();
         for(ExcelProductVo excelProductVo: excelProductVos){
             // excel信息转化为标准类
-            ProductStandard productStandard = transExcelToStandard(excelProductVo);
+            ProductStandardVo productStandard = transExcelToStandard(excelProductVo);
             // 更新数据库，已经存在的则会直接修改，为更新关联数据已存在的关联数据会被删除
             updateProduct(productStandard);
         }
@@ -797,8 +541,8 @@ public class ProductService {
         return ResultVoUtil.success(excelProductVos);
     }
 
-    public ProductStandard transExcelToStandard(ExcelProductVo excelProductVo){
-        ProductStandard productStandard = new ProductStandard();
+    public ProductStandardVo transExcelToStandard(ExcelProductVo excelProductVo){
+        ProductStandardVo productStandard = new ProductStandardVo();
         // 如果已经存在了则修改，否则则添加
         if(productRepository.findProductByProductIndex(excelProductVo.getProductIndex()) == null){
             // 表示添加
@@ -828,14 +572,14 @@ public class ProductService {
             return ResultVoUtil.success("数据为空");
         }
         // 2.获取要下载Excel文件的路径
-        ResultVo<String> resultVo = getDownLoadPath(ExcelProductWriteVo.class, excelProductWriteVos);
+        ResultVo<String> resultVo = fileService.getDownLoadPath(ExcelProductWriteVo.class, excelProductWriteVos);
         if (!resultVo.checkSuccess()) {
             log.error("【导出Excel文件】获取要下载Excel文件的路径失败");
             return resultVo;
         }
         // 3.下载Excel文件
         String fileDownLoadPath = resultVo.getData();
-        ResultVo<String> downLoadResultVo = downloadFile(fileDownLoadPath, response);
+        ResultVo<String> downLoadResultVo = fileService.downloadFile(fileDownLoadPath, response);
         if (null != downLoadResultVo && !downLoadResultVo.checkSuccess()) {
             log.error("【导出Excel文件】下载文件失败");
             return downLoadResultVo;
@@ -875,34 +619,4 @@ public class ProductService {
         excelProductWriteVo.setProductProcessingCost(product.getProductProcessingCost());
         return excelProductWriteVo;
     }
-
-    public ResultVo<String> getDownLoadPath(Class<ExcelProductWriteVo> clazz, List<ExcelProductWriteVo> excelWriteVos) {
-        String downLoadPath = FileUtil.getDownLoadPath();
-        if (StringUtil.isBlank(downLoadPath)) {
-            log.error("【导出Excel文件】生成临时文件失败");
-            return ResultVoUtil.error("生成临时文件失败");
-        }
-        // 1.创建一个临时目录
-        FileUtil.mkdirs(downLoadPath);
-        // String fullFilePath = downLoadPath + File.separator + System.currentTimeMillis() + "." + ExcelUtil.EXCEL_2007;
-        String fullFilePath = downLoadPath + File.separator + System.currentTimeMillis() + "." + "xlsx";
-        log.info("【导出Excel文件】文件的临时路径为：{}", fullFilePath);
-        // 2.写入数据
-        excelUtil.simpleExcelWrite(fullFilePath, clazz, excelWriteVos);
-        return ResultVoUtil.success(fullFilePath);
-    }
-
-    public ResultVo<String> downloadFile(String filePath, HttpServletResponse response) {
-        File file = new File(filePath);
-        // 1.参数校验
-        if (!file.exists()) {
-            log.error("【下载文件】文件路径{}不存在", filePath);
-            return ResultVoUtil.error("文件不存在");
-        }
-        // 2.下载文件
-        log.info("【下载文件】下载文件的路径为{}", filePath);
-        return FileUtil.downloadFile(file, response);
-    }
-
-
 }

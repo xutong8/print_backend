@@ -1,8 +1,6 @@
 package com.zju.vis.print_backend.vo;
 
-import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
-import com.zju.vis.print_backend.convert.SexConvert;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

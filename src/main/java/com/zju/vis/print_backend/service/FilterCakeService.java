@@ -6,10 +6,7 @@ import com.zju.vis.print_backend.compositekey.RelFilterCakeRawMaterialKey;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.*;
-import com.zju.vis.print_backend.vo.ExcelFilterCakeVo;
-import com.zju.vis.print_backend.vo.ExcelFilterCakeWriteVo;
-import com.zju.vis.print_backend.vo.ExcelRawMaterialWriteVo;
-import com.zju.vis.print_backend.vo.ResultVo;
+import com.zju.vis.print_backend.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +19,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.zju.vis.print_backend.Utils.Utils.stepMonth;
@@ -53,96 +49,19 @@ public class FilterCakeService {
     // 调用一般方法
     Utils utils = new Utils();
 
-    // 导入excel文件
-    @Resource
-    private ExcelUtil excelUtil;
 
     @Resource
     private FileService fileService;
 
-    // 用于返回滤饼列表名
-    public class FilterCakeName{
-        private Long filterCakeId;
-        private String filterCakeName;
-
-        public Long getFilterCakeId() {
-            return filterCakeId;
-        }
-
-        public void setFilterCakeId(Long filterCakeId) {
-            this.filterCakeId = filterCakeId;
-        }
-
-        public String getFilterCakeName() {
-            return filterCakeName;
-        }
-
-        public void setFilterCakeName(String filterCakeName) {
-            this.filterCakeName = filterCakeName;
-        }
-    }
-
-    // FilterCake 结果封装
-    public class FilterCakePackage{
-        // 附加信息
-        private Integer pageNo;
-        private Integer pageSize;
-        private Integer pageNum;
-        private Integer total;
-
-        // 返回的标准列表
-        private List<FilterCakeStandard> list;
-
-        public Integer getPageNo() {
-            return pageNo;
-        }
-
-        public void setPageNo(Integer pageNo) {
-            this.pageNo = pageNo;
-        }
-
-        public Integer getPageSize() {
-            return pageSize;
-        }
-
-        public void setPageSize(Integer pageSize) {
-            this.pageSize = pageSize;
-        }
-
-        public Integer getPageNum() {
-            return pageNum;
-        }
-
-        public void setPageNum(Integer pageNum) {
-            this.pageNum = pageNum;
-        }
-
-        public Integer getTotal() {
-            return total;
-        }
-
-        public void setTotal(Integer total) {
-            this.total = total;
-        }
-
-        public List<FilterCakeStandard> getList() {
-            return list;
-        }
-
-        public void setList(List<FilterCakeStandard> list) {
-            this.list = list;
-        }
-    }
-
     // List<FilterCake> 添加额外信息打包发送
-    public FilterCakePackage packFilterCake(List<FilterCake> filterCakeList,
-                             Integer pageNo,Integer pageSize,
-                             Integer filterCakeNum){
-        List<FilterCakeStandard> filterCakeStandardList = new ArrayList<>();
+    public FilterCakePackageVo packFilterCake(List<FilterCake> filterCakeList,
+                                              Integer pageNo, Integer pageSize,
+                                              Integer filterCakeNum){
+        List<FilterCakeStandardVo> filterCakeStandardList = new ArrayList<>();
         for(FilterCake filterCake: filterCakeList){
             filterCakeStandardList.add(filterCakeStandardization(filterCake));
         }
-        FilterCakePackage filterCakePackage = new FilterCakePackage();
+        FilterCakePackageVo filterCakePackage = new FilterCakePackageVo();
         filterCakePackage.setPageNo(pageNo + 1);
         filterCakePackage.setPageSize(pageSize);
         filterCakePackage.setPageNum(
@@ -153,121 +72,9 @@ public class FilterCakeService {
         return filterCakePackage;
     }
 
-    // FilterCake 标准化形式类
-    public static class FilterCakeStandard{
-        private Long filterCakeId;                  //滤饼id
-        private String filterCakeName;              //滤饼名称
-        private String filterCakeIndex;             //滤饼编号
-        private String filterCakeColor;             //滤饼颜色
-        private Float filterCakeProcessingCost;     //滤饼批处理价格
-        private Integer filterCakeAccountingQuantity;//滤饼批次生产数量
-        private Double filterCakeUnitPrice;         //滤饼单位价格
-        private Integer filterCakePriceIncreasePercent;//滤饼价格增幅比例
-        private String filterCakeSpecification;     //滤饼规格
-        private String filterCakeRemarks;           //备注
-        private List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList;
-        private List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList;
-
-        public List<RawMaterialService.RawMaterialSimple> getRawMaterialSimpleList() {
-            return rawMaterialSimpleList;
-        }
-
-        public void setRawMaterialSimpleList(List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList) {
-            this.rawMaterialSimpleList = rawMaterialSimpleList;
-        }
-
-        public List<FilterCakeSimple> getFilterCakeSimpleList() {
-            return filterCakeSimpleList;
-        }
-
-        public void setFilterCakeSimpleList(List<FilterCakeSimple> filterCakeSimpleList) {
-            this.filterCakeSimpleList = filterCakeSimpleList;
-        }
-
-        public Long getFilterCakeId() {
-            return filterCakeId;
-        }
-
-        public void setFilterCakeId(Long filterCakeId) {
-            this.filterCakeId = filterCakeId;
-        }
-
-        public String getFilterCakeName() {
-            return filterCakeName;
-        }
-
-        public void setFilterCakeName(String filterCakeName) {
-            this.filterCakeName = filterCakeName;
-        }
-
-        public String getFilterCakeIndex() {
-            return filterCakeIndex;
-        }
-
-        public void setFilterCakeIndex(String filterCakeIndex) {
-            this.filterCakeIndex = filterCakeIndex;
-        }
-
-        public String getFilterCakeColor() {
-            return filterCakeColor;
-        }
-
-        public void setFilterCakeColor(String filterCakeColor) {
-            this.filterCakeColor = filterCakeColor;
-        }
-
-        public Double getFilterCakeUnitPrice() {
-            return filterCakeUnitPrice;
-        }
-
-        public Float getFilterCakeProcessingCost() {
-            return filterCakeProcessingCost;
-        }
-
-        public void setFilterCakeProcessingCost(Float filterCakeProcessingCost) {
-            this.filterCakeProcessingCost = filterCakeProcessingCost;
-        }
-
-        public Integer getFilterCakeAccountingQuantity() {
-            return filterCakeAccountingQuantity;
-        }
-
-        public void setFilterCakeAccountingQuantity(Integer filterCakeAccountingQuantity) {
-            this.filterCakeAccountingQuantity = filterCakeAccountingQuantity;
-        }
-
-        public void setFilterCakeUnitPrice(Double filterCakeUnitPrice) {
-            this.filterCakeUnitPrice = filterCakeUnitPrice;
-        }
-
-        public Integer getFilterCakePriceIncreasePercent() {
-            return filterCakePriceIncreasePercent;
-        }
-
-        public void setFilterCakePriceIncreasePercent(Integer filterCakePriceIncreasePercent) {
-            this.filterCakePriceIncreasePercent = filterCakePriceIncreasePercent;
-        }
-
-        public String getFilterCakeSpecification() {
-            return filterCakeSpecification;
-        }
-
-        public void setFilterCakeSpecification(String filterCakeSpecification) {
-            this.filterCakeSpecification = filterCakeSpecification;
-        }
-
-        public String getFilterCakeRemarks() {
-            return filterCakeRemarks;
-        }
-
-        public void setFilterCakeRemarks(String filterCakeRemarks) {
-            this.filterCakeRemarks = filterCakeRemarks;
-        }
-    }
-
     // FilterCake 转化为标准对象 FilterCakeStandard
-    public FilterCakeStandard filterCakeStandardization(FilterCake filterCake){
-        FilterCakeStandard filterCakeStandard = new FilterCakeStandard();
+    public FilterCakeStandardVo filterCakeStandardization(FilterCake filterCake){
+        FilterCakeStandardVo filterCakeStandard = new FilterCakeStandardVo();
         filterCakeStandard.setFilterCakeId(filterCake.getFilterCakeId());
         filterCakeStandard.setFilterCakeName(filterCake.getFilterCakeName());
         filterCakeStandard.setFilterCakeIndex(filterCake.getFilterCakeIndex());
@@ -288,14 +95,14 @@ public class FilterCakeService {
         filterCakeStandard.setFilterCakeRemarks(filterCake.getFilterCakeRemarks());
 
         // 设置返回的简单滤饼表
-        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
         for (FilterCake filterCake1 : filterCake.getFilterCakeList()) {
             filterCakeSimpleList.add(simplifyFilterCakeF(filterCake1, filterCake.getFilterCakeId()));
         }
         filterCakeStandard.setFilterCakeSimpleList(filterCakeSimpleList);
 
         // 设置返回的简单原料表
-        List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+        List<RawMaterialSimpleVo> rawMaterialSimpleList = new ArrayList<>();
         for (RawMaterial rawMaterial : filterCake.getRawMaterialList()) {
             rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterialF(rawMaterial, filterCake.getFilterCakeId()));
         }
@@ -304,41 +111,11 @@ public class FilterCakeService {
         return filterCakeStandard;
     }
 
-    public FilterCake deSimplifyFilterCake(FilterCakeSimple filterCakeSimple, Long productId) {
+    public FilterCake deSimplifyFilterCake(FilterCakeSimpleVo filterCakeSimple, Long productId) {
         FilterCake filterCake = new FilterCake();
-        filterCake = findFilterCakeByFilterCakeName(filterCakeSimple.filterCakeName);
+        filterCake = findFilterCakeByFilterCakeName(filterCakeSimple.getFilterCakeName());
         //todo : 用料量信息在简化的原料信息里面
         return filterCake;
-    }
-    // 用于返回滤饼简单信息
-    public static class FilterCakeSimple{
-        private Long filterCakeId;
-        private String filterCakeName;
-        private Double inventory;
-
-        public Long getFilterCakeId() {
-            return filterCakeId;
-        }
-
-        public void setFilterCakeId(Long filterCakeId) {
-            this.filterCakeId = filterCakeId;
-        }
-
-        public String getFilterCakeName() {
-            return filterCakeName;
-        }
-
-        public void setFilterCakeName(String filterCakeName) {
-            this.filterCakeName = filterCakeName;
-        }
-
-        public Double getInventory() {
-            return inventory;
-        }
-
-        public void setInventory(Double inventory) {
-            this.inventory = inventory;
-        }
     }
 
     // 根据调用者的productId filterCakeId 结合自身找到对应的投料量
@@ -362,8 +139,8 @@ public class FilterCakeService {
         return -1.0;
     }
 
-    public FilterCakeSimple simplifyFilterCake(FilterCake filterCake, Long productId){
-        FilterCakeSimple filterCakeSimple = new FilterCakeSimple();
+    public FilterCakeSimpleVo simplifyFilterCake(FilterCake filterCake, Long productId){
+        FilterCakeSimpleVo filterCakeSimple = new FilterCakeSimpleVo();
         filterCakeSimple.setFilterCakeId(filterCake.getFilterCakeId());
         filterCakeSimple.setFilterCakeName(filterCake.getFilterCakeName());
         filterCakeSimple.setInventory(getInventory(filterCake.getRelProductFilterCakeList(),
@@ -371,8 +148,8 @@ public class FilterCakeService {
         return filterCakeSimple;
     }
 
-    public FilterCakeSimple simplifyFilterCakeF(FilterCake filterCake, Long filterCakeId){
-        FilterCakeSimple filterCakeSimple = new FilterCakeSimple();
+    public FilterCakeSimpleVo simplifyFilterCakeF(FilterCake filterCake, Long filterCakeId){
+        FilterCakeSimpleVo filterCakeSimple = new FilterCakeSimpleVo();
         filterCakeSimple.setFilterCakeId(filterCake.getFilterCakeId());
         filterCakeSimple.setFilterCakeName(filterCake.getFilterCakeName());
         filterCakeSimple.setInventory(getInventoryF(filterCake.getRelFilterCakeFilterCakeListUsed(),
@@ -382,13 +159,13 @@ public class FilterCakeService {
 
     public Double calculateFilterCakePrice(FilterCake filterCake){
         // 标准化获取简化列表
-        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
         for (FilterCake filterCake1 : filterCake.getFilterCakeList()) {
             filterCakeSimpleList.add(simplifyFilterCakeF(filterCake1, filterCake.getFilterCakeId()));
         }
 
         // 设置返回的简单原料表
-        List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+        List<RawMaterialSimpleVo> rawMaterialSimpleList = new ArrayList<>();
         for (RawMaterial rawMaterial : filterCake.getRawMaterialList()) {
             rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterialF(rawMaterial, filterCake.getFilterCakeId()));
         }
@@ -396,12 +173,12 @@ public class FilterCakeService {
         Double sum = 0.0;
         sum += filterCake.getFilterCakeProcessingCost();
         if(filterCakeSimpleList.size() != 0){
-            for(FilterCakeSimple filterCakeSimple: filterCakeSimpleList){
+            for(FilterCakeSimpleVo filterCakeSimple: filterCakeSimpleList){
                 System.out.println("currnt filtercake id :" + filterCakeSimple.getFilterCakeId());
                 sum +=  filterCakeSimple.getInventory() * calculateFilterCakePrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeSimple.getFilterCakeId()));
             }
         }
-        for(RawMaterialService.RawMaterialSimple rawMaterialSimple: rawMaterialSimpleList){
+        for(RawMaterialSimpleVo rawMaterialSimple: rawMaterialSimpleList){
             sum += rawMaterialSimple.getInventory() * rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialUnitPrice();
         }
         return sum / filterCake.getFilterCakeAccountingQuantity();
@@ -409,12 +186,12 @@ public class FilterCakeService {
 
     public Double calculateFilterCakeHistoryPrice(FilterCake filterCake, Date historyDate){
         // 标准化获取简化列表
-        List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
+        List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
         for (FilterCake filterCake1 : filterCake.getFilterCakeList()) {
             filterCakeSimpleList.add(simplifyFilterCakeF(filterCake1, filterCake.getFilterCakeId()));
         }
         // 设置返回的简单原料表
-        List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
+        List<RawMaterialSimpleVo> rawMaterialSimpleList = new ArrayList<>();
         for (RawMaterial rawMaterial : filterCake.getRawMaterialList()) {
             rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterialF(rawMaterial, filterCake.getFilterCakeId()));
         }
@@ -423,12 +200,12 @@ public class FilterCakeService {
         sum += filterCake.getFilterCakeProcessingCost();
         // 获取滤饼历史价格
         if(filterCakeSimpleList.size()!=0){
-            for(FilterCakeSimple filterCakeSimple: filterCakeSimpleList){
+            for(FilterCakeSimpleVo filterCakeSimple: filterCakeSimpleList){
                 sum +=  filterCakeSimple.getInventory() * calculateFilterCakeHistoryPrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeSimple.getFilterCakeId()),historyDate);
             }
         }
         // 获取原料历史价格
-        for(RawMaterialService.RawMaterialSimple rawMaterialSimple: rawMaterialSimpleList){
+        for(RawMaterialSimpleVo rawMaterialSimple: rawMaterialSimpleList){
             List<Utils.HistoryPrice> historyPriceList = rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialHistoryPrice();
             if(historyPriceList.size()!=0){
                 // 标识是否有增加过历史数据，没有则说明最早没有当时的历史数据则取当前原料最早的数据作为当时的虚拟数据
@@ -474,8 +251,8 @@ public class FilterCakeService {
 
     //查
     //-------------------------------------------------------------------------
-    public FilterCakePackage findAll(Integer pageNo,
-                                    Integer pageSize
+    public FilterCakePackageVo findAll(Integer pageNo,
+                                       Integer pageSize
     ) {
         Integer filterCakeNum = filterCakeRepository.findAll().size();
         Pageable pageable = PageRequest.of(pageNo, pageSize);
@@ -483,10 +260,10 @@ public class FilterCakeService {
         return packFilterCake(page.toList(),pageNo,pageSize,filterCakeNum);
     }
 
-    public List<FilterCakeName> findAllFilterCakeName(){
-        List<FilterCakeName> filterCakeNameList = new ArrayList<>();
+    public List<FilterCakeNameVo> findAllFilterCakeName(){
+        List<FilterCakeNameVo> filterCakeNameList = new ArrayList<>();
         for(FilterCake filterCake: filterCakeRepository.findAll()){
-            FilterCakeName filterCakeName = new FilterCakeName();
+            FilterCakeNameVo filterCakeName = new FilterCakeNameVo();
             filterCakeName.setFilterCakeId(filterCake.getFilterCakeId());
             filterCakeName.setFilterCakeName(filterCake.getFilterCakeName());
             filterCakeNameList.add(filterCakeName);
@@ -495,7 +272,7 @@ public class FilterCakeService {
     }
 
 
-    public FilterCakePackage findAllFilterCakeByCondition(
+    public FilterCakePackageVo findAllFilterCakeByCondition(
             String typeOfQuery, String conditionOfQuery,
             Integer pageNo, Integer pageSize
     ){
@@ -517,9 +294,9 @@ public class FilterCakeService {
         );
     }
 
-    public FilterCakeService.FilterCakeStandard findFilterCakeByFilterCakeId(Long filterCakeId){
+    public FilterCakeStandardVo findFilterCakeByFilterCakeId(Long filterCakeId){
         if(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId) == null){
-            return new FilterCakeStandard();
+            return new FilterCakeStandardVo();
         }
         return  filterCakeStandardization(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId));
     }
@@ -589,7 +366,7 @@ public class FilterCakeService {
     }
 
     // 解包标准类
-    public DeStandardizeResult deStandardizeFilterCake(FilterCakeStandard filterCakeStandard){
+    public DeStandardizeResult deStandardizeFilterCake(FilterCakeStandardVo filterCakeStandard){
         FilterCake filterCake = new FilterCake();
         filterCake.setFilterCakeId(filterCakeStandard.getFilterCakeId());
         filterCake.setFilterCakeName(filterCakeStandard.getFilterCakeName());
@@ -603,7 +380,7 @@ public class FilterCakeService {
         // 关系表设置
         List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = new ArrayList<>();
         if(filterCakeStandard.getRawMaterialSimpleList()!=null){
-            for(RawMaterialService.RawMaterialSimple rawMaterialSimple: filterCakeStandard.getRawMaterialSimpleList()){
+            for(RawMaterialSimpleVo rawMaterialSimple: filterCakeStandard.getRawMaterialSimpleList()){
                 Long rawMaterialId = rawMaterialSimple.getRawMaterialId();
                 Double inventory = rawMaterialSimple.getInventory();
 
@@ -621,7 +398,7 @@ public class FilterCakeService {
 
         List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList = new ArrayList<>();
         if(filterCakeStandard.getFilterCakeSimpleList()!=null){
-            for(FilterCakeSimple filterCakeSimple: filterCakeStandard.getFilterCakeSimpleList()){
+            for(FilterCakeSimpleVo filterCakeSimple: filterCakeStandard.getFilterCakeSimpleList()){
                 Long filterCakeUsedId = filterCakeSimple.getFilterCakeId();
                 Double inventory = filterCakeSimple.getInventory();
 
@@ -661,7 +438,7 @@ public class FilterCakeService {
 
 
 
-    public FilterCake addFilterCake(FilterCakeStandard filterCakeStandard) {
+    public FilterCake addFilterCake(FilterCakeStandardVo filterCakeStandard) {
         DeStandardizeResult result = deStandardizeFilterCake(filterCakeStandard);
         FilterCake filterCake = result.getFiltercake();
         List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = result.getRelFilterCakeRawMaterialList();
@@ -678,7 +455,7 @@ public class FilterCakeService {
     //改
     //-------------------------------------------------------------------------
     // update FilterCake data
-    public String updateFilterCake(FilterCakeStandard updatedFilterCake) {
+    public String updateFilterCake(FilterCakeStandardVo updatedFilterCake) {
         FilterCake originFilterCake = filterCakeRepository.findFilterCakeByFilterCakeId(updatedFilterCake.getFilterCakeId());
         if(originFilterCake == null){
             FilterCake addedFilterCake = addFilterCake(updatedFilterCake);
@@ -755,15 +532,15 @@ public class FilterCakeService {
         List<ExcelFilterCakeVo> excelFilterCakeVos = importResult.getData();
         for(ExcelFilterCakeVo excelFilterCakeVo: excelFilterCakeVos){
             // excel信息转化为标准类
-            FilterCakeStandard filterCakeStandard = transExcelToStandard(excelFilterCakeVo);
+            FilterCakeStandardVo filterCakeStandard = transExcelToStandard(excelFilterCakeVo);
             // 更新数据库，已存在则会直接替换
             updateFilterCake(filterCakeStandard);
         }
         return ResultVoUtil.success(excelFilterCakeVos);
     }
 
-    public FilterCakeStandard transExcelToStandard(ExcelFilterCakeVo excelFilterCakeVo){
-        FilterCakeStandard filterCakeStandard = new FilterCakeStandard();
+    public FilterCakeStandardVo transExcelToStandard(ExcelFilterCakeVo excelFilterCakeVo){
+        FilterCakeStandardVo filterCakeStandard = new FilterCakeStandardVo();
         // 如果已经存在了则修改，否则则添加
         if(filterCakeRepository.findFilterCakeByFilterCakeName(excelFilterCakeVo.getFilterCakeName()) == null){
             // 表示添加

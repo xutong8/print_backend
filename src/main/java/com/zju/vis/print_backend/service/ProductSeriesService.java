@@ -4,10 +4,7 @@ import com.zju.vis.print_backend.Utils.*;
 import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
-import com.zju.vis.print_backend.vo.ExcelProductSeriesVo;
-import com.zju.vis.print_backend.vo.ExcelProductSeriesWriteVo;
-import com.zju.vis.print_backend.vo.ExcelRawMaterialWriteVo;
-import com.zju.vis.print_backend.vo.ResultVo;
+import com.zju.vis.print_backend.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -136,7 +133,7 @@ public class ProductSeriesService {
         private Long productSeriesId;
         private String productSeriesName;
         private String productSeriesFunction;
-        private List<ProductService.ProductSimple> productSimpleList;
+        private List<ProductSimpleVo> productSimpleList;
 
         public Long getProductSeriesId() {
             return productSeriesId;
@@ -162,11 +159,11 @@ public class ProductSeriesService {
             this.productSeriesFunction = productSeriesFunction;
         }
 
-        public List<ProductService.ProductSimple> getProductSimpleList() {
+        public List<ProductSimpleVo> getProductSimpleList() {
             return productSimpleList;
         }
 
-        public void setProductSimpleList(List<ProductService.ProductSimple> productSimpleList) {
+        public void setProductSimpleList(List<ProductSimpleVo> productSimpleList) {
             this.productSimpleList = productSimpleList;
         }
     }
@@ -177,7 +174,7 @@ public class ProductSeriesService {
         productSeriesStandard.setProductSeriesName(productSeries.getProductSeriesName());
         productSeriesStandard.setProductSeriesFunction(productSeries.getProductSeriesFunction());
         // 设置返回的简单产品列表
-        List<ProductService.ProductSimple> productSimpleList = new ArrayList<>();
+        List<ProductSimpleVo> productSimpleList = new ArrayList<>();
         for(Product product: productSeries.getProductList()){
             productSimpleList.add(productService.simplifyProduct(product));
         }

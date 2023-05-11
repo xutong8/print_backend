@@ -1,27 +1,21 @@
 package com.zju.vis.print_backend.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 
 import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.dao.ProductRepository;
-import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
-import com.zju.vis.print_backend.entity.RelProductFilterCake;
-import com.zju.vis.print_backend.service.RawMaterialService;
 import com.zju.vis.print_backend.service.RelProductFilterCakeService;
 import com.zju.vis.print_backend.service.RelProductRawMaterialService;
+import com.zju.vis.print_backend.vo.ProductPackageVo;
+import com.zju.vis.print_backend.vo.ProductStandardVo;
 import com.zju.vis.print_backend.vo.ResultVo;
-import io.swagger.models.auth.In;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import com.zju.vis.print_backend.entity.Product;
@@ -30,10 +24,7 @@ import com.zju.vis.print_backend.service.ProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import springfox.documentation.spring.web.json.Json;
 
 @Api(description = "产品管理")
 @RequestMapping("/product")
@@ -53,7 +44,7 @@ public class ProductController {
     @ApiOperation(value = "获取所有产品")
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     @ResponseBody
-    public ProductService.ProductPackage findAll(
+    public ProductPackageVo findAll(
             @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
@@ -73,7 +64,7 @@ public class ProductController {
     @ApiOperation(value = "根据关联条件返回对应的产品(滤饼名、原料名、系列名)")
     @RequestMapping(value = "/findAllByRelCondition", method = RequestMethod.GET)
     @ResponseBody
-    public ProductService.ProductPackage findAllByRelCondition(
+    public ProductPackageVo findAllByRelCondition(
             @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName,
             @RequestParam(value = "filterCakeName", defaultValue = "") String filterCakeName,
             @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName,
@@ -89,7 +80,7 @@ public class ProductController {
                 "  productSeriesName: " + productSeriesName);
 
         long s = System.currentTimeMillis();
-        ProductService.ProductPackage list = productService.findAllByRelCondition(rawMaterialName, filterCakeName, productSeriesName, pageNo - 1, pageSize);
+        ProductPackageVo list = productService.findAllByRelCondition(rawMaterialName, filterCakeName, productSeriesName, pageNo - 1, pageSize);
         long e = System.currentTimeMillis();
         System.out.println("findbycondition开始的时间：" + s);
         System.out.println("findbycondition结束的时间：" + e);
@@ -101,7 +92,7 @@ public class ProductController {
     @ApiOperation(value = "Product直接查询")
     @RequestMapping(value = "/findAllByDirectCondition", method = RequestMethod.GET)
     @ResponseBody
-    public ProductService.ProductPackage findAllByDirectCondition(
+    public ProductPackageVo findAllByDirectCondition(
             @RequestParam(value = "typeOfQuery", defaultValue = "产品名称") String typeOfQuery,
             @RequestParam(value = "conditionOfQuery", defaultValue = "") String conditionOfQuery,
             // @Valid @RequestBody ,
@@ -109,7 +100,7 @@ public class ProductController {
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
         long s = System.currentTimeMillis();
-        ProductService.ProductPackage list = productService.findAllByDirectCondition(typeOfQuery, conditionOfQuery, pageNo - 1, pageSize);
+        ProductPackageVo list = productService.findAllByDirectCondition(typeOfQuery, conditionOfQuery, pageNo - 1, pageSize);
         long e = System.currentTimeMillis();
         System.out.println("findbycondition开始的时间：" + s);
         System.out.println("findbycondition结束的时间：" + e);
@@ -138,7 +129,7 @@ public class ProductController {
     @ApiOperation(value = "添加新产品")
     @RequestMapping(value = "/addProduct", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Product> addProduct(@Valid @RequestBody ProductService.ProductStandard productStandard) {
+    public ResponseEntity<Product> addProduct(@Valid @RequestBody ProductStandardVo productStandard) {
         Product savedProduct = productService.addProduct(productStandard);
         return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
@@ -148,7 +139,7 @@ public class ProductController {
     @ResponseBody
     public ResponseEntity<String> updateProduct(
             // @RequestParam(value = "productId") Long productId,
-            @Valid @RequestBody ProductService.ProductStandard updatedProduct
+            @Valid @RequestBody ProductStandardVo updatedProduct
     ) {
         String result = productService.updateProduct(updatedProduct);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -158,7 +149,7 @@ public class ProductController {
     @RequestMapping(value = "/findProductByProductId", method = RequestMethod.GET)
     @ResponseBody
     // public Product findProductByProductId(
-    public ProductService.ProductStandard findProductByProductId(
+    public ProductStandardVo findProductByProductId(
             @RequestParam(value = "productId", defaultValue = "") Long productId
     ) {
         return productService.findProductByProductId(productId);
@@ -167,25 +158,25 @@ public class ProductController {
     @Resource
     private ProductRepository productRepository;
 
-    @ApiOperation(value = "测试商品历史价格用接口")
-    @RequestMapping(value = "/findFilterCakeHistoryPriceTest", method = RequestMethod.GET)
-    @ResponseBody
-    public Double testHistoryPrice(
-            @RequestParam(value = "productId", defaultValue = "") Long productId,
-            @RequestParam(value = "testDate", defaultValue = "2022-12-20") String testDate
-    ) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = null;
-        try {
-            date = sdf.parse(testDate);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println(date);
-        return productService.calculateProductHistoryPrice(productRepository.findProductByProductId(productId), date);
-    }
+    // @ApiOperation(value = "测试商品历史价格用接口")
+    // @RequestMapping(value = "/findFilterCakeHistoryPriceTest", method = RequestMethod.GET)
+    // @ResponseBody
+    // public Double testHistoryPrice(
+    //         @RequestParam(value = "productId", defaultValue = "") Long productId,
+    //         @RequestParam(value = "testDate", defaultValue = "2022-12-20") String testDate
+    // ) {
+    //     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    //     Date date = null;
+    //     try {
+    //         date = sdf.parse(testDate);
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //     }
+    //     System.out.println(date);
+    //     return productService.calculateProductHistoryPrice(productRepository.findProductByProductId(productId), date);
+    // }
 
-    @ApiOperation(value = "测试产品历史价格列表用接口")
+    @ApiOperation(value = "产品历史价格列表用接口")
     @RequestMapping(value = "/getProductHistoryPriceList", method = RequestMethod.GET)
     public List<Utils.HistoryPrice> getProductHistoryPriceList(
             @RequestParam(value = "productId", defaultValue = "1" ) Long productId,

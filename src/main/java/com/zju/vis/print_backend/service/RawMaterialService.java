@@ -4,10 +4,8 @@ import com.zju.vis.print_backend.Utils.*;
 import com.zju.vis.print_backend.compositekey.RelDateRawMaterialKey;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.*;
-import com.zju.vis.print_backend.vo.ExcelProductWriteVo;
-import com.zju.vis.print_backend.vo.ExcelRawMaterialVo;
-import com.zju.vis.print_backend.vo.ExcelRawMaterialWriteVo;
-import com.zju.vis.print_backend.vo.ResultVo;
+import com.zju.vis.print_backend.vo.*;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,99 +37,21 @@ public class RawMaterialService {
     @Resource
     private RelProductRawMaterialService relProductRawMaterialService;
 
-    // 导入excel文件
-    @Resource
-    private ExcelUtil excelUtil;
-
     @Resource
     private FileService fileService;
 
     // 用于调用一般方法
     Utils utils = new Utils();
 
-    // 用于返回原料列表名
-    public class RawMaterialName{
-        private Long rawMaterialId;
-        private String rawMaterialName;
-
-        public Long getRawMaterialId() {
-            return rawMaterialId;
-        }
-
-        public void setRawMaterialId(Long rawMaterialId) {
-            this.rawMaterialId = rawMaterialId;
-        }
-
-        public String getRawMaterialName() {
-            return rawMaterialName;
-        }
-
-        public void setRawMaterialName(String rawMaterialName) {
-            this.rawMaterialName = rawMaterialName;
-        }
-    }
-
-    // RawMaterial 结果封装
-    public class RawMaterialPackage{
-        // 附加信息
-        private Integer pageNo;
-        private Integer pageSize;
-        private Integer pageNum;
-        private Integer total;
-
-        // 返回的标准列表
-        private List<RawMaterialStandard> list;
-
-        public Integer getPageNo() {
-            return pageNo;
-        }
-
-        public void setPageNo(Integer pageNo) {
-            this.pageNo = pageNo;
-        }
-
-        public Integer getPageSize() {
-            return pageSize;
-        }
-
-        public void setPageSize(Integer pageSize) {
-            this.pageSize = pageSize;
-        }
-
-        public Integer getPageNum() {
-            return pageNum;
-        }
-
-        public void setPageNum(Integer pageNum) {
-            this.pageNum = pageNum;
-        }
-
-        public Integer getTotal() {
-            return total;
-        }
-
-        public void setTotal(Integer total) {
-            this.total = total;
-        }
-
-        public List<RawMaterialStandard> getList() {
-            return list;
-        }
-
-        public void setList(List<RawMaterialStandard> list) {
-            this.list = list;
-        }
-    }
-
     // List<RawMaterial> 添加额外信息标准化打包发送
-    public RawMaterialPackage packMaterial(List<RawMaterial> rawMaterialList,
-                                           Integer pageNo,Integer pageSize,
-                                           Integer rawMaterialNum){
-        List<RawMaterialStandard> rawMaterialStandardList = new ArrayList<>();
+    public RawMaterialPackageVo packMaterial(List<RawMaterial> rawMaterialList,
+                                             Integer pageNo, Integer pageSize,
+                                             Integer rawMaterialNum){
+        List<RawMaterialStandardVo> rawMaterialStandardList = new ArrayList<>();
         for(RawMaterial rawMaterial: rawMaterialList){
             rawMaterialStandardList.add(RawMaterialStandardization(rawMaterial));
         }
-        RawMaterialPackage rawMaterialPackage = new RawMaterialPackage();
+        RawMaterialPackageVo rawMaterialPackage = new RawMaterialPackageVo();
         rawMaterialPackage.setPageNo(pageNo + 1);
         rawMaterialPackage.setPageSize(pageSize);
         rawMaterialPackage.setPageNum(
@@ -143,85 +63,9 @@ public class RawMaterialService {
     }
 
 
-    // RawMaterial 标准化形式类
-    public static class RawMaterialStandard{
-        private Long rawMaterialId;
-        private String rawMaterialName;
-        private String rawMaterialIndex;
-        private Double rawMaterialUnitPrice;
-        private Integer rawMaterialIncreasePercent;
-        private String rawMaterialConventional;
-        private String rawMaterialSpecification;
-        private List<Utils.HistoryPrice> rawMaterialHistoryPrice;
-
-        public Long getRawMaterialId() {
-            return rawMaterialId;
-        }
-
-        public void setRawMaterialId(Long rawMaterialId) {
-            this.rawMaterialId = rawMaterialId;
-        }
-
-        public String getRawMaterialName() {
-            return rawMaterialName;
-        }
-
-        public void setRawMaterialName(String rawMaterialName) {
-            this.rawMaterialName = rawMaterialName;
-        }
-
-        public String getRawMaterialIndex() {
-            return rawMaterialIndex;
-        }
-
-        public void setRawMaterialIndex(String rawMaterialIndex) {
-            this.rawMaterialIndex = rawMaterialIndex;
-        }
-
-        public Double getRawMaterialUnitPrice() {
-            return rawMaterialUnitPrice;
-        }
-
-        public void setRawMaterialUnitPrice(Double rawMaterialUnitPrice) {
-            this.rawMaterialUnitPrice = rawMaterialUnitPrice;
-        }
-
-        public Integer getRawMaterialIncreasePercent() {
-            return rawMaterialIncreasePercent;
-        }
-
-        public void setRawMaterialIncreasePercent(Integer rawMaterialIncreasePercent) {
-            this.rawMaterialIncreasePercent = rawMaterialIncreasePercent;
-        }
-
-        public String getRawMaterialConventional() {
-            return rawMaterialConventional;
-        }
-
-        public void setRawMaterialConventional(String rawMaterialConventional) {
-            this.rawMaterialConventional = rawMaterialConventional;
-        }
-
-        public String getRawMaterialSpecification() {
-            return rawMaterialSpecification;
-        }
-
-        public void setRawMaterialSpecification(String rawMaterialSpecification) {
-            this.rawMaterialSpecification = rawMaterialSpecification;
-        }
-
-        public List<Utils.HistoryPrice> getRawMaterialHistoryPrice() {
-            return rawMaterialHistoryPrice;
-        }
-
-        public void setRawMaterialHistoryPrice(List<Utils.HistoryPrice> rawMaterialHistoryPrice) {
-            this.rawMaterialHistoryPrice = rawMaterialHistoryPrice;
-        }
-    }
-
     // RawMaterial 转化为标准对象 RawMaterialStandard
-    public RawMaterialStandard RawMaterialStandardization(RawMaterial rawMaterial){
-        RawMaterialStandard rawMaterialStandard = new RawMaterialStandard();
+    public RawMaterialStandardVo RawMaterialStandardization(RawMaterial rawMaterial){
+        RawMaterialStandardVo rawMaterialStandard = new RawMaterialStandardVo();
         rawMaterialStandard.setRawMaterialId(rawMaterial.getRawMaterialId());
         rawMaterialStandard.setRawMaterialName(rawMaterial.getRawMaterialName());
         rawMaterialStandard.setRawMaterialIndex(rawMaterial.getRawMaterialIndex());
@@ -244,41 +88,11 @@ public class RawMaterialService {
         return rawMaterialStandard;
     }
 
-    public RawMaterial deSimplifyRawMaterial(RawMaterialSimple rawMaterialSimple, Long productId) {
+    public RawMaterial deSimplifyRawMaterial(RawMaterialSimpleVo rawMaterialSimple, Long productId) {
         RawMaterial rawMaterial = new RawMaterial();
-        rawMaterial = findRawMaterialByRawMaterialName(rawMaterialSimple.rawMaterialName);
+        rawMaterial = findRawMaterialByRawMaterialName(rawMaterialSimple.getRawMaterialName());
         //todo : 用料量信息在简化的原料信息里面
         return rawMaterial;
-    }
-    // 用于简单原料简单信息
-    public static class RawMaterialSimple{
-        private Long rawMaterialId;
-        private String rawMaterialName;
-        private Double inventory;
-
-        public Long getRawMaterialId() {
-            return rawMaterialId;
-        }
-
-        public void setRawMaterialId(Long rawMaterialId) {
-            this.rawMaterialId = rawMaterialId;
-        }
-
-        public String getRawMaterialName() {
-            return rawMaterialName;
-        }
-
-        public void setRawMaterialName(String rawMaterialName) {
-            this.rawMaterialName = rawMaterialName;
-        }
-
-        public Double getInventory() {
-            return inventory;
-        }
-
-        public void setInventory(Double inventory) {
-            this.inventory = inventory;
-        }
     }
 
     // 根据调用者的productId filterCakeId 结合自身找到对应的投料量
@@ -308,8 +122,8 @@ public class RawMaterialService {
      * @return
      */
     // 简单原料信息封装
-    public RawMaterialSimple simplifyRawMaterial(RawMaterial rawMaterial,Long productId){
-        RawMaterialSimple rawMaterialSimple = new RawMaterialSimple();
+    public RawMaterialSimpleVo simplifyRawMaterial(RawMaterial rawMaterial, Long productId){
+        RawMaterialSimpleVo rawMaterialSimple = new RawMaterialSimpleVo();
         rawMaterialSimple.setRawMaterialId(rawMaterial.getRawMaterialId());
         rawMaterialSimple.setRawMaterialName(rawMaterial.getRawMaterialName());
         // 获取投料量信息
@@ -320,8 +134,8 @@ public class RawMaterialService {
     }
 
     // 滤饼类的简单原料信息封装
-    public RawMaterialSimple simplifyRawMaterialF(RawMaterial rawMaterial,Long filterCakeId){
-        RawMaterialSimple rawMaterialSimple = new RawMaterialSimple();
+    public RawMaterialSimpleVo simplifyRawMaterialF(RawMaterial rawMaterial, Long filterCakeId){
+        RawMaterialSimpleVo rawMaterialSimple = new RawMaterialSimpleVo();
         rawMaterialSimple.setRawMaterialId(rawMaterial.getRawMaterialId());
         rawMaterialSimple.setRawMaterialName(rawMaterial.getRawMaterialName());
         rawMaterialSimple.setInventory(getInventoryF(rawMaterial.getRelFilterCakeRawMaterialList(),
@@ -331,8 +145,8 @@ public class RawMaterialService {
 
     //查
     //-------------------------------------------------------------------------
-    public RawMaterialPackage findAll(Integer pageNo,
-                                     Integer pageSize
+    public RawMaterialPackageVo findAll(Integer pageNo,
+                                        Integer pageSize
     ) {
         Integer rawMaterialNum = rawMaterialRepository.findAll().size();
         Pageable pageable = PageRequest.of(pageNo, pageSize);
@@ -340,10 +154,10 @@ public class RawMaterialService {
         return packMaterial(page.toList(),pageNo,pageSize,rawMaterialNum);
     }
 
-    public List<RawMaterialName> findAllRawMaterialName(){
-        List<RawMaterialName> rawMaterialNameList = new ArrayList<>();
+    public List<RawMaterialNameVo> findAllRawMaterialName(){
+        List<RawMaterialNameVo> rawMaterialNameList = new ArrayList<>();
         for (RawMaterial rawMaterial: rawMaterialRepository.findAll()){
-            RawMaterialName rawMaterialName = new RawMaterialName();
+            RawMaterialNameVo rawMaterialName = new RawMaterialNameVo();
             rawMaterialName.setRawMaterialId(rawMaterial.getRawMaterialId());
             rawMaterialName.setRawMaterialName(rawMaterial.getRawMaterialName());
             rawMaterialNameList.add(rawMaterialName);
@@ -351,7 +165,7 @@ public class RawMaterialService {
         return rawMaterialNameList;
     }
 
-    public RawMaterialPackage findAllRawMaterialByCondition(
+    public RawMaterialPackageVo findAllRawMaterialByCondition(
             String typeOfQuery, String conditionOfQuery,
             Integer pageNo, Integer pageSize
     ){
@@ -368,9 +182,9 @@ public class RawMaterialService {
         );
     }
 
-    public RawMaterialStandard findRawMaterialByRawMaterialId(Long rawMaterialId){
+    public RawMaterialStandardVo findRawMaterialByRawMaterialId(Long rawMaterialId){
         if(rawMaterialRepository.findRawMaterialByRawMaterialId(rawMaterialId) == null){
-            return new RawMaterialStandard();
+            return new RawMaterialStandardVo();
         }
         return  RawMaterialStandardization(rawMaterialRepository.findRawMaterialByRawMaterialId(rawMaterialId));
     }
@@ -429,34 +243,15 @@ public class RawMaterialService {
 
     //增
     //-------------------------------------------------------------------------
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DeStandardizeResult{
         private RawMaterial rawMaterial;
         private List<RelDateRawMaterial> relDateRawMaterialList;
-
-        //构造函数
-        public DeStandardizeResult(RawMaterial rawMaterial, List<RelDateRawMaterial> relDateRawMaterialList) {
-            this.rawMaterial = rawMaterial;
-            this.relDateRawMaterialList = relDateRawMaterialList;
-        }
-
-        public RawMaterial getRawMaterial() {
-            return rawMaterial;
-        }
-
-        public void setRawMaterial(RawMaterial rawMaterial) {
-            this.rawMaterial = rawMaterial;
-        }
-
-        public List<RelDateRawMaterial> getRelDateRawMaterialList() {
-            return relDateRawMaterialList;
-        }
-
-        public void setRelDateRawMaterialList(List<RelDateRawMaterial> relDateRawMaterialList) {
-            this.relDateRawMaterialList = relDateRawMaterialList;
-        }
     }
 
-    public DeStandardizeResult deStandardizeRawMaterial(RawMaterialStandard rawMaterialStandard){
+    public DeStandardizeResult deStandardizeRawMaterial(RawMaterialStandardVo rawMaterialStandard){
         RawMaterial rawMaterial = new RawMaterial();
         rawMaterial.setRawMaterialId(rawMaterialStandard.getRawMaterialId());
         rawMaterial.setRawMaterialName(rawMaterialStandard.getRawMaterialName());
@@ -495,7 +290,7 @@ public class RawMaterialService {
         }
     }
 
-    public RawMaterial addRawMaterial(RawMaterialStandard rawMaterialStandard) {
+    public RawMaterial addRawMaterial(RawMaterialStandardVo rawMaterialStandard) {
         DeStandardizeResult result = deStandardizeRawMaterial(rawMaterialStandard);
         RawMaterial rawMaterial = result.getRawMaterial();
         List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
@@ -508,7 +303,7 @@ public class RawMaterialService {
 
     //改
     //-------------------------------------------------------------------------
-    public String updateRawMaterial(RawMaterialStandard updatedRawMaterial) {
+    public String updateRawMaterial(RawMaterialStandardVo updatedRawMaterial) {
         RawMaterial originRawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(updatedRawMaterial.getRawMaterialId());
         if(originRawMaterial == null){
             RawMaterial addedRawMaterial = addRawMaterial(updatedRawMaterial);
@@ -574,15 +369,15 @@ public class RawMaterialService {
         List<ExcelRawMaterialVo> excelRawMaterialVos = importResult.getData();
         for(ExcelRawMaterialVo excelRawMaterialVo: excelRawMaterialVos){
             // excel信息转化为标准类
-            RawMaterialStandard rawMaterialStandard = transExcelToStandard(excelRawMaterialVo);
+            RawMaterialStandardVo rawMaterialStandard = transExcelToStandard(excelRawMaterialVo);
             // 更新数据库，已存在则会直接替换
             updateRawMaterial(rawMaterialStandard);
         }
         return ResultVoUtil.success(excelRawMaterialVos);
     }
 
-    public RawMaterialStandard transExcelToStandard(ExcelRawMaterialVo excelRawMaterialVo){
-        RawMaterialStandard rawMaterialStandard = new RawMaterialStandard();
+    public RawMaterialStandardVo transExcelToStandard(ExcelRawMaterialVo excelRawMaterialVo){
+        RawMaterialStandardVo rawMaterialStandard = new RawMaterialStandardVo();
         // 如果已经存在了则修改，否则则添加
         if(rawMaterialRepository.findRawMaterialByRawMaterialName(excelRawMaterialVo.getRawMaterialName()) == null){
             // 表示添加

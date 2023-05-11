@@ -3,13 +3,15 @@ package com.zju.vis.print_backend.controller;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RawMaterialService;
 import com.zju.vis.print_backend.service.RelDateRawMaterialService;
+import com.zju.vis.print_backend.vo.RawMaterialNameVo;
+import com.zju.vis.print_backend.vo.RawMaterialPackageVo;
+import com.zju.vis.print_backend.vo.RawMaterialStandardVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +35,7 @@ public class RawMaterialController {
     @ApiOperation(value = "获取所有原料")
     @RequestMapping(value = "/findAllRawMaterial", method = RequestMethod.GET)
     @ResponseBody
-    public RawMaterialService.RawMaterialPackage findAll(
+    public RawMaterialPackageVo findAll(
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ) {
@@ -43,14 +45,14 @@ public class RawMaterialController {
     @ApiOperation(value = "获取所有原料名称")
     @RequestMapping(value = "/findAllRawMaterialName", method = RequestMethod.GET)
     @ResponseBody
-    public List<RawMaterialService.RawMaterialName> findAllRawMaterialName() {
+    public List<RawMaterialNameVo> findAllRawMaterialName() {
         return rawMaterialService.findAllRawMaterialName();
     }
 
     @ApiOperation(value = "根据条件返回所有的原料")
     @RequestMapping(value = "/findAllRawMaterialByCondition", method = RequestMethod.GET)
     @ResponseBody
-    public RawMaterialService.RawMaterialPackage findAllRawMaterialByCondition(
+    public RawMaterialPackageVo findAllRawMaterialByCondition(
             @RequestParam(value = "typeOfQuery", defaultValue = "原料品名") String typeOfQuery,
             @RequestParam(value = "conditionOfQuery" ,defaultValue = "") String conditionOfQuery,
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
@@ -62,7 +64,7 @@ public class RawMaterialController {
     @ApiOperation(value = "根据 ID 返回原料")
     @RequestMapping(value = "/findRawMaterialByRawMaterialId", method = RequestMethod.GET)
     @ResponseBody
-    public RawMaterialService.RawMaterialStandard findRawMaterialByRawMaterialId(
+    public RawMaterialStandardVo findRawMaterialByRawMaterialId(
             @RequestParam(value = "rawMaterialId", defaultValue = "") Long rawMaterialId
     ) {
         return rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialId);
@@ -78,7 +80,7 @@ public class RawMaterialController {
     @ApiOperation(value = "新增原料")
     @RequestMapping(value = "/addRawMaterial", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<RawMaterial> addRawMaterial(@Valid @RequestBody RawMaterialService.RawMaterialStandard rawMaterialStandard) {
+    public ResponseEntity<RawMaterial> addRawMaterial(@Valid @RequestBody RawMaterialStandardVo rawMaterialStandard) {
         RawMaterial rawMaterial = rawMaterialService.addRawMaterial(rawMaterialStandard);
         return new ResponseEntity<>(rawMaterial, HttpStatus.OK);
     }
@@ -87,7 +89,7 @@ public class RawMaterialController {
     @RequestMapping(value = "/updateRawMaterial", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> updateRawMaterial(
-            @Valid @RequestBody RawMaterialService.RawMaterialStandard updatedRawMaterial
+            @Valid @RequestBody RawMaterialStandardVo updatedRawMaterial
     ) {
         String result = rawMaterialService.updateRawMaterial(updatedRawMaterial);
         return new ResponseEntity<>(result, HttpStatus.OK);

@@ -4,26 +4,24 @@ package com.zju.vis.print_backend.controller;
 import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
-import com.zju.vis.print_backend.entity.RelFilterCakeFilterCake;
-import com.zju.vis.print_backend.entity.RelFilterCakeRawMaterial;
 import com.zju.vis.print_backend.service.FilterCakeService;
 
 import com.zju.vis.print_backend.service.RelFilterCakeFilterCakeService;
 import com.zju.vis.print_backend.service.RelFilterCakeRawMaterialService;
+import com.zju.vis.print_backend.vo.FilterCakeNameVo;
+import com.zju.vis.print_backend.vo.FilterCakePackageVo;
+import com.zju.vis.print_backend.vo.FilterCakeStandardVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @Api(description = "滤饼管理")
@@ -44,7 +42,7 @@ public class FilterCakeController {
     @ApiOperation(value = "获取所有滤饼")
     @RequestMapping(value = "/findAllFilterCake", method = RequestMethod.GET)
     @ResponseBody
-    public FilterCakeService.FilterCakePackage findAll(
+    public FilterCakePackageVo findAll(
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ){
@@ -55,7 +53,7 @@ public class FilterCakeController {
     @ApiOperation(value = "获取所有滤饼的名称")
     @RequestMapping(value = "/findAllFilterCakeName", method = RequestMethod.GET)
     @ResponseBody
-    public List<FilterCakeService.FilterCakeName> findAllFilterCakeName(){
+    public List<FilterCakeNameVo> findAllFilterCakeName(){
         return filterCakeService.findAllFilterCakeName();
     }
 
@@ -63,7 +61,7 @@ public class FilterCakeController {
     @ApiOperation(value = "根据条件返回所有的滤饼")
     @RequestMapping(value = "/findAllFilterCakeByCondition" ,method = RequestMethod.GET)
     @ResponseBody
-    public FilterCakeService.FilterCakePackage findAllFilterCakeByCondition(
+    public FilterCakePackageVo findAllFilterCakeByCondition(
             @RequestParam(value = "typeOfQuery", defaultValue = "滤饼名称") String typeOfQuery,
             @RequestParam(value = "conditionOfQuery" ,defaultValue = "") String conditionOfQuery,
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
@@ -73,18 +71,10 @@ public class FilterCakeController {
         return filterCakeService.findAllFilterCakeByCondition(typeOfQuery, conditionOfQuery, pageNo-1, pageSize);
     }
 
-
-    // @ApiOperation(value = "根据滤饼名称返回对应的产品")
-    // @RequestMapping(value = "/findProductsByFilterCakeName", method = RequestMethod.GET)
-    // @ResponseBody
-    // public Set<Product> findProductsByFilterCakeName(String MaterialName){
-    //     return filterCakeService.findProductsByFilterCakeName(MaterialName);
-    // }
-
     @ApiOperation(value = "添加新滤饼")
     @RequestMapping(value = "/addFilterCake", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<FilterCake> addFilterCake(@Valid @RequestBody FilterCakeService.FilterCakeStandard filterCakeStandard) {
+    public ResponseEntity<FilterCake> addFilterCake(@Valid @RequestBody FilterCakeStandardVo filterCakeStandard) {
         FilterCake savedFilterCake = filterCakeService.addFilterCake(filterCakeStandard);
         return new ResponseEntity<>(savedFilterCake, HttpStatus.CREATED);
     }
@@ -93,7 +83,7 @@ public class FilterCakeController {
     @RequestMapping(value = "/updateFilterCake", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> updateFilterCake(
-            @Valid @RequestBody FilterCakeService.FilterCakeStandard updatedFilterCake
+            @Valid @RequestBody FilterCakeStandardVo updatedFilterCake
     ) {
         String result = filterCakeService.updateFilterCake(updatedFilterCake);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -102,7 +92,7 @@ public class FilterCakeController {
     @ApiOperation(value = "根据 ID 返回滤饼")
     @RequestMapping(value = "/findFilterCakeByFilterCakeId", method = RequestMethod.GET)
     @ResponseBody
-    public FilterCakeService.FilterCakeStandard findFilterCakeByFilterCakeId(
+    public FilterCakeStandardVo findFilterCakeByFilterCakeId(
             @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId
     ) {
         return filterCakeService.findFilterCakeByFilterCakeId(filterCakeId);
@@ -111,26 +101,26 @@ public class FilterCakeController {
     @Resource
     private FilterCakeRepository filterCakeRepository;
 
-    @ApiOperation(value = "测试滤饼历史价格用接口")
-    @RequestMapping(value = "/findFilterCakeHistoryPriceTest", method = RequestMethod.GET)
-    @ResponseBody
-    public Double testHistoryPrice(
-            @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId,
-            @RequestParam(value = "testDate", defaultValue = "2022-12-20") String testDate
-            // @RequestParam(value = "year") Integer year,
-            // @RequestParam(value = "month") Integer month,
-            // @RequestParam(value = "date") Integer date
-    ) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = null;
-        try{
-            date = sdf.parse(testDate);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        System.out.println(date);
-        return filterCakeService.calculateFilterCakeHistoryPrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId),date);
-    }
+    // @ApiOperation(value = "测试滤饼历史价格用接口")
+    // @RequestMapping(value = "/findFilterCakeHistoryPriceTest", method = RequestMethod.GET)
+    // @ResponseBody
+    // public Double testHistoryPrice(
+    //         @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId,
+    //         @RequestParam(value = "testDate", defaultValue = "2022-12-20") String testDate
+    //         // @RequestParam(value = "year") Integer year,
+    //         // @RequestParam(value = "month") Integer month,
+    //         // @RequestParam(value = "date") Integer date
+    // ) {
+    //     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    //     Date date = null;
+    //     try{
+    //         date = sdf.parse(testDate);
+    //     }catch (Exception e){
+    //         e.printStackTrace();
+    //     }
+    //     System.out.println(date);
+    //     return filterCakeService.calculateFilterCakeHistoryPrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId),date);
+    // }
 
     @ApiOperation(value = "测试滤饼历史价格列表用接口")
     @RequestMapping(value = "/getFilterCakeHistoryPriceList", method = RequestMethod.GET)
