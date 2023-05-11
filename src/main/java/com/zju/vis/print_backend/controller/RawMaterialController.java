@@ -2,6 +2,7 @@ package com.zju.vis.print_backend.controller;
 
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RawMaterialService;
+import com.zju.vis.print_backend.service.RelDateRawMaterialService;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +26,9 @@ public class RawMaterialController {
 
     @Resource
     private RawMaterialService rawMaterialService;
+
+    @Resource
+    private RelDateRawMaterialService relDateRawMaterialService;
 
     @ApiOperation(value = "获取所有原料")
     @RequestMapping(value = "/findAllRawMaterial", method = RequestMethod.GET)
@@ -106,10 +110,24 @@ public class RawMaterialController {
         return rawMaterialService.importRawMaterialExcelAndPersistence(excel);
     }
 
+    // 关系表文件上传 RelDateRawMaterial
+    @ApiOperation(value = "上传RelDateRawMaterial文件并持久化")
+    @RequestMapping(value = "/uploadRelDR")
+    public ResultVo importRelDateRawMaterialExcel(@RequestParam("file") MultipartFile excel){
+        return relDateRawMaterialService.importRelDateRawMaterialExcelAndPersistence(excel);
+    }
+
     // 下载文件
     @ApiOperation(value = "下载RawMaterial文件")
     @PostMapping("/exportExcel")
     public ResultVo exportRawMaterialExcel(final HttpServletResponse response) {
         return rawMaterialService.exportRawMaterialExcel(response);
+    }
+
+    // 关系表文件下载 RelDateRawMaterial
+    @ApiOperation(value = "下载RelDateRawMaterial文件")
+    @PostMapping("/exportRelDRExcel")
+    public ResultVo exportRelDateRawMaterialExcel(final HttpServletResponse response){
+        return relDateRawMaterialService.exportRelDateRawMaterialExcel(response);
     }
 }
