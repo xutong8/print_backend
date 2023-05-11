@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -342,7 +343,7 @@ public class FilterCakeService {
     public Double getInventory(List<RelProductFilterCake> relProductFilterCakeList, Long productId, Long filterCakeId){
         for(RelProductFilterCake relProductFilterCake: relProductFilterCakeList){
             if((relProductFilterCake.getId().getProductId().longValue() == productId.longValue()) && (relProductFilterCake.getId().getFilterCakeId().longValue() == filterCakeId.longValue())){
-                System.out.println("返回滤饼产品的Inventory:" + relProductFilterCake.getInventory());
+                // System.out.println("返回滤饼产品的Inventory:" + relProductFilterCake.getInventory());
                 return relProductFilterCake.getInventory();
             }
         }
@@ -351,12 +352,8 @@ public class FilterCakeService {
 
     public Double getInventoryF(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList, Long filterCakeId, Long filterCakeIdUsed){
         for(RelFilterCakeFilterCake relFilterCakeFilterCake: relFilterCakeFilterCakeList){
-            // System.out.println("relFilterCakeFilterCake.getId().getFilterCakeId()" + relFilterCakeFilterCake.getId().getFilterCakeId());
-            // System.out.println("filterCakeId" + filterCakeId);
-            // System.out.println("relFilterCakeFilterCake.getId().getFilterCakeIdUsed()" + relFilterCakeFilterCake.getId().getFilterCakeIdUsed());
-            // System.out.println("filterCakeIdUsed" + filterCakeIdUsed);
             if((relFilterCakeFilterCake.getId().getFilterCakeId().longValue() == filterCakeId.longValue()) && (relFilterCakeFilterCake.getId().getFilterCakeIdUsed().longValue() == filterCakeIdUsed.longValue())){
-                System.out.println("返回滤饼滤饼的Inventory:" + relFilterCakeFilterCake.getInventory());
+                // System.out.println("返回滤饼滤饼的Inventory:" + relFilterCakeFilterCake.getInventory());
                 return relFilterCakeFilterCake.getInventory();
             }
         }
@@ -434,17 +431,13 @@ public class FilterCakeService {
             if(historyPriceList.size()!=0){
                 // 标识是否有增加过历史数据，没有则说明最早没有当时的历史数据则取当前原料最早的数据作为当时的虚拟数据
                 boolean flag = false;
-
                 // 逆序日期从大到小排序 2023.01.15 > 2022.12.31
                 Collections.reverse(historyPriceList);
                 for(Utils.HistoryPrice historyPrice: historyPriceList){
-                    // System.out.println("----------------------------------------------------------------------------------");
-                    // System.out.println("historyPrice.getDate():" + historyPrice.getDate() + "  HistoryDate:" + historyDate);
-                    // System.out.println("historyPrice.getDate().getTime()" + historyPrice.getDate().getTime() + "HistoryDate.getTime()" + historyDate.getTime());
                     // 只有日期默认是 8.00 开始算，因此默认减一天时间进行比较
                     // 取第一个小于当前日期的价格
                     if(historyPrice.getDate().getTime() - (86400*1000) <= historyDate.getTime()){
-                        System.out.println("选取的时间:" + historyPrice.getDate());
+                        // System.out.println("选取的时间:" + historyPrice.getDate());
                         sum += rawMaterialSimple.getInventory() * historyPrice.getPrice();
                         flag = true;
                         break;
@@ -455,29 +448,33 @@ public class FilterCakeService {
                 }
             }
         }
-        System.out.println("sum: " + sum + "\nfilterCake.getFilterCakeAccountingQuantity(): " + filterCake.getFilterCakeAccountingQuantity());
+        // System.out.println("sum: " + sum + "  filterCake.getFilterCakeAccountingQuantity(): " + filterCake.getFilterCakeAccountingQuantity());
         return sum / filterCake.getFilterCakeAccountingQuantity();
     }
 
     // 列表形式返回历史价格，不过由于当前返回形式未确定因此这部分暂时空置
-    // public List<Utils.HistoryPrice> calculateFilterCakeHistoryPrice(FilterCake filterCake){
-    //     // 标准化获取简化列表
-    //     List<FilterCakeService.FilterCakeSimple> filterCakeSimpleList = new ArrayList<>();
-    //     for (FilterCake filterCake1 : filterCake.getFilterCakeList()) {
-    //         filterCakeSimpleList.add(simplifyFilterCakeF(filterCake1, filterCake.getFilterCakeId()));
-    //     }
-    //     // 设置返回的简单原料表
-    //     List<RawMaterialService.RawMaterialSimple> rawMaterialSimpleList = new ArrayList<>();
-    //     for (RawMaterial rawMaterial : filterCake.getRawMaterialList()) {
-    //         rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterialF(rawMaterial, filterCake.getFilterCakeId()));
-    //     }
-    //     if(rawMaterialSimpleList.size() == 0){
-    //         return new ArrayList<>();
-    //     }
-    //
-    //
-    //     return null;
-    // }
+    // public List<Utils.HistoryPrice> getFilterCakeHistoryPriceList(FilterCake filterCake){
+    public List<Utils.HistoryPrice> getFilterCakeHistoryPriceList(Long filterCakeId){
+        FilterCake filterCake = filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId);
+        List<Utils.HistoryPrice> historyPriceList = new ArrayList<>();
+        // SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
+        for(int i = 0;i < 12 ; i++){
+            Date date = stepMonth(new Date(),-i);
+            // System.out.println(dateFormat.format(date));
+            Utils.HistoryPrice historyPrice = new Utils.HistoryPrice();
+            historyPrice.setDate(new java.sql.Date(date.getTime()));
+            historyPrice.setPrice(calculateFilterCakeHistoryPrice(filterCake,date));
+            historyPriceList.add(historyPrice);
+        }
+        return historyPriceList;
+    }
+
+    public static Date stepMonth(Date sourceDate, int month) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(sourceDate);
+        c.add(Calendar.MONTH, month);
+        return c.getTime();
+    }
 
     //查
     //-------------------------------------------------------------------------

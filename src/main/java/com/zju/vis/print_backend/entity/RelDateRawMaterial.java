@@ -18,7 +18,7 @@ public class RelDateRawMaterial {
     RawMaterial rawMaterial;
 
     @Column(name = "price")
-    Float price;
+    Double price;
 
     public RelDateRawMaterialKey getId() {
         return id;
@@ -36,11 +36,11 @@ public class RelDateRawMaterial {
         this.rawMaterial = rawMaterial;
     }
 
-    public Float getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Float price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 }

@@ -22,5 +22,5 @@ public class ExcelRelDateRawMaterialWriteVo {
 
     // 当期价格
     @ExcelProperty("当期价格")
-    private Float price;
+    private Double price;
 }

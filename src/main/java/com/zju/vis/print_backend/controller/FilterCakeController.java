@@ -1,6 +1,7 @@
 package com.zju.vis.print_backend.controller;
 
 
+import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.entity.RelFilterCakeFilterCake;
@@ -129,6 +130,14 @@ public class FilterCakeController {
         }
         System.out.println(date);
         return filterCakeService.calculateFilterCakeHistoryPrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId),date);
+    }
+
+    @ApiOperation(value = "测试滤饼历史价格列表用接口")
+    @RequestMapping(value = "/getFilterCakeHistoryPriceList", method = RequestMethod.GET)
+    public List<Utils.HistoryPrice> getFilterCakeHistoryPriceList(
+            @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId
+    ){
+        return filterCakeService.getFilterCakeHistoryPriceList(filterCakeId);
     }
 
     @ApiOperation(value = "通过 filterCakeId删除记录")

@@ -285,7 +285,7 @@ public class RawMaterialService {
     public Double getInventory(List<RelProductRawMaterial> relProductRawMaterialList, Long productId, Long rawMaterialId){
         for(RelProductRawMaterial relProductRawMaterial: relProductRawMaterialList){
             if((relProductRawMaterial.getId().getProductId().longValue() == productId.longValue()) && (relProductRawMaterial.getId().getRawMaterialId().longValue() == rawMaterialId.longValue())){
-                System.out.println("返回原料产品的Inventory:" + relProductRawMaterial.getInventory());
+                //System.out.println("返回原料产品的Inventory:" + relProductRawMaterial.getInventory());
                 return relProductRawMaterial.getInventory();
             }
         }
@@ -294,7 +294,7 @@ public class RawMaterialService {
     public Double getInventoryF(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList, Long filterCakeId, Long rawMaterialId){
         for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: relFilterCakeRawMaterialList){
             if((relFilterCakeRawMaterial.getId().getFilterCakeId().longValue() == filterCakeId.longValue()) && (relFilterCakeRawMaterial.getId().getRawMaterialId().longValue() == rawMaterialId.longValue())){
-                System.out.println("返回原料滤饼的Inventory:" + relFilterCakeRawMaterial.getInventory());
+                //System.out.println("返回原料滤饼的Inventory:" + relFilterCakeRawMaterial.getInventory());
                 return relFilterCakeRawMaterial.getInventory();
             }
         }
@@ -470,7 +470,7 @@ public class RawMaterialService {
         if(rawMaterialStandard.getRawMaterialHistoryPrice() != null){
             for(Utils.HistoryPrice historyPrice: rawMaterialStandard.getRawMaterialHistoryPrice()){
                 Date rawMaterialDate = historyPrice.getDate();
-                Float price = historyPrice.getPrice();
+                Double price = historyPrice.getPrice();
 
                 RelDateRawMaterial relDateRawMaterial = new RelDateRawMaterial();
                 RelDateRawMaterialKey relDateRawMaterialKey = new RelDateRawMaterialKey();
