@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 
+import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.dao.ProductRepository;
 import com.zju.vis.print_backend.dao.ProductSeriesRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
@@ -184,6 +185,14 @@ public class ProductController {
         return productService.calculateProductHistoryPrice(productRepository.findProductByProductId(productId), date);
     }
 
+    @ApiOperation(value = "测试产品历史价格列表用接口")
+    @RequestMapping(value = "/getProductHistoryPriceList", method = RequestMethod.GET)
+    public List<Utils.HistoryPrice> getProductHistoryPriceList(
+            @RequestParam(value = "productId", defaultValue = "1" ) Long productId,
+            @RequestParam(value = "months", defaultValue = "12") Long months
+    ){
+        return productService.getProductHistoryPriceList(productId,months);
+    }
 
     // 上传文件
     @ApiOperation(value = "上传Product文件并持久化")

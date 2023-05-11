@@ -25,6 +25,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.zju.vis.print_backend.Utils.Utils.stepMonth;
+
 @Slf4j
 @Service
 public class FilterCakeService {
@@ -452,13 +454,12 @@ public class FilterCakeService {
         return sum / filterCake.getFilterCakeAccountingQuantity();
     }
 
-    // 列表形式返回历史价格，不过由于当前返回形式未确定因此这部分暂时空置
-    // public List<Utils.HistoryPrice> getFilterCakeHistoryPriceList(FilterCake filterCake){
-    public List<Utils.HistoryPrice> getFilterCakeHistoryPriceList(Long filterCakeId){
+    // 列表形式返回历史价格
+    public List<Utils.HistoryPrice> getFilterCakeHistoryPriceList(Long filterCakeId,Long months){
         FilterCake filterCake = filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId);
         List<Utils.HistoryPrice> historyPriceList = new ArrayList<>();
         // SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
-        for(int i = 0;i < 12 ; i++){
+        for(int i = 0;i < months ; i++){
             Date date = stepMonth(new Date(),-i);
             // System.out.println(dateFormat.format(date));
             Utils.HistoryPrice historyPrice = new Utils.HistoryPrice();
@@ -469,12 +470,7 @@ public class FilterCakeService {
         return historyPriceList;
     }
 
-    public static Date stepMonth(Date sourceDate, int month) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(sourceDate);
-        c.add(Calendar.MONTH, month);
-        return c.getTime();
-    }
+
 
     //查
     //-------------------------------------------------------------------------

@@ -135,9 +135,10 @@ public class FilterCakeController {
     @ApiOperation(value = "测试滤饼历史价格列表用接口")
     @RequestMapping(value = "/getFilterCakeHistoryPriceList", method = RequestMethod.GET)
     public List<Utils.HistoryPrice> getFilterCakeHistoryPriceList(
-            @RequestParam(value = "filterCakeId", defaultValue = "") Long filterCakeId
+            @RequestParam(value = "filterCakeId", defaultValue = "1" ) Long filterCakeId,
+            @RequestParam(value = "months", defaultValue = "12") Long months
     ){
-        return filterCakeService.getFilterCakeHistoryPriceList(filterCakeId);
+        return filterCakeService.getFilterCakeHistoryPriceList(filterCakeId,months);
     }
 
     @ApiOperation(value = "通过 filterCakeId删除记录")

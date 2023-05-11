@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,13 @@ public class Utils {
     public static class HistoryPrice{
         private Date date;
         private Double price;
+    }
+
+    public static java.util.Date stepMonth(java.util.Date sourceDate, int month) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(sourceDate);
+        c.add(Calendar.MONTH, month);
+        return c.getTime();
     }
 
     // 判断字符串是否为空

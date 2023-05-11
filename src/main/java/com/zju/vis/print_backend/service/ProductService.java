@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.zju.vis.print_backend.Utils.Utils.stepMonth;
+
 @Slf4j
 @Service
 public class ProductService {
@@ -540,7 +542,7 @@ public class ProductService {
                 Collections.reverse(historyPriceList);
                 for(Utils.HistoryPrice historyPrice: historyPriceList){
                     if(historyPrice.getDate().getTime() - (86400*1000) <= historyDate.getTime()){
-                        System.out.println("选取的时间:" + historyPrice.getDate());
+                        // System.out.println("选取的时间:" + historyPrice.getDate());
                         sum += rawMaterialSimple.getInventory() * historyPrice.getPrice();
                         flag = true;
                         break;
@@ -551,8 +553,23 @@ public class ProductService {
                 }
             }
         }
-        System.out.println("sum: " + sum + "\nfilterCake.getFilterCakeAccountingQuantity(): " + product.getProductAccountingQuantity());
+        // System.out.println("sum: " + sum + "\nfilterCake.getFilterCakeAccountingQuantity(): " + product.getProductAccountingQuantity());
         return sum / product.getProductAccountingQuantity();
+    }
+
+    // 列表形式返回历史价格
+    public List<Utils.HistoryPrice> getProductHistoryPriceList(Long productId,Long months){
+        Product product = productRepository.findProductByProductId(productId);
+        List<Utils.HistoryPrice> historyPriceList = new ArrayList<>();
+        for(int i = 0;i < months ; i++){
+            Date date = stepMonth(new Date(),-i);
+            // System.out.println(dateFormat.format(date));
+            Utils.HistoryPrice historyPrice = new Utils.HistoryPrice();
+            historyPrice.setDate(new java.sql.Date(date.getTime()));
+            historyPrice.setPrice(calculateProductHistoryPrice(product,date));
+            historyPriceList.add(historyPrice);
+        }
+        return historyPriceList;
     }
 
     //删
