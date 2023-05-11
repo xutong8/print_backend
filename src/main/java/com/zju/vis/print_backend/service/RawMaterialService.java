@@ -154,12 +154,12 @@ public class RawMaterialService {
         return packMaterial(page.toList(),pageNo,pageSize,rawMaterialNum);
     }
 
-    public List<RawMaterialNameVo> findAllRawMaterialName(){
-        List<RawMaterialNameVo> rawMaterialNameList = new ArrayList<>();
+    public List<EntityNameVo> findAllRawMaterialName(){
+        List<EntityNameVo> rawMaterialNameList = new ArrayList<>();
         for (RawMaterial rawMaterial: rawMaterialRepository.findAll()){
-            RawMaterialNameVo rawMaterialName = new RawMaterialNameVo();
-            rawMaterialName.setRawMaterialId(rawMaterial.getRawMaterialId());
-            rawMaterialName.setRawMaterialName(rawMaterial.getRawMaterialName());
+            EntityNameVo rawMaterialName = new EntityNameVo();
+            rawMaterialName.setId(rawMaterial.getRawMaterialId());
+            rawMaterialName.setName(rawMaterial.getRawMaterialName());
             rawMaterialNameList.add(rawMaterialName);
         }
         return rawMaterialNameList;

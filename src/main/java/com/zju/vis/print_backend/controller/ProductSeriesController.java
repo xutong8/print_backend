@@ -3,8 +3,8 @@ package com.zju.vis.print_backend.controller;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
 import com.zju.vis.print_backend.service.ProductSeriesService;
+import com.zju.vis.print_backend.vo.EntityNameVo;
 import com.zju.vis.print_backend.vo.PackageVo;
-import com.zju.vis.print_backend.vo.ProductSeriesNameVo;
 import com.zju.vis.print_backend.vo.ProductSeriesStandardVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
@@ -42,7 +42,7 @@ public class ProductSeriesController {
     @ApiOperation(value = "获取所有的产品系列名称")
     @RequestMapping(value = "/findAllProductSeriesName", method = RequestMethod.GET)
     @ResponseBody
-    public List<ProductSeriesNameVo> findAllProductSeriesName(){
+    public List<EntityNameVo> findAllProductSeriesName(){
         return productSeriesService.findAllProductSeriesName();
     }
 

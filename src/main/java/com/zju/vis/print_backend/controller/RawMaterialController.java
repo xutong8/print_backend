@@ -3,8 +3,8 @@ package com.zju.vis.print_backend.controller;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RawMaterialService;
 import com.zju.vis.print_backend.service.RelDateRawMaterialService;
+import com.zju.vis.print_backend.vo.EntityNameVo;
 import com.zju.vis.print_backend.vo.PackageVo;
-import com.zju.vis.print_backend.vo.RawMaterialNameVo;
 import com.zju.vis.print_backend.vo.RawMaterialStandardVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
@@ -45,7 +45,7 @@ public class RawMaterialController {
     @ApiOperation(value = "获取所有原料名称")
     @RequestMapping(value = "/findAllRawMaterialName", method = RequestMethod.GET)
     @ResponseBody
-    public List<RawMaterialNameVo> findAllRawMaterialName() {
+    public List<EntityNameVo> findAllRawMaterialName() {
         return rawMaterialService.findAllRawMaterialName();
     }
 

@@ -84,12 +84,12 @@ public class ProductSeriesService {
         return packProductSeries(page.toList(), pageNo, pageSize, productSeriesNum);
     }
 
-    public  List<ProductSeriesNameVo> findAllProductSeriesName(){
-        List<ProductSeriesNameVo> productSeriesNameList = new ArrayList<>();
+    public  List<EntityNameVo> findAllProductSeriesName(){
+        List<EntityNameVo> productSeriesNameList = new ArrayList<>();
         for(ProductSeries productSeries: productSeriesRepository.findAll()){
-            ProductSeriesNameVo productSeriesName = new ProductSeriesNameVo();
-            productSeriesName.setProductSeriesId(productSeries.getProductSeriesId());
-            productSeriesName.setProductSeriesName(productSeries.getProductSeriesName());
+            EntityNameVo productSeriesName = new EntityNameVo();
+            productSeriesName.setId(productSeries.getProductSeriesId());
+            productSeriesName.setName(productSeries.getProductSeriesName());
             productSeriesNameList.add(productSeriesName);
         }
         return productSeriesNameList;

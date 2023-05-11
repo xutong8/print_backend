@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// 返回系列名称
+// 用户返回简单实体名
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductSeriesNameVo {
-    private Long productSeriesId;
-    private String productSeriesName;
+public class EntityNameVo {
+    private Long id;
+    private String name;
 }

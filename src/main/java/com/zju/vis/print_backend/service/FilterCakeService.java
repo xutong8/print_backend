@@ -260,12 +260,12 @@ public class FilterCakeService {
         return packFilterCake(page.toList(),pageNo,pageSize,filterCakeNum);
     }
 
-    public List<FilterCakeNameVo> findAllFilterCakeName(){
-        List<FilterCakeNameVo> filterCakeNameList = new ArrayList<>();
+    public List<EntityNameVo> findAllFilterCakeName(){
+        List<EntityNameVo> filterCakeNameList = new ArrayList<>();
         for(FilterCake filterCake: filterCakeRepository.findAll()){
-            FilterCakeNameVo filterCakeName = new FilterCakeNameVo();
-            filterCakeName.setFilterCakeId(filterCake.getFilterCakeId());
-            filterCakeName.setFilterCakeName(filterCake.getFilterCakeName());
+            EntityNameVo filterCakeName = new EntityNameVo();
+            filterCakeName.setId(filterCake.getFilterCakeId());
+            filterCakeName.setName(filterCake.getFilterCakeName());
             filterCakeNameList.add(filterCakeName);
         }
         return filterCakeNameList;

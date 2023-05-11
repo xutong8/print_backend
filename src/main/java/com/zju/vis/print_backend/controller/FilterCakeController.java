@@ -49,7 +49,7 @@ public class FilterCakeController {
     @ApiOperation(value = "获取所有滤饼的名称")
     @RequestMapping(value = "/findAllFilterCakeName", method = RequestMethod.GET)
     @ResponseBody
-    public List<FilterCakeNameVo> findAllFilterCakeName(){
+    public List<EntityNameVo> findAllFilterCakeName(){
         return filterCakeService.findAllFilterCakeName();
     }
 
