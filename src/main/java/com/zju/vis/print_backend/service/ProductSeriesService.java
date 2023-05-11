@@ -65,7 +65,7 @@ public class ProductSeriesService {
         productSeriesStandard.setProductSeriesName(productSeries.getProductSeriesName());
         productSeriesStandard.setProductSeriesFunction(productSeries.getProductSeriesFunction());
         // 设置返回的简单产品列表
-        List<ProductSimpleVo> productSimpleList = new ArrayList<>();
+        List<EntityNameVo> productSimpleList = new ArrayList<>();
         for(Product product: productSeries.getProductList()){
             productSimpleList.add(productService.simplifyProduct(product));
         }

@@ -72,20 +72,12 @@ public class ProductController {
             @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
-
         // findAllByCondition(String rawMaterialName, String filterCakeName, String productSeriesName)
         System.out.println("List<Product> findAllByCondition   " +
                 "rawMaterialName: " + rawMaterialName +
                 "  filterCakeName: " + filterCakeName +
                 "  productSeriesName: " + productSeriesName);
-
-        long s = System.currentTimeMillis();
         PackageVo list = productService.findAllByRelCondition(rawMaterialName, filterCakeName, productSeriesName, pageNo - 1, pageSize);
-        long e = System.currentTimeMillis();
-        System.out.println("findbycondition开始的时间：" + s);
-        System.out.println("findbycondition结束的时间：" + e);
-        System.out.println("findbycondition查询的时间差为：" + (e - s));
-
         return list;
     }
 
@@ -99,12 +91,7 @@ public class ProductController {
             @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
-        long s = System.currentTimeMillis();
         PackageVo list = productService.findAllByDirectCondition(typeOfQuery, conditionOfQuery, pageNo - 1, pageSize);
-        long e = System.currentTimeMillis();
-        System.out.println("findbycondition开始的时间：" + s);
-        System.out.println("findbycondition结束的时间：" + e);
-        System.out.println("findbycondition查询的时间差为：" + (e - s));
         return list;
     }
 

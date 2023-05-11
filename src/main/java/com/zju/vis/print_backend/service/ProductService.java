@@ -140,10 +140,8 @@ public class ProductService {
         return packProduct(page.toList(), pageNo, pageSize, productNum);
     }
 
-    public ProductSimpleVo simplifyProduct(Product product){
-        ProductSimpleVo productSimple = new ProductSimpleVo(product.getProductId(),product.getProductName());
-        // productSimple.setProductId(product.getProductId());
-        // productSimple.setProductName(product.getProductName());
+    public EntityNameVo simplifyProduct(Product product){
+        EntityNameVo productSimple = new EntityNameVo(product.getProductId(),product.getProductName());
         return productSimple;
     }
 
@@ -192,7 +190,7 @@ public class ProductService {
     ){
         List<Product> resultList = new ArrayList<>();
         if(utils.isEmptyString(conditionOfQuery)){
-            System.out.println("M1 findAll");
+            // System.out.println("M1 findAll");
             return findAll(pageNo, pageSize);
         }
 
