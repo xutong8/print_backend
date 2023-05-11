@@ -12,7 +12,7 @@ import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RelProductFilterCakeService;
 import com.zju.vis.print_backend.service.RelProductRawMaterialService;
 import com.zju.vis.print_backend.vo.HistoryPriceVo;
-import com.zju.vis.print_backend.vo.ProductPackageVo;
+import com.zju.vis.print_backend.vo.PackageVo;
 import com.zju.vis.print_backend.vo.ProductStandardVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +44,7 @@ public class ProductController {
     @ApiOperation(value = "获取所有产品")
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     @ResponseBody
-    public ProductPackageVo findAll(
+    public PackageVo findAll(
             @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
@@ -64,7 +64,7 @@ public class ProductController {
     @ApiOperation(value = "根据关联条件返回对应的产品(滤饼名、原料名、系列名)")
     @RequestMapping(value = "/findAllByRelCondition", method = RequestMethod.GET)
     @ResponseBody
-    public ProductPackageVo findAllByRelCondition(
+    public PackageVo findAllByRelCondition(
             @RequestParam(value = "rawMaterialName", defaultValue = "") String rawMaterialName,
             @RequestParam(value = "filterCakeName", defaultValue = "") String filterCakeName,
             @RequestParam(value = "productSeriesName", defaultValue = "") String productSeriesName,
@@ -80,7 +80,7 @@ public class ProductController {
                 "  productSeriesName: " + productSeriesName);
 
         long s = System.currentTimeMillis();
-        ProductPackageVo list = productService.findAllByRelCondition(rawMaterialName, filterCakeName, productSeriesName, pageNo - 1, pageSize);
+        PackageVo list = productService.findAllByRelCondition(rawMaterialName, filterCakeName, productSeriesName, pageNo - 1, pageSize);
         long e = System.currentTimeMillis();
         System.out.println("findbycondition开始的时间：" + s);
         System.out.println("findbycondition结束的时间：" + e);
@@ -92,7 +92,7 @@ public class ProductController {
     @ApiOperation(value = "Product直接查询")
     @RequestMapping(value = "/findAllByDirectCondition", method = RequestMethod.GET)
     @ResponseBody
-    public ProductPackageVo findAllByDirectCondition(
+    public PackageVo findAllByDirectCondition(
             @RequestParam(value = "typeOfQuery", defaultValue = "产品名称") String typeOfQuery,
             @RequestParam(value = "conditionOfQuery", defaultValue = "") String conditionOfQuery,
             // @Valid @RequestBody ,
@@ -100,7 +100,7 @@ public class ProductController {
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
         long s = System.currentTimeMillis();
-        ProductPackageVo list = productService.findAllByDirectCondition(typeOfQuery, conditionOfQuery, pageNo - 1, pageSize);
+        PackageVo list = productService.findAllByDirectCondition(typeOfQuery, conditionOfQuery, pageNo - 1, pageSize);
         long e = System.currentTimeMillis();
         System.out.println("findbycondition开始的时间：" + s);
         System.out.println("findbycondition结束的时间：" + e);

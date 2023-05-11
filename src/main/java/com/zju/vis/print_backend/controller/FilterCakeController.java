@@ -38,7 +38,7 @@ public class FilterCakeController {
     @ApiOperation(value = "获取所有滤饼")
     @RequestMapping(value = "/findAllFilterCake", method = RequestMethod.GET)
     @ResponseBody
-    public FilterCakePackageVo findAll(
+    public PackageVo findAll(
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ){
@@ -57,7 +57,7 @@ public class FilterCakeController {
     @ApiOperation(value = "根据条件返回所有的滤饼")
     @RequestMapping(value = "/findAllFilterCakeByCondition" ,method = RequestMethod.GET)
     @ResponseBody
-    public FilterCakePackageVo findAllFilterCakeByCondition(
+    public PackageVo findAllFilterCakeByCondition(
             @RequestParam(value = "typeOfQuery", defaultValue = "滤饼名称") String typeOfQuery,
             @RequestParam(value = "conditionOfQuery" ,defaultValue = "") String conditionOfQuery,
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,

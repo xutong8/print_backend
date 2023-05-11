@@ -2,17 +2,15 @@ package com.zju.vis.print_backend.controller;
 
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.ProductSeries;
-import com.zju.vis.print_backend.entity.RelProductFilterCake;
 import com.zju.vis.print_backend.service.ProductSeriesService;
-import com.zju.vis.print_backend.service.RawMaterialService;
-import com.zju.vis.print_backend.service.RelProductFilterCakeService;
-import com.zju.vis.print_backend.service.RelProductRawMaterialService;
+import com.zju.vis.print_backend.vo.PackageVo;
+import com.zju.vis.print_backend.vo.ProductSeriesNameVo;
+import com.zju.vis.print_backend.vo.ProductSeriesStandardVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +32,7 @@ public class ProductSeriesController {
     @ApiOperation(value = "获取所有的产品系列")
     @RequestMapping(value = "/findAllProductSeries", method = RequestMethod.GET)
     @ResponseBody
-    public ProductSeriesService.ProductSeriesPackage findAll(
+    public PackageVo findAll(
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ){
@@ -44,14 +42,14 @@ public class ProductSeriesController {
     @ApiOperation(value = "获取所有的产品系列名称")
     @RequestMapping(value = "/findAllProductSeriesName", method = RequestMethod.GET)
     @ResponseBody
-    public List<ProductSeriesService.ProductSeriesName> findAllProductSeriesName(){
+    public List<ProductSeriesNameVo> findAllProductSeriesName(){
         return productSeriesService.findAllProductSeriesName();
     }
 
     @ApiOperation(value = "根据 ID 返回产品系列")
     @RequestMapping(value = "/findProductSeriesByProductSeriesId", method = RequestMethod.GET)
     @ResponseBody
-    public ProductSeriesService.ProductSeriesStandard findProductSeriesByProductSeriesId(
+    public ProductSeriesStandardVo findProductSeriesByProductSeriesId(
             @RequestParam(value = "productSeriesId", defaultValue = "") Long productSeriesId
     ) {
         return productSeriesService.findProductSeriesByProductSeriesId(productSeriesId);
@@ -79,7 +77,7 @@ public class ProductSeriesController {
     @ApiOperation(value = "添加新的产品系列")
     @RequestMapping(value = "/addProductSeries", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> addProductSeries(@RequestBody ProductSeriesService.ProductSeriesStandard productSeriesStandard) {
+    public ResponseEntity<String> addProductSeries(@RequestBody ProductSeriesStandardVo productSeriesStandard) {
         ProductSeries newProductSeries = productSeriesService.addProductSeries(productSeriesStandard);
         return ResponseEntity.ok("New Product Series with ID: " + newProductSeries.getProductSeriesId() + " has been added.");
     }
@@ -88,7 +86,7 @@ public class ProductSeriesController {
     @RequestMapping(value = "/updateProductSeries", method = RequestMethod.PUT)
     @ResponseBody
     public ResponseEntity<String> updateProductSeries(
-            @Valid @RequestBody ProductSeriesService.ProductSeriesStandard updatedProductSeries
+            @Valid @RequestBody ProductSeriesStandardVo updatedProductSeries
     ) {
         try {
             String result = productSeriesService.updateProductSeries(updatedProductSeries);

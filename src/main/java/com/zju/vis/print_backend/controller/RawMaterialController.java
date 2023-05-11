@@ -3,8 +3,8 @@ package com.zju.vis.print_backend.controller;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RawMaterialService;
 import com.zju.vis.print_backend.service.RelDateRawMaterialService;
+import com.zju.vis.print_backend.vo.PackageVo;
 import com.zju.vis.print_backend.vo.RawMaterialNameVo;
-import com.zju.vis.print_backend.vo.RawMaterialPackageVo;
 import com.zju.vis.print_backend.vo.RawMaterialStandardVo;
 import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
@@ -35,7 +35,7 @@ public class RawMaterialController {
     @ApiOperation(value = "获取所有原料")
     @RequestMapping(value = "/findAllRawMaterial", method = RequestMethod.GET)
     @ResponseBody
-    public RawMaterialPackageVo findAll(
+    public PackageVo findAll(
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
             @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
     ) {
@@ -52,7 +52,7 @@ public class RawMaterialController {
     @ApiOperation(value = "根据条件返回所有的原料")
     @RequestMapping(value = "/findAllRawMaterialByCondition", method = RequestMethod.GET)
     @ResponseBody
-    public RawMaterialPackageVo findAllRawMaterialByCondition(
+    public PackageVo findAllRawMaterialByCondition(
             @RequestParam(value = "typeOfQuery", defaultValue = "原料品名") String typeOfQuery,
             @RequestParam(value = "conditionOfQuery" ,defaultValue = "") String conditionOfQuery,
             @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,

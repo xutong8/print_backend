@@ -54,14 +54,14 @@ public class FilterCakeService {
     private FileService fileService;
 
     // List<FilterCake> 添加额外信息打包发送
-    public FilterCakePackageVo packFilterCake(List<FilterCake> filterCakeList,
+    public PackageVo packFilterCake(List<FilterCake> filterCakeList,
                                               Integer pageNo, Integer pageSize,
                                               Integer filterCakeNum){
         List<FilterCakeStandardVo> filterCakeStandardList = new ArrayList<>();
         for(FilterCake filterCake: filterCakeList){
             filterCakeStandardList.add(filterCakeStandardization(filterCake));
         }
-        FilterCakePackageVo filterCakePackage = new FilterCakePackageVo();
+        PackageVo filterCakePackage = new PackageVo();
         filterCakePackage.setPageNo(pageNo + 1);
         filterCakePackage.setPageSize(pageSize);
         filterCakePackage.setPageNum(
@@ -251,7 +251,7 @@ public class FilterCakeService {
 
     //查
     //-------------------------------------------------------------------------
-    public FilterCakePackageVo findAll(Integer pageNo,
+    public PackageVo findAll(Integer pageNo,
                                        Integer pageSize
     ) {
         Integer filterCakeNum = filterCakeRepository.findAll().size();
@@ -272,7 +272,7 @@ public class FilterCakeService {
     }
 
 
-    public FilterCakePackageVo findAllFilterCakeByCondition(
+    public PackageVo findAllFilterCakeByCondition(
             String typeOfQuery, String conditionOfQuery,
             Integer pageNo, Integer pageSize
     ){

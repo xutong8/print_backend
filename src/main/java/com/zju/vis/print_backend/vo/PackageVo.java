@@ -6,11 +6,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-// FilterCake 结果封装
+// 包封装结果封装
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FilterCakePackageVo {
+public class PackageVo<T> {
     // 附加信息
     private Integer pageNo;
     private Integer pageSize;
@@ -18,6 +18,5 @@ public class FilterCakePackageVo {
     private Integer total;
 
     // 返回的标准列表
-    private List<FilterCakeStandardVo> list;
-
+    private List<T> list;
 }

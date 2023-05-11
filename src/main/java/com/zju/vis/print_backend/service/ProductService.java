@@ -66,14 +66,14 @@ public class ProductService {
     private FileService fileService;
 
     // List<Product> 添加额外信息打包发送
-    public ProductPackageVo packProduct(List<Product> productList,
-                                        Integer pageNo, Integer pageSize,
-                                        Integer productNum) {
+    public PackageVo packProduct(List<Product> productList,
+                                 Integer pageNo, Integer pageSize,
+                                 Integer productNum) {
         List<ProductStandardVo> productStandardList = new ArrayList<>();
         for (Product product : productList) {
             productStandardList.add(ProductStandardization(product));
         }
-        ProductPackageVo productPackage = new ProductPackageVo();
+        PackageVo productPackage = new PackageVo();
         // 前端page从1开始，返回时+1
         productPackage.setPageNo(pageNo + 1);
         productPackage.setPageSize(pageSize);
@@ -131,8 +131,8 @@ public class ProductService {
 
     //查
     //-------------------------------------------------------------------------
-    public ProductPackageVo findAll(Integer pageNo,
-                                    Integer pageSize
+    public PackageVo findAll(Integer pageNo,
+                             Integer pageSize
     ) {
         Integer productNum = productRepository.findAll().size();
         Pageable pageable = PageRequest.of(pageNo, pageSize);
@@ -184,7 +184,7 @@ public class ProductService {
         return resultSet;
     }
 
-    public ProductPackageVo findAllByDirectCondition(
+    public PackageVo findAllByDirectCondition(
             String typeOfQuery,
             String conditionOfQuery,
             Integer pageNo,
@@ -216,7 +216,7 @@ public class ProductService {
         return packProduct(subList, pageNo, pageSize, productNum);
     }
 
-    public ProductPackageVo findAllByRelCondition(
+    public PackageVo findAllByRelCondition(
             String rawMaterialName,
             String filterCakeName,
             String productSeriesName,

@@ -47,9 +47,6 @@ public class Product {
     @Column(name = "product_series_id")
     private Long productSeriesId;
 
-    // @Transient
-    // private String productSeriesName;
-
     @Column(name = "product_factory_name", nullable = false)
     private String productFactoryName;
 

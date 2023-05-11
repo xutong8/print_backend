@@ -44,14 +44,14 @@ public class RawMaterialService {
     Utils utils = new Utils();
 
     // List<RawMaterial> 添加额外信息标准化打包发送
-    public RawMaterialPackageVo packMaterial(List<RawMaterial> rawMaterialList,
+    public PackageVo packMaterial(List<RawMaterial> rawMaterialList,
                                              Integer pageNo, Integer pageSize,
                                              Integer rawMaterialNum){
         List<RawMaterialStandardVo> rawMaterialStandardList = new ArrayList<>();
         for(RawMaterial rawMaterial: rawMaterialList){
             rawMaterialStandardList.add(RawMaterialStandardization(rawMaterial));
         }
-        RawMaterialPackageVo rawMaterialPackage = new RawMaterialPackageVo();
+        PackageVo rawMaterialPackage = new PackageVo();
         rawMaterialPackage.setPageNo(pageNo + 1);
         rawMaterialPackage.setPageSize(pageSize);
         rawMaterialPackage.setPageNum(
@@ -145,7 +145,7 @@ public class RawMaterialService {
 
     //查
     //-------------------------------------------------------------------------
-    public RawMaterialPackageVo findAll(Integer pageNo,
+    public PackageVo findAll(Integer pageNo,
                                         Integer pageSize
     ) {
         Integer rawMaterialNum = rawMaterialRepository.findAll().size();
@@ -165,7 +165,7 @@ public class RawMaterialService {
         return rawMaterialNameList;
     }
 
-    public RawMaterialPackageVo findAllRawMaterialByCondition(
+    public PackageVo findAllRawMaterialByCondition(
             String typeOfQuery, String conditionOfQuery,
             Integer pageNo, Integer pageSize
     ){

@@ -37,87 +37,16 @@ public class ProductSeriesService {
     // 调用其他服务类的方法
     ProductService productService = new ProductService();
 
-    public class ProductSeriesName{
-        private Long productSeriesId;
-        private String productSeriesName;
-
-        public Long getProductSeriesId() {
-            return productSeriesId;
-        }
-
-        public void setProductSeriesId(Long productSeriesId) {
-            this.productSeriesId = productSeriesId;
-        }
-
-        public String getProductSeriesName() {
-            return productSeriesName;
-        }
-
-        public void setProductSeriesName(String productSeriesName) {
-            this.productSeriesName = productSeriesName;
-        }
-    }
-
-    public class ProductSeriesPackage{
-        // 附加信息
-        private Integer pageNo;
-        private Integer pageSize;
-        private Integer pageNum;
-        private Integer total;
-
-        // 返回的标准产品系列表
-        private List<ProductSeriesStandard> list;
-
-        public Integer getPageNo() {
-            return pageNo;
-        }
-
-        public void setPageNo(Integer pageNo) {
-            this.pageNo = pageNo;
-        }
-
-        public Integer getPageSize() {
-            return pageSize;
-        }
-
-        public void setPageSize(Integer pageSize) {
-            this.pageSize = pageSize;
-        }
-
-        public Integer getPageNum() {
-            return pageNum;
-        }
-
-        public void setPageNum(Integer pageNum) {
-            this.pageNum = pageNum;
-        }
-
-        public Integer getTotal() {
-            return total;
-        }
-
-        public void setTotal(Integer total) {
-            this.total = total;
-        }
-
-        public List<ProductSeriesStandard> getList() {
-            return list;
-        }
-
-        public void setList(List<ProductSeriesStandard> list) {
-            this.list = list;
-        }
-    }
 
     // List<ProductSeries> 添加额外信息打包发送,传输进来的已经是分割过的串
-    public ProductSeriesPackage packProductSeries(List<ProductSeries> productSeriesList,
-                                                  Integer pageNo, Integer pageSize,
-                                                  Integer productSeriesNum){
-        List<ProductSeriesStandard> productSeriesStandardList = new ArrayList<>();
+    public PackageVo packProductSeries(List<ProductSeries> productSeriesList,
+                                                    Integer pageNo, Integer pageSize,
+                                                    Integer productSeriesNum){
+        List<ProductSeriesStandardVo> productSeriesStandardList = new ArrayList<>();
         for(ProductSeries productSeries: productSeriesList){
             productSeriesStandardList.add(ProductSeriesStandardization(productSeries));
         }
-        ProductSeriesPackage productSeriesPackage = new ProductSeriesPackage();
+        PackageVo productSeriesPackage = new PackageVo();
         // 前端page从1开始，返回时+1
         productSeriesPackage.setPageNo(pageNo + 1);
         productSeriesPackage.setPageSize(pageSize);
@@ -129,47 +58,9 @@ public class ProductSeriesService {
         return productSeriesPackage;
     }
 
-    public static class ProductSeriesStandard{
-        private Long productSeriesId;
-        private String productSeriesName;
-        private String productSeriesFunction;
-        private List<ProductSimpleVo> productSimpleList;
 
-        public Long getProductSeriesId() {
-            return productSeriesId;
-        }
-
-        public void setProductSeriesId(Long productSeriesId) {
-            this.productSeriesId = productSeriesId;
-        }
-
-        public String getProductSeriesName() {
-            return productSeriesName;
-        }
-
-        public void setProductSeriesName(String productSeriesName) {
-            this.productSeriesName = productSeriesName;
-        }
-
-        public String getProductSeriesFunction() {
-            return productSeriesFunction;
-        }
-
-        public void setProductSeriesFunction(String productSeriesFunction) {
-            this.productSeriesFunction = productSeriesFunction;
-        }
-
-        public List<ProductSimpleVo> getProductSimpleList() {
-            return productSimpleList;
-        }
-
-        public void setProductSimpleList(List<ProductSimpleVo> productSimpleList) {
-            this.productSimpleList = productSimpleList;
-        }
-    }
-
-    public ProductSeriesStandard ProductSeriesStandardization(ProductSeries productSeries){
-        ProductSeriesStandard productSeriesStandard = new ProductSeriesStandard();
+    public ProductSeriesStandardVo ProductSeriesStandardization(ProductSeries productSeries){
+        ProductSeriesStandardVo productSeriesStandard = new ProductSeriesStandardVo();
         productSeriesStandard.setProductSeriesId(productSeries.getProductSeriesId());
         productSeriesStandard.setProductSeriesName(productSeries.getProductSeriesName());
         productSeriesStandard.setProductSeriesFunction(productSeries.getProductSeriesFunction());
@@ -184,8 +75,8 @@ public class ProductSeriesService {
 
     //查
     //-------------------------------------------------------------------------
-    public ProductSeriesPackage findAll(Integer pageNo,
-                                       Integer pageSize
+    public PackageVo findAll(Integer pageNo,
+                                          Integer pageSize
     ) {
         Integer productSeriesNum = productSeriesRepository.findAll().size();
         Pageable pageable = PageRequest.of(pageNo, pageSize);
@@ -193,10 +84,10 @@ public class ProductSeriesService {
         return packProductSeries(page.toList(), pageNo, pageSize, productSeriesNum);
     }
 
-    public  List<ProductSeriesName> findAllProductSeriesName(){
-        List<ProductSeriesName> productSeriesNameList = new ArrayList<>();
+    public  List<ProductSeriesNameVo> findAllProductSeriesName(){
+        List<ProductSeriesNameVo> productSeriesNameList = new ArrayList<>();
         for(ProductSeries productSeries: productSeriesRepository.findAll()){
-            ProductSeriesName productSeriesName = new ProductSeriesName();
+            ProductSeriesNameVo productSeriesName = new ProductSeriesNameVo();
             productSeriesName.setProductSeriesId(productSeries.getProductSeriesId());
             productSeriesName.setProductSeriesName(productSeries.getProductSeriesName());
             productSeriesNameList.add(productSeriesName);
@@ -204,9 +95,9 @@ public class ProductSeriesService {
         return productSeriesNameList;
     }
 
-    public ProductSeriesStandard findProductSeriesByProductSeriesId(Long productSeriesId) {
+    public ProductSeriesStandardVo findProductSeriesByProductSeriesId(Long productSeriesId) {
         if(productSeriesRepository.findProductSeriesByProductSeriesId(productSeriesId) == null){
-            return new ProductSeriesStandard();
+            return new ProductSeriesStandardVo();
         }
         return ProductSeriesStandardization(productSeriesRepository.findProductSeriesByProductSeriesId(productSeriesId));
     }
@@ -249,7 +140,7 @@ public class ProductSeriesService {
     //增
     //-------------------------------------------------------------------------
     //add productSeries data
-    public ProductSeries deStandardizeProductSeries(ProductSeriesStandard productSeriesStandard){
+    public ProductSeries deStandardizeProductSeries(ProductSeriesStandardVo productSeriesStandard){
         ProductSeries productSeries = new ProductSeries();
         productSeries.setProductSeriesId(productSeriesStandard.getProductSeriesId());
         productSeries.setProductSeriesName(productSeriesStandard.getProductSeriesName());
@@ -258,7 +149,7 @@ public class ProductSeriesService {
         return productSeries;
     }
 
-    public ProductSeries addProductSeries(ProductSeriesStandard productSeriesStandard) {
+    public ProductSeries addProductSeries(ProductSeriesStandardVo productSeriesStandard) {
         ProductSeries productSeries = deStandardizeProductSeries(productSeriesStandard);
         // 添加时指定一个不存在的id进而使用自增id
         productSeries.setProductSeriesId(new Long(0));
@@ -268,7 +159,7 @@ public class ProductSeriesService {
     //改
     //-------------------------------------------------------------------------
     //update product data
-    public String updateProductSeries(ProductSeriesStandard updatedProductSeries) {
+    public String updateProductSeries(ProductSeriesStandardVo updatedProductSeries) {
         if(productSeriesRepository.findProductSeriesByProductSeriesId(updatedProductSeries.getProductSeriesId()) == null){
             ProductSeries addedProductSeries = addProductSeries(updatedProductSeries);
             return "数据库中不存在对应数据,已添加Id为" + addedProductSeries.getProductSeriesId() + "的条目" ;
@@ -291,15 +182,15 @@ public class ProductSeriesService {
         List<ExcelProductSeriesVo> excelProductSeriesVos = importResult.getData();
         for(ExcelProductSeriesVo excelProductSeriesVo: excelProductSeriesVos){
             // excel信息转化为标准类
-            ProductSeriesStandard productSeriesStandard = transExcelToStandard(excelProductSeriesVo);
+            ProductSeriesStandardVo productSeriesStandard = transExcelToStandard(excelProductSeriesVo);
             // 更新数据库，已存在则会直接替换
             updateProductSeries(productSeriesStandard);
         }
         return ResultVoUtil.success(excelProductSeriesVos);
     }
 
-    public ProductSeriesStandard transExcelToStandard(ExcelProductSeriesVo excelProductSeriesVo){
-        ProductSeriesStandard productSeriesStandard = new ProductSeriesStandard();
+    public ProductSeriesStandardVo transExcelToStandard(ExcelProductSeriesVo excelProductSeriesVo){
+        ProductSeriesStandardVo productSeriesStandard = new ProductSeriesStandardVo();
         // 如果已经存在了则修改，否则则添加
         if(productSeriesRepository.findProductSeriesByProductSeriesName(excelProductSeriesVo.getProductSeriesName()) == null){
             // 表示添加
