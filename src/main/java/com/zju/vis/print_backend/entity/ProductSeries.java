@@ -2,11 +2,15 @@ package com.zju.vis.print_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "tb_product_series")
 public class ProductSeries {
@@ -28,31 +32,4 @@ public class ProductSeries {
     @JoinColumn(name = "product_series_id")
     private List<Product> productList;
 
-    public Long getProductSeriesId() {
-        return productSeriesId;
-    }
-
-    public void setProductSeriesId(Long productSeriesId) {
-        this.productSeriesId = productSeriesId;
-    }
-
-    public String getProductSeriesName() {
-        return productSeriesName;
-    }
-
-    public void setProductSeriesName(String productSeriesName) {
-        this.productSeriesName = productSeriesName;
-    }
-
-    public String getProductSeriesFunction() {
-        return productSeriesFunction;
-    }
-
-    public void setProductSeriesFunction(String productSeriesFunction) {
-        this.productSeriesFunction = productSeriesFunction;
-    }
-
-    public List<Product> getProductList() {
-        return productList;
-    }
 }

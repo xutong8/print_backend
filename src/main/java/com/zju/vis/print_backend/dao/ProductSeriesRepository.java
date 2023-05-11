@@ -9,14 +9,17 @@ import java.util.List;
 
 public interface ProductSeriesRepository extends JpaRepository<ProductSeries, Long> {
 
-    List<ProductSeries> findAll();
-    List<ProductSeries> findProductSeriesByProductSeriesNameContaining(String productSeriesName);
+    // 查单个
     ProductSeries findProductSeriesByProductSeriesName(String productSeriesName);
     ProductSeries findProductSeriesByProductSeriesId(Long productSeriesId);
     ProductSeries findProductSeriesByProductSeriesIdIs(Long productSeriesId);
 
     @Query("SELECT ps.productSeriesId FROM ProductSeries ps WHERE ps.productSeriesName = :productSeriesName")
     Long findProductSeriesIdByProductSeriesName(@Param("productSeriesName") String productSeriesName);
+
+    // 查多个
+    List<ProductSeries> findAll();
+    List<ProductSeries> findProductSeriesByProductSeriesNameContaining(String productSeriesName);
 
     //根据productSeriesId删除记录
     void deleteByProductSeriesId(Long productSeriesId);

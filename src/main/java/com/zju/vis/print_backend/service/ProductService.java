@@ -308,11 +308,11 @@ public class ProductService {
         }
         // 获取原料历史价格
         for(RawMaterialSimpleVo rawMaterialSimple: rawMaterialSimpleList){
-            List<Utils.HistoryPrice> historyPriceList = rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialHistoryPrice();
+            List<HistoryPriceVo> historyPriceList = rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialHistoryPrice();
             if(historyPriceList.size()!=0){
                 boolean flag = false;
                 Collections.reverse(historyPriceList);
-                for(Utils.HistoryPrice historyPrice: historyPriceList){
+                for(HistoryPriceVo historyPrice: historyPriceList){
                     if(historyPrice.getDate().getTime() - (86400*1000) <= historyDate.getTime()){
                         // System.out.println("选取的时间:" + historyPrice.getDate());
                         sum += rawMaterialSimple.getInventory() * historyPrice.getPrice();
@@ -330,13 +330,13 @@ public class ProductService {
     }
 
     // 列表形式返回历史价格
-    public List<Utils.HistoryPrice> getProductHistoryPriceList(Long productId,Long months){
+    public List<HistoryPriceVo> getProductHistoryPriceList(Long productId, Long months){
         Product product = productRepository.findProductByProductId(productId);
-        List<Utils.HistoryPrice> historyPriceList = new ArrayList<>();
+        List<HistoryPriceVo> historyPriceList = new ArrayList<>();
         for(int i = 0;i < months ; i++){
             Date date = stepMonth(new Date(),-i);
             // System.out.println(dateFormat.format(date));
-            Utils.HistoryPrice historyPrice = new Utils.HistoryPrice();
+            HistoryPriceVo historyPrice = new HistoryPriceVo();
             historyPrice.setDate(new java.sql.Date(date.getTime()));
             historyPrice.setPrice(calculateProductHistoryPrice(product,date));
             historyPriceList.add(historyPrice);
@@ -597,12 +597,12 @@ public class ProductService {
     public List<ExcelProductWriteVo> getExcelProductWriteVoListByCondition(){
         List<ExcelProductWriteVo> excelProductWriteVos = new ArrayList<>();
         for(Product product: productRepository.findAll()){
-            excelProductWriteVos.add(transProductToExcel(product));
+            excelProductWriteVos.add(transEntityToExcel(product));
         }
         return excelProductWriteVos;
     }
 
-    public ExcelProductWriteVo transProductToExcel(Product product){
+    public ExcelProductWriteVo transEntityToExcel(Product product){
         ExcelProductWriteVo excelProductWriteVo = new ExcelProductWriteVo();
         excelProductWriteVo.setProductName(product.getProductName());
         excelProductWriteVo.setProductIndex(product.getProductIndex());

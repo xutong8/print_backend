@@ -13,14 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Utils {
-    // 通用日期价格类(static 用于外部调用
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class HistoryPrice{
-        private Date date;
-        private Double price;
-    }
 
     public static java.util.Date stepMonth(java.util.Date sourceDate, int month) {
         Calendar c = Calendar.getInstance();

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RelProductFilterCakeRepository extends JpaRepository<RelProductFilterCake, RelProductFilterCakeKey> {
+
+    // 查单个
     RelProductFilterCake findRelProductFilterCakeByProductAndFilterCake(Product product, FilterCake filterCake);
     RelProductFilterCake findRelProductFilterCakeByIdEquals(RelProductFilterCakeKey id);
 }

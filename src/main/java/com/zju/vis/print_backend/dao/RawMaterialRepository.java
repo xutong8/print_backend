@@ -6,9 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface RawMaterialRepository extends JpaRepository<RawMaterial, Long> {
-    List<RawMaterial> findAll();
+
+    // 查单个
     RawMaterial findRawMaterialByRawMaterialId(Long rawMaterialId);
     RawMaterial findRawMaterialByRawMaterialName(String rawMaterialName);
+
+    // 查多个
+    List<RawMaterial> findAll();
     List<RawMaterial> findAllByRawMaterialNameContaining(String rawMaterialName);
     List<RawMaterial> findAllByRawMaterialIndexContaining(String rawMaterialIndex);
 

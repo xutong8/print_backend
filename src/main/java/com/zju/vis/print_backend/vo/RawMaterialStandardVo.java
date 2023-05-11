@@ -1,6 +1,5 @@
 package com.zju.vis.print_backend.vo;
 
-import com.zju.vis.print_backend.Utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,5 +18,5 @@ public class RawMaterialStandardVo {
     private Integer rawMaterialIncreasePercent;
     private String rawMaterialConventional;
     private String rawMaterialSpecification;
-    private List<Utils.HistoryPrice> rawMaterialHistoryPrice;
+    private List<HistoryPriceVo> rawMaterialHistoryPrice;
 }

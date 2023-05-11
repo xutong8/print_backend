@@ -7,11 +7,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 
-import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.dao.ProductRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RelProductFilterCakeService;
 import com.zju.vis.print_backend.service.RelProductRawMaterialService;
+import com.zju.vis.print_backend.vo.HistoryPriceVo;
 import com.zju.vis.print_backend.vo.ProductPackageVo;
 import com.zju.vis.print_backend.vo.ProductStandardVo;
 import com.zju.vis.print_backend.vo.ResultVo;
@@ -178,7 +178,7 @@ public class ProductController {
 
     @ApiOperation(value = "产品历史价格列表用接口")
     @RequestMapping(value = "/getProductHistoryPriceList", method = RequestMethod.GET)
-    public List<Utils.HistoryPrice> getProductHistoryPriceList(
+    public List<HistoryPriceVo> getProductHistoryPriceList(
             @RequestParam(value = "productId", defaultValue = "1" ) Long productId,
             @RequestParam(value = "months", defaultValue = "12") Long months
     ){

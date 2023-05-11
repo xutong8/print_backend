@@ -1,11 +1,10 @@
 package com.zju.vis.print_backend.Utils;
 
-import com.zju.vis.print_backend.Utils.ResultVoUtil;
 import com.zju.vis.print_backend.common.ApplicationContextHolder;
-import com.zju.vis.print_backend.configuration.FileConfig;
+import com.zju.vis.print_backend.config.FileConfig;
+import com.zju.vis.print_backend.enums.ResultCodeEnum;
 import com.zju.vis.print_backend.vo.ResultVo;
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,53 +15,6 @@ import java.net.URLEncoder;
 
 @Slf4j
 public class FileUtil {
-
-    // 自定义的枚举类
-    @Getter
-    public enum ResultCodeEnum {
-        SUCCESS(200, "成功")
-        ,
-        ERROR(301, "错误")
-        ,
-        PARAM_ERROR(303, "参数错误")
-        ,
-        FILE_NOT_EXIST(304, "文件不存在")
-        ,
-        CLOSE_FAILD(305, "关闭流失败")
-        ;
-
-        private Integer code;
-        private String message;
-
-        ResultCodeEnum(Integer code, String message) {
-            this.code = code;
-            this.message = message;
-        }
-
-    }
-
-    // 自定义异常 ParamErrorException
-    @Data
-    public static class ParamErrorException extends RuntimeException {
-        // 错误码
-        private Integer code;
-
-        // 错误消息
-        private String msg;
-
-        public ParamErrorException() {
-            this(ResultCodeEnum.PARAM_ERROR.getCode(), ResultCodeEnum.PARAM_ERROR.getMessage());
-        }
-        public ParamErrorException(String msg) {
-            this(ResultCodeEnum.PARAM_ERROR.getCode(), msg);
-        }
-        public ParamErrorException(Integer code, String msg) {
-            super(msg);
-            this.code = code;
-            this.msg = msg;
-        }
-
-    }
 
     private static FileConfig fileConfig = ApplicationContextHolder.getContext().getBean(FileConfig.class);
 

@@ -2,6 +2,7 @@ package com.zju.vis.print_backend.service;
 
 import com.alibaba.fastjson.JSON;
 import com.zju.vis.print_backend.Utils.*;
+import com.zju.vis.print_backend.exception.ParamErrorException;
 import com.zju.vis.print_backend.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class FileService {
         // 1.参数校验
         if (null == file || file.isEmpty()) {
             log.error("【文件上传】文件为空!");
-            throw new FileUtil.ParamErrorException();
+            throw new ParamErrorException();
         }
         // 2.上传文件
         ResultVo<String> resultVo = FileUtil.uploadFile(file);
@@ -37,7 +38,7 @@ public class FileService {
         log.info("【批量上传】进入到批量上传文件");
         if (null == files || files.length == 0) {
             log.error("【批量上传】上传的文件为空，files={}", files);
-            throw new FileUtil.ParamErrorException();
+            throw new ParamErrorException();
         }
         List<MultipartFile> multipartFiles = Arrays.asList(files);
         // 1.校验是否有空文件
@@ -148,7 +149,7 @@ public class FileService {
         log.info("【上传Excel文件】进入到上传Excel文件方法...");
         if (null == file || file.isEmpty()) {
             log.error("【上传Excel文件】上传的文件为空，file={}", file);
-            throw new FileUtil.ParamErrorException();
+            throw new ParamErrorException();
         }
         boolean b = ExcelUtil.checkExcelExtension(file);
         if (!b) {

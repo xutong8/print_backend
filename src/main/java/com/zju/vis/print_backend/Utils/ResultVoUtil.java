@@ -1,7 +1,7 @@
 package com.zju.vis.print_backend.Utils;
 
+import com.zju.vis.print_backend.enums.ResultCodeEnum;
 import com.zju.vis.print_backend.vo.ResultVo;
-import lombok.Data;
 
 public class ResultVoUtil {
 
@@ -10,7 +10,7 @@ public class ResultVoUtil {
     }
     public static ResultVo success(Object object) {
         ResultVo result = new ResultVo();
-        result.setCode(FileUtil.ResultCodeEnum.SUCCESS.getCode());
+        result.setCode(ResultCodeEnum.SUCCESS.getCode());
         result.setMsg("成功");
         result.setData(object);
         return result;
@@ -29,7 +29,7 @@ public class ResultVoUtil {
 
     public static ResultVo error(String msg) {
         ResultVo result = new ResultVo();
-        result.setCode(FileUtil.ResultCodeEnum.ERROR.getCode());
+        result.setCode(ResultCodeEnum.ERROR.getCode());
         result.setMsg(msg);
         return result;
     }

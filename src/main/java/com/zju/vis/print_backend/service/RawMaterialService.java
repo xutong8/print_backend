@@ -77,9 +77,9 @@ public class RawMaterialService {
         rawMaterialStandard.setRawMaterialConventional(rawMaterial.getRawMaterialConventional());
         rawMaterialStandard.setRawMaterialSpecification(rawMaterial.getRawMaterialSpecification());
         // 设置历史价格
-        List<Utils.HistoryPrice> historyPriceList = new ArrayList<>();
+        List<HistoryPriceVo> historyPriceList = new ArrayList<>();
         for(RelDateRawMaterial relDateRawMaterial: rawMaterial.getRelDateRawMaterialList()){
-            Utils.HistoryPrice historyPrice = new Utils.HistoryPrice();
+            HistoryPriceVo historyPrice = new HistoryPriceVo();
             historyPrice.setDate(relDateRawMaterial.getId().getRawMaterialDate());
             historyPrice.setPrice(relDateRawMaterial.getPrice());
             historyPriceList.add(historyPrice);
@@ -263,7 +263,7 @@ public class RawMaterialService {
         // 关系表设置
         List<RelDateRawMaterial> relDateRawMaterialList = new ArrayList<>();
         if(rawMaterialStandard.getRawMaterialHistoryPrice() != null){
-            for(Utils.HistoryPrice historyPrice: rawMaterialStandard.getRawMaterialHistoryPrice()){
+            for(HistoryPriceVo historyPrice: rawMaterialStandard.getRawMaterialHistoryPrice()){
                 Date rawMaterialDate = historyPrice.getDate();
                 Double price = historyPrice.getPrice();
 
@@ -428,12 +428,12 @@ public class RawMaterialService {
     public List<ExcelRawMaterialWriteVo> getExcelRawMaterialWriteVoListByCondition(){
         List<ExcelRawMaterialWriteVo> excelRawMaterialWriteVos = new ArrayList<>();
         for(RawMaterial rawMaterial: rawMaterialRepository.findAll()){
-            excelRawMaterialWriteVos.add(transRawMaterialToExcel(rawMaterial));
+            excelRawMaterialWriteVos.add(transEntityToExcel(rawMaterial));
         }
         return excelRawMaterialWriteVos;
     }
 
-    public ExcelRawMaterialWriteVo transRawMaterialToExcel(RawMaterial rawMaterial){
+    public ExcelRawMaterialWriteVo transEntityToExcel(RawMaterial rawMaterial){
         ExcelRawMaterialWriteVo excelRawMaterialWriteVo = new ExcelRawMaterialWriteVo();
         excelRawMaterialWriteVo.setRawMaterialName(rawMaterial.getRawMaterialName());
         excelRawMaterialWriteVo.setRawMaterialIndex(rawMaterial.getRawMaterialIndex());

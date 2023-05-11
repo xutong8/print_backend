@@ -13,5 +13,4 @@ public interface RelProductRawMaterialRepository extends JpaRepository<RelProduc
     RelProductRawMaterial findRelProductRawMaterialByProductAndRawMaterial(Product product, RawMaterial rawMaterial);
     RelProductRawMaterial findRelProductRawMaterialByIdEquals(RelProductRawMaterialKey id);
 
-    void deleteByIdEquals(RelProductRawMaterialKey id);
 }

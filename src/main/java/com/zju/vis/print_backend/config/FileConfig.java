@@ -1,4 +1,4 @@
-package com.zju.vis.print_backend.configuration;
+package com.zju.vis.print_backend.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

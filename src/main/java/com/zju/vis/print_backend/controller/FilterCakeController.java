@@ -1,17 +1,13 @@
 package com.zju.vis.print_backend.controller;
 
 
-import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.service.FilterCakeService;
 
 import com.zju.vis.print_backend.service.RelFilterCakeFilterCakeService;
 import com.zju.vis.print_backend.service.RelFilterCakeRawMaterialService;
-import com.zju.vis.print_backend.vo.FilterCakeNameVo;
-import com.zju.vis.print_backend.vo.FilterCakePackageVo;
-import com.zju.vis.print_backend.vo.FilterCakeStandardVo;
-import com.zju.vis.print_backend.vo.ResultVo;
+import com.zju.vis.print_backend.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -124,7 +120,7 @@ public class FilterCakeController {
 
     @ApiOperation(value = "测试滤饼历史价格列表用接口")
     @RequestMapping(value = "/getFilterCakeHistoryPriceList", method = RequestMethod.GET)
-    public List<Utils.HistoryPrice> getFilterCakeHistoryPriceList(
+    public List<HistoryPriceVo> getFilterCakeHistoryPriceList(
             @RequestParam(value = "filterCakeId", defaultValue = "1" ) Long filterCakeId,
             @RequestParam(value = "months", defaultValue = "12") Long months
     ){

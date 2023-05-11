@@ -1,4 +1,4 @@
-package com.zju.vis.print_backend.configuration;
+package com.zju.vis.print_backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

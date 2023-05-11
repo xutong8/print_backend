@@ -1,6 +1,6 @@
 package com.zju.vis.print_backend.vo;
 
-import com.zju.vis.print_backend.Utils.FileUtil;
+import com.zju.vis.print_backend.enums.ResultCodeEnum;
 import lombok.Data;
 
 @Data
@@ -17,7 +17,7 @@ public class ResultVo<T> {
 
     // 判断是否成功
     public boolean checkSuccess() {
-        return FileUtil.ResultCodeEnum.SUCCESS.getCode().equals(this.code);
+        return ResultCodeEnum.SUCCESS.getCode().equals(this.code);
     }
 
 }

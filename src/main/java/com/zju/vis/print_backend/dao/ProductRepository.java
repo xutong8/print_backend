@@ -12,16 +12,17 @@ import com.zju.vis.print_backend.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    // 查单个
+    Product findProductByProductId(Long productId);
+    Product findProductByProductName(String productName);
+    Product findProductByProductIndex(String productIndex);
+
+    // 查多个
     List<Product> findAll();
     List<Product> findAllByProductNameContaining(String productName);
     List<Product> findAllByProductIndexContaining(String productIndex);
     List<Product> findAllByProductCodeContaining(String productCode);
     List<Product> findAllByProductColorContaining(String productColor);
-
-
-    Product findProductByProductId(Long productId);
-    Product findProductByProductName(String productName);
-    Product findProductByProductIndex(String productIndex);
 
     //根据productId 删除记录
     void deleteByProductId(Long productId);

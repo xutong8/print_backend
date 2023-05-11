@@ -206,13 +206,13 @@ public class FilterCakeService {
         }
         // 获取原料历史价格
         for(RawMaterialSimpleVo rawMaterialSimple: rawMaterialSimpleList){
-            List<Utils.HistoryPrice> historyPriceList = rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialHistoryPrice();
+            List<HistoryPriceVo> historyPriceList = rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialHistoryPrice();
             if(historyPriceList.size()!=0){
                 // 标识是否有增加过历史数据，没有则说明最早没有当时的历史数据则取当前原料最早的数据作为当时的虚拟数据
                 boolean flag = false;
                 // 逆序日期从大到小排序 2023.01.15 > 2022.12.31
                 Collections.reverse(historyPriceList);
-                for(Utils.HistoryPrice historyPrice: historyPriceList){
+                for(HistoryPriceVo historyPrice: historyPriceList){
                     // 只有日期默认是 8.00 开始算，因此默认减一天时间进行比较
                     // 取第一个小于当前日期的价格
                     if(historyPrice.getDate().getTime() - (86400*1000) <= historyDate.getTime()){
@@ -232,14 +232,14 @@ public class FilterCakeService {
     }
 
     // 列表形式返回历史价格
-    public List<Utils.HistoryPrice> getFilterCakeHistoryPriceList(Long filterCakeId,Long months){
+    public List<HistoryPriceVo> getFilterCakeHistoryPriceList(Long filterCakeId, Long months){
         FilterCake filterCake = filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId);
-        List<Utils.HistoryPrice> historyPriceList = new ArrayList<>();
+        List<HistoryPriceVo> historyPriceList = new ArrayList<>();
         // SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
         for(int i = 0;i < months ; i++){
             Date date = stepMonth(new Date(),-i);
             // System.out.println(dateFormat.format(date));
-            Utils.HistoryPrice historyPrice = new Utils.HistoryPrice();
+            HistoryPriceVo historyPrice = new HistoryPriceVo();
             historyPrice.setDate(new java.sql.Date(date.getTime()));
             historyPrice.setPrice(calculateFilterCakeHistoryPrice(filterCake,date));
             historyPriceList.add(historyPrice);

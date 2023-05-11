@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RelFilterCakeRawMaterialRepository extends JpaRepository<RelFilterCakeRawMaterial, RelFilterCakeRawMaterialKey> {
-    void deleteByIdEquals(RelFilterCakeRawMaterialKey id);
+
 }

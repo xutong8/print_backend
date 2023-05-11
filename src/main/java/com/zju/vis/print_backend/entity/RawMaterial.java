@@ -1,12 +1,16 @@
 package com.zju.vis.print_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "tb_raw_material")
 public class RawMaterial {
@@ -49,16 +53,6 @@ public class RawMaterial {
     private List<FilterCake> filterCakeList=new ArrayList<>();
 
 
-    public List<FilterCake> getFilterCakeList() {
-        return filterCakeList;
-    }
-
-    public void setFilterCakeList(List<FilterCake> filterCakeList) {
-        this.filterCakeList = filterCakeList;
-    }
-
-
-
     @OneToMany(mappedBy = "rawMaterial")
     private List<RelProductRawMaterial> relProductRawMaterialList;
 
@@ -68,87 +62,4 @@ public class RawMaterial {
     @OneToMany(mappedBy = "rawMaterial")
     private List<RelDateRawMaterial> relDateRawMaterialList;
 
-    public List<RelProductRawMaterial> getRelProductRawMaterialList() {
-        return relProductRawMaterialList;
-    }
-
-    public void setRelProductRawMaterialList(List<RelProductRawMaterial> relProductRawMaterialList) {
-        this.relProductRawMaterialList = relProductRawMaterialList;
-    }
-
-    public List<RelFilterCakeRawMaterial> getRelFilterCakeRawMaterialList() {
-        return relFilterCakeRawMaterialList;
-    }
-
-    public void setRelFilterCakeRawMaterialList(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList) {
-        this.relFilterCakeRawMaterialList = relFilterCakeRawMaterialList;
-    }
-
-    public List<RelDateRawMaterial> getRelDateRawMaterialList() {
-        return relDateRawMaterialList;
-    }
-
-    public void setRelDateRawMaterialList(List<RelDateRawMaterial> relDateRawMaterialList) {
-        this.relDateRawMaterialList = relDateRawMaterialList;
-    }
-
-    public Long getRawMaterialId() {
-        return rawMaterialId;
-    }
-
-    public void setRawMaterialId(Long rawMaterialId) {
-        this.rawMaterialId = rawMaterialId;
-    }
-
-    public String getRawMaterialName() {
-        return rawMaterialName;
-    }
-
-    public void setRawMaterialName(String rawMaterialName) {
-        this.rawMaterialName = rawMaterialName;
-    }
-
-    public String getRawMaterialIndex() {
-        return rawMaterialIndex;
-    }
-
-    public void setRawMaterialIndex(String rawMaterialIndex) {
-        this.rawMaterialIndex = rawMaterialIndex;
-    }
-
-    public Double getRawMaterialPrice() {
-        return rawMaterialPrice;
-    }
-
-    public void setRawMaterialPrice(Double rawMaterialPrice) {
-        this.rawMaterialPrice = rawMaterialPrice;
-    }
-
-    public String getRawMaterialConventional() {
-        return rawMaterialConventional;
-    }
-
-    public void setRawMaterialConventional(String rawMaterialConventional) {
-        this.rawMaterialConventional = rawMaterialConventional;
-    }
-
-    public String getRawMaterialSpecification() {
-        return rawMaterialSpecification;
-    }
-
-    public void setRawMaterialSpecification(String rawMaterialSpecification) {
-        this.rawMaterialSpecification = rawMaterialSpecification;
-    }
-
-    public List<Product> getProductList() {
-        return productList;
-    }
-
-    // public void setProductList(List<Product> productList) {
-    //     this.productList = productList;
-    // }
-
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
-    }
 }

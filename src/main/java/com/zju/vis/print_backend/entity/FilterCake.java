@@ -1,12 +1,16 @@
 package com.zju.vis.print_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "tb_filter_cake")
 public class FilterCake {
@@ -61,22 +65,6 @@ public class FilterCake {
     @JsonIgnore
     private List<RawMaterial> rawMaterialList = new ArrayList<>();
 
-    public List<RawMaterial> getRawMaterialList() {
-        return rawMaterialList;
-    }
-
-    public void setRawMaterialList(List<RawMaterial> rawMaterialList) {
-        this.rawMaterialList = rawMaterialList;
-    }
-
-    public List<FilterCake> getFilterCakeList() {
-        return filterCakeList;
-    }
-
-    public void setFilterCakeList(List<FilterCake> filterCakeList) {
-        this.filterCakeList = filterCakeList;
-    }
-
     // 关联表
 
     @OneToMany(mappedBy = "filterCake")
@@ -91,120 +79,4 @@ public class FilterCake {
 
     @OneToMany(mappedBy = "filterCake")
     private List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
-
-    public List<RelProductFilterCake> getRelProductFilterCakeList() {
-        return relProductFilterCakeList;
-    }
-
-    public void setRelProductFilterCakeList(List<RelProductFilterCake> relProductFilterCakeList) {
-        this.relProductFilterCakeList = relProductFilterCakeList;
-    }
-
-    public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeListUsed() {
-        return relFilterCakeFilterCakeListUsed;
-    }
-
-    public void setRelFilterCakeFilterCakeListUsed(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeListUsed) {
-        this.relFilterCakeFilterCakeListUsed = relFilterCakeFilterCakeListUsed;
-    }
-
-    public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeListUser() {
-        return relFilterCakeFilterCakeListUser;
-    }
-
-    public void setRelFilterCakeFilterCakeListUser(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeListUser) {
-        this.relFilterCakeFilterCakeListUser = relFilterCakeFilterCakeListUser;
-    }
-
-    public List<RelFilterCakeRawMaterial> getRelFilterCakeRawMaterialList() {
-        return relFilterCakeRawMaterialList;
-    }
-
-    public void setRelFilterCakeRawMaterialList(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList) {
-        this.relFilterCakeRawMaterialList = relFilterCakeRawMaterialList;
-    }
-
-    // public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeList() {
-    //     return relFilterCakeFilterCakeList;
-    // }
-    //
-    // public void setRelFilterCakeFilterCakeList(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList) {
-    //     this.relFilterCakeFilterCakeList = relFilterCakeFilterCakeList;
-    // }
-
-
-
-    public Long getFilterCakeId() {
-        return filterCakeId;
-    }
-
-    public void setFilterCakeId(Long filterCakeId) {
-        this.filterCakeId = filterCakeId;
-    }
-
-    public String getFilterCakeName() {
-        return filterCakeName;
-    }
-
-    public void setFilterCakeName(String filterCakeName) {
-        this.filterCakeName = filterCakeName;
-    }
-
-    public String getFilterCakeIndex() {
-        return filterCakeIndex;
-    }
-
-    public void setFilterCakeIndex(String filterCakeIndex) {
-        this.filterCakeIndex = filterCakeIndex;
-    }
-
-    public String getFilterCakeColor() {
-        return filterCakeColor;
-    }
-
-    public void setFilterCakeColor(String filterCakeColor) {
-        this.filterCakeColor = filterCakeColor;
-    }
-
-    public Float getFilterCakeProcessingCost() {
-        return filterCakeProcessingCost;
-    }
-
-    public void setFilterCakeProcessingCost(Float filterCakeProcessingCost) {
-        this.filterCakeProcessingCost = filterCakeProcessingCost;
-    }
-
-    public Integer getFilterCakeAccountingQuantity() {
-        return filterCakeAccountingQuantity;
-    }
-
-    public void setFilterCakeAccountingQuantity(Integer filterCakeAccountingQuantity) {
-        this.filterCakeAccountingQuantity = filterCakeAccountingQuantity;
-    }
-
-    public String getFilterCakeSpecification() {
-        return filterCakeSpecification;
-    }
-
-    public void setFilterCakeSpecification(String filterCakeSpecification) {
-        this.filterCakeSpecification = filterCakeSpecification;
-    }
-
-    public String getFilterCakeRemarks() {
-        return filterCakeRemarks;
-    }
-
-    public void setFilterCakeRemarks(String filterCakeRemarks) {
-        this.filterCakeRemarks = filterCakeRemarks;
-    }
-
-    public List<Product> getProductList() {
-        return productList;
-    }
-
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
-    }
-
-
 }
