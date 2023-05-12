@@ -116,9 +116,9 @@ public class ProductController {
     @ApiOperation(value = "添加新产品")
     @RequestMapping(value = "/addProduct", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Product> addProduct(@Valid @RequestBody ProductStandardVo productStandard) {
-        Product savedProduct = productService.addProduct(productStandard);
-        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+    public ResultVo addProduct(@Valid @RequestBody ProductStandardVo productStandard) {
+        return productService.addProduct(productStandard);
+        // return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "更新产品信息")

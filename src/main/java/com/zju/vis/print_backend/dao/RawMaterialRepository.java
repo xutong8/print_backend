@@ -10,6 +10,7 @@ public interface RawMaterialRepository extends JpaRepository<RawMaterial, Long> 
     // 查单个
     RawMaterial findRawMaterialByRawMaterialId(Long rawMaterialId);
     RawMaterial findRawMaterialByRawMaterialName(String rawMaterialName);
+    RawMaterial findRawMaterialByRawMaterialIndex(String rawMaterialIndex);
 
     // 查多个
     List<RawMaterial> findAll();

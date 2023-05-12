@@ -149,11 +149,16 @@ public class ProductSeriesService {
         return productSeries;
     }
 
-    public ProductSeries addProductSeries(ProductSeriesStandardVo productSeriesStandard) {
+    public ResultVo addProductSeries(ProductSeriesStandardVo productSeriesStandard) {
         ProductSeries productSeries = deStandardizeProductSeries(productSeriesStandard);
+        if(productSeriesRepository.findProductSeriesByProductSeriesName(productSeriesStandard.getProductSeriesName()) != null){
+            return ResultVoUtil.error("产品系列名重复");
+        }
         // 添加时指定一个不存在的id进而使用自增id
         productSeries.setProductSeriesId(new Long(0));
-        return productSeriesRepository.save(productSeries);
+        ProductSeries savedEntity = productSeriesRepository.save(productSeries);
+        productSeriesStandard.setProductSeriesId(savedEntity.getProductSeriesId());
+        return ResultVoUtil.success(productSeriesStandard);
     }
 
     //改
@@ -161,8 +166,13 @@ public class ProductSeriesService {
     //update product data
     public String updateProductSeries(ProductSeriesStandardVo updatedProductSeries) {
         if(productSeriesRepository.findProductSeriesByProductSeriesId(updatedProductSeries.getProductSeriesId()) == null){
-            ProductSeries addedProductSeries = addProductSeries(updatedProductSeries);
-            return "数据库中不存在对应数据,已添加Id为" + addedProductSeries.getProductSeriesId() + "的条目" ;
+            ResultVo<ProductSeriesStandardVo> result = addProductSeries(updatedProductSeries);
+            if(result.checkSuccess()){
+                return "数据库中不存在对应数据,已添加Id为" + result.getData().getProductSeriesId() + "的条目" ;
+            }
+            else{
+                return "产品系列名重复";
+            }
         }
         ProductSeries productSeries = deStandardizeProductSeries(updatedProductSeries);
         productSeriesRepository.save(productSeries);

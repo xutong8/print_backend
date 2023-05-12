@@ -12,7 +12,6 @@ public interface ProductSeriesRepository extends JpaRepository<ProductSeries, Lo
     // 查单个
     ProductSeries findProductSeriesByProductSeriesName(String productSeriesName);
     ProductSeries findProductSeriesByProductSeriesId(Long productSeriesId);
-    ProductSeries findProductSeriesByProductSeriesIdIs(Long productSeriesId);
 
     @Query("SELECT ps.productSeriesId FROM ProductSeries ps WHERE ps.productSeriesName = :productSeriesName")
     Long findProductSeriesIdByProductSeriesName(@Param("productSeriesName") String productSeriesName);

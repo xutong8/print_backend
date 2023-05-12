@@ -290,15 +290,20 @@ public class RawMaterialService {
         }
     }
 
-    public RawMaterial addRawMaterial(RawMaterialStandardVo rawMaterialStandard) {
+    public ResultVo addRawMaterial(RawMaterialStandardVo rawMaterialStandard) {
         DeStandardizeResult result = deStandardizeRawMaterial(rawMaterialStandard);
         RawMaterial rawMaterial = result.getRawMaterial();
+        if(rawMaterialRepository.findRawMaterialByRawMaterialIndex(rawMaterial.getRawMaterialIndex()) != null){
+            return ResultVoUtil.error("原料编码重复");
+        }
         List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
 
         rawMaterial.setRawMaterialId(new Long(0));
         RawMaterial savedRawMaterial = rawMaterialRepository.save(rawMaterial);
         saveRelDateRawMaterials(savedRawMaterial, relDateRawMaterialList);
-        return savedRawMaterial;
+        // 设置变换后id
+        rawMaterialStandard.setRawMaterialId(savedRawMaterial.getRawMaterialId());
+        return ResultVoUtil.success(rawMaterialStandard);
     }
 
     //改
@@ -306,8 +311,13 @@ public class RawMaterialService {
     public String updateRawMaterial(RawMaterialStandardVo updatedRawMaterial) {
         RawMaterial originRawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(updatedRawMaterial.getRawMaterialId());
         if(originRawMaterial == null){
-            RawMaterial addedRawMaterial = addRawMaterial(updatedRawMaterial);
-            return "数据库中不存在对应数据,已添加Id为" + addedRawMaterial.getRawMaterialId() + "的条目" ;
+            ResultVo<RawMaterialStandardVo> result = addRawMaterial(updatedRawMaterial);
+            if(result.checkSuccess()){
+                return "数据库中不存在对应数据,已添加Id为" + result.getData().getRawMaterialId() + "的条目" ;
+            }
+            else{
+                return "原料编码重复";
+            }
         }
         // 删除原先单向时间关系
         for(RelDateRawMaterial relDateRawMaterial: originRawMaterial.getRelDateRawMaterialList()){

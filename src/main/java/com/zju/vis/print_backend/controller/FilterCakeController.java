@@ -70,9 +70,8 @@ public class FilterCakeController {
     @ApiOperation(value = "添加新滤饼")
     @RequestMapping(value = "/addFilterCake", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<FilterCake> addFilterCake(@Valid @RequestBody FilterCakeStandardVo filterCakeStandard) {
-        FilterCake savedFilterCake = filterCakeService.addFilterCake(filterCakeStandard);
-        return new ResponseEntity<>(savedFilterCake, HttpStatus.CREATED);
+    public ResultVo addFilterCake(@Valid @RequestBody FilterCakeStandardVo filterCakeStandard) {
+        return filterCakeService.addFilterCake(filterCakeStandard);
     }
 
     @ApiOperation(value = "更新滤饼信息")

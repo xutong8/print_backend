@@ -475,9 +475,13 @@ public class ProductService {
     }
 
     // @Transactional
-    public Product addProduct(ProductStandardVo productStandard) {
+    public ResultVo addProduct(ProductStandardVo productStandard) {
         DeStandardizeResult result = deStandardizeProduct(productStandard);
         Product product = result.getProduct();
+        if(productRepository.findProductByProductIndex(product.getProductIndex()) != null ||
+                productRepository.findProductByProductCode(product.getProductCode()) != null ){
+            return ResultVoUtil.error("商品编码或商品代码重复");
+        }
         List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
         List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
         // 添加时指定一个不存在的id进而使用自增id
@@ -485,15 +489,21 @@ public class ProductService {
         Product savedProduct = productRepository.save(product);
         saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
         saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
-        return savedProduct;
+        // 设置变换后的id
+        productStandard.setProductId(savedProduct.getProductId());
+        return ResultVoUtil.success(productStandard);
     }
 
     //改
     //-------------------------------------------------------------------------
     public String updateProduct(ProductStandardVo updatedProduct) {
         if(productRepository.findProductByProductId(updatedProduct.getProductId()) == null){
-            Product addedProduct = addProduct(updatedProduct);
-            return "数据库中不存在对应数据,已添加Id为" + addedProduct.getProductId() + "条目" ;
+            ResultVo<ProductStandardVo> result = addProduct(updatedProduct);
+            if(result.checkSuccess()){
+                return "数据库中不存在对应数据,已添加Id为" + result.getData().getProductName() + "条目" ;
+            }else{
+                return "商品编码或商品代码重复";
+            }
         }
         // 先删掉原先的关系
         Product originProduct = productRepository.findProductByProductId(updatedProduct.getProductId());

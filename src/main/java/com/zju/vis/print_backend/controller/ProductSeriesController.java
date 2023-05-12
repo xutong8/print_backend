@@ -77,9 +77,8 @@ public class ProductSeriesController {
     @ApiOperation(value = "添加新的产品系列")
     @RequestMapping(value = "/addProductSeries", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> addProductSeries(@RequestBody ProductSeriesStandardVo productSeriesStandard) {
-        ProductSeries newProductSeries = productSeriesService.addProductSeries(productSeriesStandard);
-        return ResponseEntity.ok("New Product Series with ID: " + newProductSeries.getProductSeriesId() + " has been added.");
+    public ResultVo addProductSeries(@RequestBody ProductSeriesStandardVo productSeriesStandard) {
+        return productSeriesService.addProductSeries(productSeriesStandard);
     }
 
     @ApiOperation(value = "更新产品系列信息")

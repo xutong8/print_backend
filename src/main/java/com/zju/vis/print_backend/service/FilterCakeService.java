@@ -7,6 +7,7 @@ import com.zju.vis.print_backend.dao.FilterCakeRepository;
 import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.*;
 import com.zju.vis.print_backend.vo.*;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -328,41 +329,13 @@ public class FilterCakeService {
 
     //增
     //-------------------------------------------------------------------------
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DeStandardizeResult{
         private FilterCake filtercake;
         private List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList;
         private List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList;
-
-        // 构造函数
-        public DeStandardizeResult(FilterCake filtercake, List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList, List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList) {
-            this.filtercake = filtercake;
-            this.relFilterCakeRawMaterialList = relFilterCakeRawMaterialList;
-            this.relFilterCakeFilterCakeList = relFilterCakeFilterCakeList;
-        }
-
-        public FilterCake getFiltercake() {
-            return filtercake;
-        }
-
-        public void setFiltercake(FilterCake filtercake) {
-            this.filtercake = filtercake;
-        }
-
-        public List<RelFilterCakeRawMaterial> getRelFilterCakeRawMaterialList() {
-            return relFilterCakeRawMaterialList;
-        }
-
-        public void setRelFilterCakeRawMaterialList(List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList) {
-            this.relFilterCakeRawMaterialList = relFilterCakeRawMaterialList;
-        }
-
-        public List<RelFilterCakeFilterCake> getRelFilterCakeFilterCakeList() {
-            return relFilterCakeFilterCakeList;
-        }
-
-        public void setRelFilterCakeFilterCakeList(List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList) {
-            this.relFilterCakeFilterCakeList = relFilterCakeFilterCakeList;
-        }
     }
 
     // 解包标准类
@@ -438,9 +411,12 @@ public class FilterCakeService {
 
 
 
-    public FilterCake addFilterCake(FilterCakeStandardVo filterCakeStandard) {
+    public ResultVo addFilterCake(FilterCakeStandardVo filterCakeStandard) {
         DeStandardizeResult result = deStandardizeFilterCake(filterCakeStandard);
         FilterCake filterCake = result.getFiltercake();
+        if(filterCakeRepository.findFilterCakeByFilterCakeName(filterCake.getFilterCakeName()) != null){
+            return ResultVoUtil.error("滤饼名重复");
+        }
         List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = result.getRelFilterCakeRawMaterialList();
         List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList = result.getRelFilterCakeFilterCakeList();
         // 添加时指定一个不存在的id进而使用自增id
@@ -448,7 +424,9 @@ public class FilterCakeService {
         FilterCake savedFilterCake = filterCakeRepository.save(filterCake);
         saveRelFilterCakeRawMaterials(savedFilterCake,relFilterCakeRawMaterialList);
         saveRelFilterCakeFilterCakes(savedFilterCake,relFilterCakeFilterCakeList);
-        return savedFilterCake;
+        // 设置更改后的id
+        filterCakeStandard.setFilterCakeId(savedFilterCake.getFilterCakeId());
+        return ResultVoUtil.success(filterCakeStandard);
     }
 
 
@@ -458,8 +436,12 @@ public class FilterCakeService {
     public String updateFilterCake(FilterCakeStandardVo updatedFilterCake) {
         FilterCake originFilterCake = filterCakeRepository.findFilterCakeByFilterCakeId(updatedFilterCake.getFilterCakeId());
         if(originFilterCake == null){
-            FilterCake addedFilterCake = addFilterCake(updatedFilterCake);
-            return "数据库中不存在对应数据,已添加Id为" + addedFilterCake.getFilterCakeName() + "的条目" ;
+            ResultVo<FilterCakeStandardVo> result = addFilterCake(updatedFilterCake);
+            if(result.checkSuccess()){
+                return "数据库中不存在对应数据,已添加Id为" + result.getData().getFilterCakeName() + "的条目" ;
+            }else{
+                return "滤饼名重复";
+            }
         }
         // 先删掉原先的关系删除单向关系
         // 删除原料关联表

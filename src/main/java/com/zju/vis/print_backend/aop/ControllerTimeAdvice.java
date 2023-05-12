@@ -29,7 +29,7 @@ public class ControllerTimeAdvice {
         Object ret = pjp.proceed();
         long e = System.currentTimeMillis();
 
-        log.info("执行函数：" + className+"."+methodName+signature.getName()+" ----> "+(e - s) + " ms");
+        log.info("执行函数："+className+"."+methodName+" ----> "+(e - s)+" ms");
         // 返回原始方法的返回值
         return ret;
     }
