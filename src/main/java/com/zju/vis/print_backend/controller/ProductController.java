@@ -124,12 +124,11 @@ public class ProductController {
     @ApiOperation(value = "更新产品信息")
     @RequestMapping(value = "/updateProduct", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<String> updateProduct(
+    public ResultVo updateProduct(
             // @RequestParam(value = "productId") Long productId,
             @Valid @RequestBody ProductStandardVo updatedProduct
     ) {
-        String result = productService.updateProduct(updatedProduct);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return productService.updateProduct(updatedProduct);
     }
 
     @ApiOperation(value = "根据 ID 返回产品")

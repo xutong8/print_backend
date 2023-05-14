@@ -77,11 +77,10 @@ public class FilterCakeController {
     @ApiOperation(value = "更新滤饼信息")
     @RequestMapping(value = "/updateFilterCake", method = RequestMethod.PUT)
     @ResponseBody
-    public ResponseEntity<String> updateFilterCake(
+    public ResultVo updateFilterCake(
             @Valid @RequestBody FilterCakeStandardVo updatedFilterCake
     ) {
-        String result = filterCakeService.updateFilterCake(updatedFilterCake);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return filterCakeService.updateFilterCake(updatedFilterCake);
     }
 
     @ApiOperation(value = "根据 ID 返回滤饼")

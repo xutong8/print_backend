@@ -496,30 +496,37 @@ public class ProductService {
 
     //改
     //-------------------------------------------------------------------------
-    public String updateProduct(ProductStandardVo updatedProduct) {
-        if(productRepository.findProductByProductId(updatedProduct.getProductId()) == null){
-            ResultVo<ProductStandardVo> result = addProduct(updatedProduct);
-            if(result.checkSuccess()){
-                return "数据库中不存在对应数据,已添加Id为" + result.getData().getProductName() + "条目" ;
-            }else{
-                return "商品编码或商品代码重复";
-            }
-        }
-        // 先删掉原先的关系
+    public ResultVo updateProduct(ProductStandardVo updatedProduct) {
         Product originProduct = productRepository.findProductByProductId(updatedProduct.getProductId());
+        if(originProduct == null){
+            ResultVo<ProductStandardVo> result = addProduct(updatedProduct);
+            return result;
+        }
+        DeStandardizeResult result = deStandardizeProduct(updatedProduct);
+        Product product = result.getProduct();
+        // 1.新编号与原编号不一致 2.新编号与数据库中已有编号重复
+        if(!product.getProductIndex().equals(originProduct.getProductIndex()) &&
+                productRepository.findProductByProductIndex(product.getProductIndex()) != null){
+            return ResultVoUtil.error("商品编码重复");
+        }
+        // 1.新商品代码与原商品代码不一致 2.新商品代码与数据库中已有的代码重复
+        if(!product.getProductCode().equals(originProduct.getProductCode()) &&
+                productRepository.findProductByProductCode(product.getProductCode()) != null){
+            return ResultVoUtil.error("商品代码重复");
+        }
+
+        // 先删掉原先的关系
         deleteRelProductRawMaterials(originProduct);
         deleteRelProductFilterCakes(originProduct);
 
         // 重新添加关系以及修改内容
-        DeStandardizeResult result = deStandardizeProduct(updatedProduct);
-        Product product = result.getProduct();
         List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
         List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
 
         Product savedProduct = productRepository.save(product);
         saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
         saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
-        return "Product " + originProduct.getProductName() + " has been changed";
+        return ResultVoUtil.success(updatedProduct);
     }
 
     //删
@@ -533,7 +540,7 @@ public class ProductService {
     // 导入文件
     //-------------------------------------------------------------------------
     public ResultVo importProductExcelAndPersistence(MultipartFile file){
-        ResultVo<List<ExcelProductVo>> importResult = fileService.importProductExcel(file);
+        ResultVo<List<ExcelProductVo>> importResult = fileService.importEntityExcel(file,ExcelProductVo.class);
         if(!importResult.checkSuccess()){
             log.error(importResult.getMsg());
             return importResult;
@@ -545,7 +552,6 @@ public class ProductService {
             // 更新数据库，已经存在的则会直接修改，为更新关联数据已存在的关联数据会被删除
             updateProduct(productStandard);
         }
-        System.out.println(excelProductVos);
         return ResultVoUtil.success(excelProductVos);
     }
 

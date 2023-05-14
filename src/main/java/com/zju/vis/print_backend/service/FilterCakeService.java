@@ -415,8 +415,10 @@ public class FilterCakeService {
         DeStandardizeResult result = deStandardizeFilterCake(filterCakeStandard);
         FilterCake filterCake = result.getFiltercake();
         if(filterCakeRepository.findFilterCakeByFilterCakeName(filterCake.getFilterCakeName()) != null){
-            return ResultVoUtil.error("滤饼名重复");
+            return ResultVoUtil.error("滤饼名称重复");
         }
+        // 1.编号不为空 2.编号与数据库中已有编号重复
+
         List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = result.getRelFilterCakeRawMaterialList();
         List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList = result.getRelFilterCakeFilterCakeList();
         // 添加时指定一个不存在的id进而使用自增id
@@ -433,17 +435,19 @@ public class FilterCakeService {
     //改
     //-------------------------------------------------------------------------
     // update FilterCake data
-    public String updateFilterCake(FilterCakeStandardVo updatedFilterCake) {
+    public ResultVo updateFilterCake(FilterCakeStandardVo updatedFilterCake) {
         FilterCake originFilterCake = filterCakeRepository.findFilterCakeByFilterCakeId(updatedFilterCake.getFilterCakeId());
         if(originFilterCake == null){
             ResultVo<FilterCakeStandardVo> result = addFilterCake(updatedFilterCake);
-            if(result.checkSuccess()){
-                return "数据库中不存在对应数据,已添加Id为" + result.getData().getFilterCakeName() + "的条目" ;
-            }else{
-                return "滤饼名重复";
-            }
+            return result;
         }
-        // 先删掉原先的关系删除单向关系
+        DeStandardizeResult result = deStandardizeFilterCake(updatedFilterCake);
+        FilterCake filterCake = result.getFiltercake();
+        // 1.新名字与原名字不一致 2.新名字与数据库中已有的名字重复
+        if(!filterCake.getFilterCakeName().equals(originFilterCake.getFilterCakeName()) &&
+                filterCakeRepository.findFilterCakeByFilterCakeName(filterCake.getFilterCakeName()) != null){
+            return ResultVoUtil.error("滤饼名重复");
+        }
         // 删除原料关联表
         for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: originFilterCake.getRelFilterCakeRawMaterialList()){
             relFilterCakeRawMaterialService.delete(relFilterCakeRawMaterial);
@@ -454,15 +458,13 @@ public class FilterCakeService {
         }
 
         // 重新添加关系以修改内容
-        DeStandardizeResult result = deStandardizeFilterCake(updatedFilterCake);
-        FilterCake filterCake = result.getFiltercake();
         List<RelFilterCakeFilterCake> relFilterCakeFilterCakeLList = result.getRelFilterCakeFilterCakeList();
         List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = result.getRelFilterCakeRawMaterialList();
 
         FilterCake savedFilterCake = filterCakeRepository.save(filterCake);
         saveRelFilterCakeFilterCakes(savedFilterCake,relFilterCakeFilterCakeLList);
         saveRelFilterCakeRawMaterials(savedFilterCake,relFilterCakeRawMaterialList);
-        return "FilterCake " + originFilterCake.getFilterCakeName() + " has been changed";
+        return ResultVoUtil.success(updatedFilterCake);
     }
 
     //删

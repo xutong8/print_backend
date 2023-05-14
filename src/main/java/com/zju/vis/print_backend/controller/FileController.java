@@ -42,10 +42,10 @@ public class FileController {
         return fileService.importExcel(excel);
     }
 
-    @PostMapping("/importProductExcel")
-    public ResultVo importProductExcel(@RequestParam("file") MultipartFile excel) {
-        return fileService.importProductExcel(excel);
-    }
+    // @PostMapping("/importProductExcel")
+    // public ResultVo importProductExcel(@RequestParam("file") MultipartFile excel) {
+    //     return fileService.importProductExcel(excel);
+    // }
 
     @PostMapping("/exportExcel")
     public ResultVo exportExcel(final HttpServletResponse response) {
