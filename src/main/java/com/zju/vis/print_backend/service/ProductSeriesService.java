@@ -95,6 +95,24 @@ public class ProductSeriesService {
         return productSeriesNameList;
     }
 
+    public PackageVo findAllProductSeriesByCondition(
+            String typeOfQuery, String conditionOfQuery,
+            Integer pageNo, Integer pageSize
+    ){
+        List<ProductSeries> productSeriesList = new ArrayList<>();
+        switch (typeOfQuery){
+            case "系列名称" :
+                productSeriesList = productSeriesRepository.findProductSeriesByProductSeriesNameContaining(conditionOfQuery);
+                break;
+            case "系列功能" :
+                productSeriesList = productSeriesRepository.findProductSeriesByProductSeriesFunctionContaining(conditionOfQuery);
+                break;
+        }
+        return packProductSeries(
+                utils.pageList(productSeriesList,pageNo,pageSize),pageNo,pageSize,productSeriesList.size()
+        );
+    }
+
     public ProductSeriesStandardVo findProductSeriesByProductSeriesId(Long productSeriesId) {
         if(productSeriesRepository.findProductSeriesByProductSeriesId(productSeriesId) == null){
             return new ProductSeriesStandardVo();

@@ -46,6 +46,18 @@ public class ProductSeriesController {
         return productSeriesService.findAllProductSeriesName();
     }
 
+    @ApiOperation(value = "根据条件返回所有的产品系列")
+    @RequestMapping(value = "/findAllProductSeriesByCondition", method = RequestMethod.GET)
+    @ResponseBody
+    public PackageVo findAllProductSeriesByCondition(
+            @RequestParam(value = "typeOfQuery", defaultValue = "系列名称") String typeOfQuery,
+            @RequestParam(value = "conditionOfQuery" ,defaultValue = "") String conditionOfQuery,
+            @RequestParam(value = "pageNo" ,defaultValue = "1") Integer pageNo,
+            @RequestParam(value = "pageSize" ,defaultValue = "10") Integer pageSize
+    ) {
+        return productSeriesService.findAllProductSeriesByCondition(typeOfQuery,conditionOfQuery,pageNo-1,pageSize);
+    }
+
     @ApiOperation(value = "根据 ID 返回产品系列")
     @RequestMapping(value = "/findProductSeriesByProductSeriesId", method = RequestMethod.GET)
     @ResponseBody
