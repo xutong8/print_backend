@@ -11,10 +11,7 @@ import com.zju.vis.print_backend.dao.ProductRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RelProductFilterCakeService;
 import com.zju.vis.print_backend.service.RelProductRawMaterialService;
-import com.zju.vis.print_backend.vo.HistoryPriceVo;
-import com.zju.vis.print_backend.vo.PackageVo;
-import com.zju.vis.print_backend.vo.ProductStandardVo;
-import com.zju.vis.print_backend.vo.ResultVo;
+import com.zju.vis.print_backend.vo.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +46,13 @@ public class ProductController {
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
         return productService.findAll(pageNo - 1, pageSize);
+    }
+
+    @ApiOperation(value = "获取所有产品名称")
+    @RequestMapping(value = "/findAllProductName", method = RequestMethod.GET)
+    @ResponseBody
+    public List<EntityNameVo> findAllProductName() {
+        return productService.findAllProductName();
     }
 
 

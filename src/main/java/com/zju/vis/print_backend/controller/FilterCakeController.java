@@ -126,7 +126,7 @@ public class FilterCakeController {
     }
 
     @ApiOperation(value = "通过 filterCakeId删除记录")
-    @RequestMapping(value = "/deleteByRawMaterialId", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteByFilterCakeId", method = RequestMethod.DELETE)
     @ResponseBody
     public ResponseEntity<String> deleteByFilterCakeId(
             @RequestParam(value = "filterCakeId") Long filterCakeId

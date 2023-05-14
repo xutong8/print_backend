@@ -145,6 +145,14 @@ public class ProductService {
         return productSimple;
     }
 
+    public List<EntityNameVo> findAllProductName(){
+        List<EntityNameVo> productSimpleList = new ArrayList<>();
+        for(Product product: productRepository.findAll()){
+            productSimpleList.add(simplifyProduct(product));
+        }
+        return productSimpleList;
+    }
+
     public ProductStandardVo findProductByProductId(Long productId) {
         if (productRepository.findProductByProductId(productId) == null) {
             return new ProductStandardVo();
