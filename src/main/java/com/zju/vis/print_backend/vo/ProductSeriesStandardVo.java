@@ -14,5 +14,5 @@ public class ProductSeriesStandardVo {
     private Long productSeriesId;
     private String productSeriesName;
     private String productSeriesFunction;
-    private List<EntityNameVo> productSimpleList;
+    private List<ProductSimpleVo> productSimpleList;
 }

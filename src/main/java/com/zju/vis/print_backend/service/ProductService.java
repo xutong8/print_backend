@@ -140,13 +140,13 @@ public class ProductService {
         return packProduct(page.toList(), pageNo, pageSize, productNum);
     }
 
-    public EntityNameVo simplifyProduct(Product product){
-        EntityNameVo productSimple = new EntityNameVo(product.getProductId(),product.getProductName());
+    public ProductSimpleVo simplifyProduct(Product product){
+        ProductSimpleVo productSimple = new ProductSimpleVo(product.getProductId(),product.getProductName());
         return productSimple;
     }
 
-    public List<EntityNameVo> findAllProductName(){
-        List<EntityNameVo> productSimpleList = new ArrayList<>();
+    public List<ProductSimpleVo> findAllProductName(){
+        List<ProductSimpleVo> productSimpleList = new ArrayList<>();
         for(Product product: productRepository.findAll()){
             productSimpleList.add(simplifyProduct(product));
         }

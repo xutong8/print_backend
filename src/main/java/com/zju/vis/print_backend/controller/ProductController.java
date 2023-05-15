@@ -51,7 +51,7 @@ public class ProductController {
     @ApiOperation(value = "获取所有产品名称")
     @RequestMapping(value = "/findAllProductName", method = RequestMethod.GET)
     @ResponseBody
-    public List<EntityNameVo> findAllProductName() {
+    public List<ProductSimpleVo> findAllProductName() {
         return productService.findAllProductName();
     }
 
