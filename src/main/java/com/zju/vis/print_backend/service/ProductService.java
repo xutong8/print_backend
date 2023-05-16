@@ -145,12 +145,15 @@ public class ProductService {
         return productSimple;
     }
 
-    public List<ProductSimpleVo> findAllProductName(){
-        List<ProductSimpleVo> productSimpleList = new ArrayList<>();
+    public List<EntityNameVo> findAllProductName(){
+        List<EntityNameVo> productNameList = new ArrayList<>();
         for(Product product: productRepository.findAll()){
-            productSimpleList.add(simplifyProduct(product));
+            EntityNameVo entityNameVo = new EntityNameVo();
+            entityNameVo.setId(product.getProductId());
+            entityNameVo.setName(product.getProductName());
+            productNameList.add(entityNameVo);
         }
-        return productSimpleList;
+        return productNameList;
     }
 
     public ProductStandardVo findProductByProductId(Long productId) {

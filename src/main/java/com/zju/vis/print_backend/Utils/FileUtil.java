@@ -150,9 +150,10 @@ public class FileUtil {
         response.setCharacterEncoding("UTF-8");
         // 返回给客户端类型，任意类型
         response.setContentType("application/octet-stream");
-        // Content-Disposition的作用：告知浏览器以何种方式显示响应返回的文件，用浏览器打开还是以附件的形式下载到本地保存
+        // Content-Disposition的作用：告知浏览器以何种方式显示响应返s回的文件，用浏览器打开还是以附件的形式下载到本地保存
         // attachment表示以附件方式下载 inline表示在线打开 "Content-Disposition: inline; filename=文件名.mp3"
         response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(file.getName(), "UTF-8"));
+        // response.addHeader("Content-Disposition", "inline;filename=" + URLEncoder.encode(file.getName(), "UTF-8"));
         // 告知浏览器文件的大小
         response.addHeader("Content-Length", String.valueOf(file.length()));
     }

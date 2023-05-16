@@ -10,14 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ExcelRelProductRawMaterialVo {
     // 商品名称
-    @ExcelProperty("商品名称")
     private String productName;
 
     // 原料名称
-    @ExcelProperty("原料名称")
     private String rawMaterialName;
 
     // 投料量
-    @ExcelProperty("投料量")
     private Double inventory;
 }

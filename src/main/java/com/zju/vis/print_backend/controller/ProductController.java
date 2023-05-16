@@ -51,7 +51,7 @@ public class ProductController {
     @ApiOperation(value = "获取所有产品名称")
     @RequestMapping(value = "/findAllProductName", method = RequestMethod.GET)
     @ResponseBody
-    public List<ProductSimpleVo> findAllProductName() {
+    public List<EntityNameVo> findAllProductName() {
         return productService.findAllProductName();
     }
 
@@ -198,21 +198,21 @@ public class ProductController {
 
     // 下载文件
     @ApiOperation(value = "下载Product文件")
-    @PostMapping("/exportExcel")
+    @RequestMapping("/exportExcel")
     public ResultVo exportProductExcel(final HttpServletResponse response) {
         return productService.exportProductExcel(response);
     }
 
     // 关系表文件下载 RelProductRawMaterial
     @ApiOperation(value = "下载RelProductRawMaterial文件")
-    @PostMapping("/exportRelPRExcel")
+    @RequestMapping("/exportRelPRExcel")
     public ResultVo exportRelProductRawMaterialExcel(final HttpServletResponse response){
         return productRawMaterialService.exportRelProductRawMaterialExcel(response);
     }
 
     // 关系表文件下载 RelProductFilterCake
     @ApiOperation(value = "下载RelProductFilterCake文件")
-    @PostMapping("/exportRelPFExcel")
+    @RequestMapping("/exportRelPFExcel")
     public ResultVo exportRelProductFilterCakeExcel(final HttpServletResponse response){
         return productFilterCakeService.exportRelProductFilterCakeExcel(response);
     }

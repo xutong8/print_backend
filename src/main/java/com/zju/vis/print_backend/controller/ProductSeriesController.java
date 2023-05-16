@@ -116,7 +116,7 @@ public class ProductSeriesController {
 
     // 文件下载
     @ApiOperation(value = "下载ProductSeries文件")
-    @PostMapping("/exportExcel")
+    @RequestMapping("/exportExcel")
     public ResultVo exportProductSeriesExcel(final HttpServletResponse response){
         return productSeriesService.exportProductSeriesExcel(response);
     }

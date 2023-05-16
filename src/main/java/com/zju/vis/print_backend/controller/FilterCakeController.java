@@ -158,21 +158,21 @@ public class FilterCakeController {
 
     // 文件下载
     @ApiOperation(value = "下载FilterCake文件")
-    @PostMapping("/exportExcel")
+    @RequestMapping("/exportExcel")
     public ResultVo exportFilterCakeExcel(final HttpServletResponse response){
         return filterCakeService.exportFilterCakeExcel(response);
     }
 
     // 关系表文件下载 RelFilterCakeRawMaterial
     @ApiOperation(value = "下载RelFilterCakeRawMaterial文件")
-    @PostMapping("/exportRelFRExcel")
+    @RequestMapping("/exportRelFRExcel")
     public ResultVo exportRelFilterCakeRawMaterialExcel(final HttpServletResponse response){
         return filterCakeRawMaterialService.exportRelFilterCakeRawMaterialExcel(response);
     }
 
     // 关系表文件下载 RelFilterCakeFilterCake
     @ApiOperation(value = "下载RelFilterCakeFilterCake文件")
-    @PostMapping("/exportRelFFExcel")
+    @RequestMapping("/exportRelFFExcel")
     public ResultVo exportRelFilterCakeFilterCakeExcel(final HttpServletResponse response){
         return filterCakeFilterCakeService.exportRelFilterCakeFilterCakeExcel(response);
     }

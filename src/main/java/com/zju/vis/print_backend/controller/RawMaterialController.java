@@ -119,14 +119,14 @@ public class RawMaterialController {
 
     // 下载文件
     @ApiOperation(value = "下载RawMaterial文件")
-    @PostMapping("/exportExcel")
+    @RequestMapping("/exportExcel")
     public ResultVo exportRawMaterialExcel(final HttpServletResponse response) {
         return rawMaterialService.exportRawMaterialExcel(response);
     }
 
     // 关系表文件下载 RelDateRawMaterial
     @ApiOperation(value = "下载RelDateRawMaterial文件")
-    @PostMapping("/exportRelDRExcel")
+    @RequestMapping("/exportRelDRExcel")
     public ResultVo exportRelDateRawMaterialExcel(final HttpServletResponse response){
         return relDateRawMaterialService.exportRelDateRawMaterialExcel(response);
     }
