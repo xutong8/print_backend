@@ -294,6 +294,7 @@ public class RawMaterialService {
         DeStandardizeResult result = deStandardizeRawMaterial(rawMaterialStandard);
         RawMaterial rawMaterial = result.getRawMaterial();
         if(rawMaterialRepository.findRawMaterialByRawMaterialName(rawMaterial.getRawMaterialName()) != null){
+            log.info("{}原料名称重复",rawMaterial.getRawMaterialName());
             return ResultVoUtil.error("原料名称重复");
         }
         // 1.编号不为空 2.编号与数据库中已有编号重复
@@ -316,6 +317,7 @@ public class RawMaterialService {
     public ResultVo updateRawMaterial(RawMaterialStandardVo updatedRawMaterial) {
         RawMaterial originRawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(updatedRawMaterial.getRawMaterialId());
         if(originRawMaterial == null){
+            log.info("RawMaterial Add ---> {}",updatedRawMaterial.getRawMaterialName());
             ResultVo<RawMaterialStandardVo> result = addRawMaterial(updatedRawMaterial);
             return result;
         }
@@ -324,18 +326,17 @@ public class RawMaterialService {
         // 1.新名字与原名字不一致 2.新名字与数据库中已有的名字重复
         if(!rawMaterial.getRawMaterialName().equals(originRawMaterial.getRawMaterialName()) &&
                 rawMaterialRepository.findRawMaterialByRawMaterialName(rawMaterial.getRawMaterialName()) != null){
+            log.info("{}原料名称重复",rawMaterial.getRawMaterialName());
             return ResultVoUtil.error("原料名称重复");
         }
-        // 1.新编号不为空 2.新编号与原编号不一致 3.新编号与数据库中已有编号重复
-        // if(!utils.isEmptyString(rawMaterial.getRawMaterialIndex()) &&
-        //         !rawMaterial.getRawMaterialIndex().equals(originRawMaterial.getRawMaterialIndex()) &&
-        //         rawMaterialRepository.findRawMaterialByRawMaterialIndex(rawMaterial.getRawMaterialIndex()) != null){
-        //     return ResultVoUtil.error("原料编号重复");
-        // }
+
+        log.info("RawMaterial Update ---> {}",updatedRawMaterial.getRawMaterialName());
 
         // 删除原先单向时间关系
-        for(RelDateRawMaterial relDateRawMaterial: originRawMaterial.getRelDateRawMaterialList()){
-            relDateRawMaterialService.delete(relDateRawMaterial);
+        if(originRawMaterial.getRelDateRawMaterialList()!=null){
+            for(RelDateRawMaterial relDateRawMaterial: originRawMaterial.getRelDateRawMaterialList()){
+                relDateRawMaterialService.delete(relDateRawMaterial);
+            }
         }
 
         // 重新添加关系以修改内容

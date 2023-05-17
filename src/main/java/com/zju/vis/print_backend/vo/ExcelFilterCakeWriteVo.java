@@ -21,8 +21,8 @@ public class ExcelFilterCakeWriteVo {
     @ExcelProperty("滤饼颜色")
     private String filterCakeColor;
 
-    // 核算数量
-    @ExcelProperty("核算数量")
+    // 批次核算数量
+    @ExcelProperty("批次核算数量")
     private Integer filterCakeAccountingQuantity;
 
     // 批次生产成本

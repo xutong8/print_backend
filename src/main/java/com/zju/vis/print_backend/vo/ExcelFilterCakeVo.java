@@ -14,7 +14,7 @@ public class ExcelFilterCakeVo {
     private String filterCakeIndex;
     // 滤饼颜色
     private String filterCakeColor;
-    // 核算数量
+    // 批次核算数量
     private Integer filterCakeAccountingQuantity;
     // 批次生产成本
     private Float filterCakeProcessingCost;

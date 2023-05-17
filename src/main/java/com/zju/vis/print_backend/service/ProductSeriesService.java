@@ -169,7 +169,8 @@ public class ProductSeriesService {
 
     public ResultVo addProductSeries(ProductSeriesStandardVo productSeriesStandard) {
         ProductSeries productSeries = deStandardizeProductSeries(productSeriesStandard);
-        if(productSeriesRepository.findProductSeriesByProductSeriesName(productSeriesStandard.getProductSeriesName()) != null){
+        if(productSeriesRepository.findProductSeriesByProductSeriesName(productSeries.getProductSeriesName()) != null){
+            log.info("{}产品系列名重复",productSeries.getProductSeriesName());
             return ResultVoUtil.error("产品系列名重复");
         }
         // 添加时指定一个不存在的id进而使用自增id
@@ -182,19 +183,33 @@ public class ProductSeriesService {
     //改
     //-------------------------------------------------------------------------
     //update product data
-    public String updateProductSeries(ProductSeriesStandardVo updatedProductSeries) {
-        if(productSeriesRepository.findProductSeriesByProductSeriesId(updatedProductSeries.getProductSeriesId()) == null){
+    public ResultVo updateProductSeries(ProductSeriesStandardVo updatedProductSeries) {
+        ProductSeries originProductSeries = productSeriesRepository.findProductSeriesByProductSeriesId(updatedProductSeries.getProductSeriesId());
+        if(originProductSeries == null){
+            log.info("ProductSeries Add ---> {}",updatedProductSeries.getProductSeriesName());
             ResultVo<ProductSeriesStandardVo> result = addProductSeries(updatedProductSeries);
-            if(result.checkSuccess()){
-                return "数据库中不存在对应数据,已添加Id为" + result.getData().getProductSeriesId() + "的条目" ;
-            }
-            else{
-                return "产品系列名重复";
-            }
+            return result;
+            // if(result.checkSuccess()){
+            //     return "数据库中不存在对应数据,已添加Id为" + result.getData().getProductSeriesId() + "的条目" ;
+            // }
+            // else{
+            //     return "产品系列名重复";
+            // }
+
         }
         ProductSeries productSeries = deStandardizeProductSeries(updatedProductSeries);
+        // 1.新名字与原名字不一致 2.新名字与数据库中已有的名字重复
+        if(!productSeries.getProductSeriesName().equals(originProductSeries.getProductSeriesName()) &&
+                productSeriesRepository.findProductSeriesByProductSeriesName(productSeries.getProductSeriesName()) != null){
+            log.info("{}产品系列名重复",productSeries.getProductSeriesName());
+            return ResultVoUtil.error("产品系列名重复");
+        }
+
+        log.info("ProductSeries Update ---> {}",updatedProductSeries.getProductSeriesName());
+
         productSeriesRepository.save(productSeries);
-        return "ProductSeries " + productSeries.getProductSeriesName() + " has been changed";
+        // return "ProductSeries " + productSeries.getProductSeriesName() + " has been changed";
+        return ResultVoUtil.success(updatedProductSeries);
     }
 
     // 导入文件

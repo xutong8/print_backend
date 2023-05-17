@@ -268,14 +268,18 @@ public class ProductService {
     public Double calculateProductPrice(Product product){
         // 设置返回的简单滤饼表
         List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
-        for (FilterCake filterCake : product.getFilterCakeList()) {
-            filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake, product.getProductId()));
+        if(product.getFilterCakeList()!=null){
+            for (FilterCake filterCake : product.getFilterCakeList()) {
+                filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake, product.getProductId()));
+            }
         }
 
         // 设置返回的简单原料表
         List<RawMaterialSimpleVo> rawMaterialSimpleList = new ArrayList<>();
-        for (RawMaterial rawMaterial : product.getRawMaterialList()) {
-            rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
+        if(product.getRawMaterialList()!=null){
+            for (RawMaterial rawMaterial : product.getRawMaterialList()) {
+                rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
+            }
         }
 
         Double sum = 0.0;
@@ -296,14 +300,18 @@ public class ProductService {
     public Double calculateProductHistoryPrice(Product product, Date historyDate){
         // 设置返回的简单滤饼表
         List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
-        for (FilterCake filterCake : product.getFilterCakeList()) {
-            filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake, product.getProductId()));
+        if(product.getFilterCakeList() != null){
+            for (FilterCake filterCake : product.getFilterCakeList()) {
+                filterCakeSimpleList.add(filterCakeService.simplifyFilterCake(filterCake, product.getProductId()));
+            }
         }
 
         // 设置返回的简单原料表
         List<RawMaterialSimpleVo> rawMaterialSimpleList = new ArrayList<>();
-        for (RawMaterial rawMaterial : product.getRawMaterialList()) {
-            rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
+        if(product.getRawMaterialList() != null){
+            for (RawMaterial rawMaterial : product.getRawMaterialList()) {
+                rawMaterialSimpleList.add(rawMaterialService.simplifyRawMaterial(rawMaterial, product.getProductId()));
+            }
         }
         Double sum = 0.0;
         // 加上批处理价格
@@ -464,24 +472,28 @@ public class ProductService {
     // 根据Product 删除所有原料关联
     private void deleteRelProductRawMaterials(Product product){
         if(product == null) return;
-        for(RawMaterial rawMaterial: product.getRawMaterialList()){
-            RelProductRawMaterialKey id = new RelProductRawMaterialKey();
-            id.setProductId(product.getProductId());
-            id.setRawMaterialId(rawMaterial.getRawMaterialId());
-            RelProductRawMaterial relProductRawMaterial = relProductRawMaterialService.findRelProductRawMaterialById(id);
-            relProductRawMaterialService.deleteRelProductRawMaterial(relProductRawMaterial);
+        if(product.getRawMaterialList()!=null){
+            for(RawMaterial rawMaterial: product.getRawMaterialList()){
+                RelProductRawMaterialKey id = new RelProductRawMaterialKey();
+                id.setProductId(product.getProductId());
+                id.setRawMaterialId(rawMaterial.getRawMaterialId());
+                RelProductRawMaterial relProductRawMaterial = relProductRawMaterialService.findRelProductRawMaterialById(id);
+                relProductRawMaterialService.deleteRelProductRawMaterial(relProductRawMaterial);
+            }
         }
     }
 
     // 根据Product 删除所有滤饼关联
     private void deleteRelProductFilterCakes(Product product){
         if(product == null) return;
-        for(FilterCake filterCake: product.getFilterCakeList()){
-            RelProductFilterCakeKey id = new RelProductFilterCakeKey();
-            id.setProductId(product.getProductId());
-            id.setFilterCakeId(filterCake.getFilterCakeId());
-            RelProductFilterCake relProductFilterCake = relProductFilterCakeService.findRelProductFilterCakeById(id);
-            relProductFilterCakeService.deleteRelProductFilterCake(relProductFilterCake);
+        if(product.getFilterCakeList()!=null){
+            for(FilterCake filterCake: product.getFilterCakeList()){
+                RelProductFilterCakeKey id = new RelProductFilterCakeKey();
+                id.setProductId(product.getProductId());
+                id.setFilterCakeId(filterCake.getFilterCakeId());
+                RelProductFilterCake relProductFilterCake = relProductFilterCakeService.findRelProductFilterCakeById(id);
+                relProductFilterCakeService.deleteRelProductFilterCake(relProductFilterCake);
+            }
         }
     }
 
@@ -489,10 +501,16 @@ public class ProductService {
     public ResultVo addProduct(ProductStandardVo productStandard) {
         DeStandardizeResult result = deStandardizeProduct(productStandard);
         Product product = result.getProduct();
-        if(productRepository.findProductByProductIndex(product.getProductIndex()) != null ||
-                productRepository.findProductByProductCode(product.getProductCode()) != null ){
-            return ResultVoUtil.error("商品编码或商品代码重复");
+        // if(productRepository.findProductByProductIndex(product.getProductIndex()) != null ||
+        //         productRepository.findProductByProductCode(product.getProductCode()) != null ){
+        //     return ResultVoUtil.error("商品编码或商品代码重复");
+        // }
+
+        if(productRepository.findProductByProductName(product.getProductName()) != null){
+            log.info("{}商品名字重复",product.getProductName());
+            return ResultVoUtil.error("商品名字重复");
         }
+
         List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
         List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
         // 添加时指定一个不存在的id进而使用自增id
@@ -510,21 +528,21 @@ public class ProductService {
     public ResultVo updateProduct(ProductStandardVo updatedProduct) {
         Product originProduct = productRepository.findProductByProductId(updatedProduct.getProductId());
         if(originProduct == null){
+            log.info("Product Add ---> {}",updatedProduct.getProductName());
             ResultVo<ProductStandardVo> result = addProduct(updatedProduct);
             return result;
         }
         DeStandardizeResult result = deStandardizeProduct(updatedProduct);
         Product product = result.getProduct();
-        // 1.新编号与原编号不一致 2.新编号与数据库中已有编号重复
-        if(!product.getProductIndex().equals(originProduct.getProductIndex()) &&
-                productRepository.findProductByProductIndex(product.getProductIndex()) != null){
-            return ResultVoUtil.error("商品编码重复");
+
+        // 1.新商品名称与原商品名称不一致 2.新商品名字与数据库中已有的名字重复
+        if(!product.getProductName().equals(originProduct.getProductName()) &&
+                productRepository.findProductByProductName(product.getProductName())!=null){
+            log.info("{}商品名字重复",product.getProductName());
+            return ResultVoUtil.error("商品名字重复");
         }
-        // 1.新商品代码与原商品代码不一致 2.新商品代码与数据库中已有的代码重复
-        if(!product.getProductCode().equals(originProduct.getProductCode()) &&
-                productRepository.findProductByProductCode(product.getProductCode()) != null){
-            return ResultVoUtil.error("商品代码重复");
-        }
+
+        log.info("Product Update ---> {}",updatedProduct.getProductName());
 
         // 先删掉原先的关系
         deleteRelProductRawMaterials(originProduct);
@@ -569,11 +587,11 @@ public class ProductService {
     public ProductStandardVo transExcelToStandard(ExcelProductVo excelProductVo){
         ProductStandardVo productStandard = new ProductStandardVo();
         // 如果已经存在了则修改，否则则添加
-        if(productRepository.findProductByProductIndex(excelProductVo.getProductIndex()) == null){
+        if(productRepository.findProductByProductName(excelProductVo.getProductName()) == null){
             // 表示添加
             productStandard.setProductId(new Long(0));
         }else{
-            productStandard.setProductId(productRepository.findProductByProductIndex(excelProductVo.getProductIndex()).getProductId());
+            productStandard.setProductId(productRepository.findProductByProductName(excelProductVo.getProductName()).getProductId());
         }
         productStandard.setProductName(excelProductVo.getProductName());
         productStandard.setProductIndex(excelProductVo.getProductIndex());

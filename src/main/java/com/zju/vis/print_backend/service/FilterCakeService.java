@@ -415,6 +415,7 @@ public class FilterCakeService {
         DeStandardizeResult result = deStandardizeFilterCake(filterCakeStandard);
         FilterCake filterCake = result.getFiltercake();
         if(filterCakeRepository.findFilterCakeByFilterCakeName(filterCake.getFilterCakeName()) != null){
+            log.info("{}滤饼名重复",filterCake.getFilterCakeName());
             return ResultVoUtil.error("滤饼名称重复");
         }
         // 1.编号不为空 2.编号与数据库中已有编号重复
@@ -438,6 +439,7 @@ public class FilterCakeService {
     public ResultVo updateFilterCake(FilterCakeStandardVo updatedFilterCake) {
         FilterCake originFilterCake = filterCakeRepository.findFilterCakeByFilterCakeId(updatedFilterCake.getFilterCakeId());
         if(originFilterCake == null){
+            log.info("FilterCake Add ---> {}",updatedFilterCake.getFilterCakeName());
             ResultVo<FilterCakeStandardVo> result = addFilterCake(updatedFilterCake);
             return result;
         }
@@ -446,15 +448,23 @@ public class FilterCakeService {
         // 1.新名字与原名字不一致 2.新名字与数据库中已有的名字重复
         if(!filterCake.getFilterCakeName().equals(originFilterCake.getFilterCakeName()) &&
                 filterCakeRepository.findFilterCakeByFilterCakeName(filterCake.getFilterCakeName()) != null){
+            log.info("{}滤饼名重复",filterCake.getFilterCakeName());
             return ResultVoUtil.error("滤饼名重复");
         }
+
+        log.info("FilterCake Update ---> {}",updatedFilterCake.getFilterCakeName());
+
         // 删除原料关联表
-        for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: originFilterCake.getRelFilterCakeRawMaterialList()){
-            relFilterCakeRawMaterialService.delete(relFilterCakeRawMaterial);
+        if(originFilterCake.getRelFilterCakeRawMaterialList()!=null){
+            for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: originFilterCake.getRelFilterCakeRawMaterialList()){
+                relFilterCakeRawMaterialService.delete(relFilterCakeRawMaterial);
+            }
         }
         // 删除滤饼关联表
-        for(RelFilterCakeFilterCake relFilterCakeFilterCake: originFilterCake.getRelFilterCakeFilterCakeListUser()){
-            relFilterCakeFilterCakeService.delete(relFilterCakeFilterCake);
+        if(originFilterCake.getRelFilterCakeFilterCakeListUser()!=null){
+            for(RelFilterCakeFilterCake relFilterCakeFilterCake: originFilterCake.getRelFilterCakeFilterCakeListUser()){
+                relFilterCakeFilterCakeService.delete(relFilterCakeFilterCake);
+            }
         }
 
         // 重新添加关系以修改内容
