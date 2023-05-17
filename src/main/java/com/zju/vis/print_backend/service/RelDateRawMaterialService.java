@@ -72,13 +72,20 @@ public class RelDateRawMaterialService {
         }
 
         // 添加新关系
+        List<String> warnStringList = new ArrayList<>();
         for(ExcelRelDateRawMaterialVo excelRelDateRawMaterialVo: excelRelDateRawMaterialVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelDateRawMaterial relDateRawMaterial = transExcelToEntity(excelRelDateRawMaterialVo);
             if(relDateRawMaterial != null){
                 // 如果已有数据则会更新，没有则添加
                 addRelDateRawMaterial(relDateRawMaterial);
+            }else{
+                String warnString = "[Warning] " + "原料{ " + excelRelDateRawMaterialVo.getRawMaterialName() +" }" + "日期{ " + excelRelDateRawMaterialVo.getRawMaterialDate() +" }" + "添加失败，请检查原料或日期表项";
+                warnStringList.add(warnString);
             }
+        }
+        if(warnStringList.size()>0){
+            return ResultVoUtil.success(201,"存在未导入表项，请仔细检查数据表以及数据库内容并重新导入",warnStringList);
         }
         return ResultVoUtil.success(excelRelDateRawMaterialVos);
     }

@@ -93,6 +93,7 @@ public class RelProductFilterCakeService {
         }
 
         // 添加新关系
+        List<String> warnStringList = new ArrayList<>();
         for(ExcelRelProductFilterCakeVo excelRelProductFilterCakeVo: excelRelProductFilterCakeVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelProductFilterCake relProductFilterCake = transExcelToEntity(excelRelProductFilterCakeVo);
@@ -100,7 +101,13 @@ public class RelProductFilterCakeService {
             if(relProductFilterCake != null){
                 // 如果已有数据则会更新，没有则添加
                 addRelProductFilterCake(relProductFilterCake);
+            }else{
+                String warnString = "[Warning] " + "产品{ " + excelRelProductFilterCakeVo.getProductName() +" }" + "或滤饼{ " + excelRelProductFilterCakeVo.getFilterCakeName() +" }" + "未找到对应表项,关系添加失败";
+                warnStringList.add(warnString);
             }
+        }
+        if(warnStringList.size()>0){
+            return ResultVoUtil.success(201,"存在未导入表项，请仔细检查数据表以及数据库内容并重新导入",warnStringList);
         }
         return ResultVoUtil.success(excelRelProductFilterCakeVos);
     }

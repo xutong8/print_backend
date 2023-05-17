@@ -600,11 +600,19 @@ public class ProductService {
             return importResult;
         }
         List<ExcelProductVo> excelProductVos = importResult.getData();
+        List<String> warnStringList = new ArrayList<>();
         for(ExcelProductVo excelProductVo: excelProductVos){
             // excel信息转化为标准类
             ProductStandardVo productStandard = transExcelToStandard(excelProductVo);
+            if(productSeriesService.findProductSeriesIdByProductSeriesName(productStandard.getProductSeriesName()) == null){
+                String warnString = "[Warning] " + "产品系列{ " + excelProductVo.getProductSeriesName() +" }"  + "未找到对应表项设置为空";
+                warnStringList.add(warnString);
+            }
             // 更新数据库，已经存在的则会直接修改，为更新关联数据已存在的关联数据会被删除
             saveProduct(productStandard);
+        }
+        if(warnStringList.size()>0){
+            return ResultVoUtil.success(201,"产品系列有未导入选项,请仔细检查数据表以及数据库内容并重新导入",warnStringList);
         }
         return ResultVoUtil.success(excelProductVos);
     }

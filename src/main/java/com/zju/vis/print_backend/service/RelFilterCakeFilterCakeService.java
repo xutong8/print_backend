@@ -80,13 +80,20 @@ public class RelFilterCakeFilterCakeService {
         }
 
         // 添加新关系
+        List<String> warnStringList = new ArrayList<>();
         for(ExcelRelFilterCakeFilterCakeVo excelRelFilterCakeFilterCakeVo: excelRelFilterCakeFilterCakeVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelFilterCakeFilterCake relFilterCakeFilterCake = transExcelToEntity(excelRelFilterCakeFilterCakeVo);
             if(relFilterCakeFilterCake != null){
                 // 如果已有数据则会更新，没有则添加
                 addRelFilterCakeFilterCake(relFilterCakeFilterCake);
+            }else{
+                String warnString = "[Warning] " + "滤饼{ " + excelRelFilterCakeFilterCakeVo.getFilterCakeName() +" }" + "或被使用滤饼{ " + excelRelFilterCakeFilterCakeVo.getFilterCakeNameUsed() +" }" + "未找到对应表项,关系添加失败";
+                warnStringList.add(warnString);
             }
+        }
+        if(warnStringList.size()>0){
+            return ResultVoUtil.success(201,"存在未导入表项，请仔细检查数据表以及数据库内容并重新导入",warnStringList);
         }
         return ResultVoUtil.success(excelRelFilterCakeFilterCakeVos);
     }

@@ -93,13 +93,20 @@ public class RelProductRawMaterialService {
         }
 
         // 添加新关系
+        List<String> warnStringList = new ArrayList<>();
         for(ExcelRelProductRawMaterialVo excelRelProductRawMaterialVo: excelRelProductRawMaterialVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelProductRawMaterial relProductRawMaterial = transExcelToEntity(excelRelProductRawMaterialVo);
             if(relProductRawMaterial != null){
                 // 如果已有数据则会更新，没有则添加
                 addRelProductRawMaterial(relProductRawMaterial);
+            }else{
+                String warnString = "[Warning] " + "产品{ " + excelRelProductRawMaterialVo.getProductName() +" }" + "或原料{ " + excelRelProductRawMaterialVo.getRawMaterialName() +" }" + "未找到对应表项,关系添加失败";
+                warnStringList.add(warnString);
             }
+        }
+        if(warnStringList.size()>0){
+            return ResultVoUtil.success(201,"存在未导入表项，请仔细检查数据表以及数据库内容并重新导入",warnStringList);
         }
         return ResultVoUtil.success(excelRelProductRawMaterialVos);
     }
