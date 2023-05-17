@@ -186,6 +186,9 @@ public class FilterCakeService {
     }
 
     public Double calculateFilterCakeHistoryPrice(FilterCake filterCake, Date historyDate){
+        if(filterCake == null){
+            return -1.0;
+        }
         // 标准化获取简化列表
         List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
         for (FilterCake filterCake1 : filterCake.getFilterCakeList()) {
@@ -234,16 +237,19 @@ public class FilterCakeService {
 
     // 列表形式返回历史价格
     public List<HistoryPriceVo> getFilterCakeHistoryPriceList(Long filterCakeId, Long months){
+        System.out.println("历史价格filterCakeId:" + filterCakeId);
         FilterCake filterCake = filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeId);
         List<HistoryPriceVo> historyPriceList = new ArrayList<>();
         // SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
-        for(int i = 0;i < months ; i++){
-            Date date = stepMonth(new Date(),-i);
-            // System.out.println(dateFormat.format(date));
-            HistoryPriceVo historyPrice = new HistoryPriceVo();
-            historyPrice.setDate(new java.sql.Date(date.getTime()));
-            historyPrice.setPrice(calculateFilterCakeHistoryPrice(filterCake,date));
-            historyPriceList.add(historyPrice);
+        if(filterCake != null){
+            for(int i = 0;i < months ; i++){
+                Date date = stepMonth(new Date(),-i);
+                // System.out.println(dateFormat.format(date));
+                HistoryPriceVo historyPrice = new HistoryPriceVo();
+                historyPrice.setDate(new java.sql.Date(date.getTime()));
+                historyPrice.setPrice(calculateFilterCakeHistoryPrice(filterCake,date));
+                historyPriceList.add(historyPrice);
+            }
         }
         return historyPriceList;
     }
@@ -410,20 +416,16 @@ public class FilterCakeService {
     }
 
 
-
-    public ResultVo addFilterCake(FilterCakeStandardVo filterCakeStandard) {
+    public ResultVo saveFilterCake(FilterCakeStandardVo filterCakeStandard){
         DeStandardizeResult result = deStandardizeFilterCake(filterCakeStandard);
         FilterCake filterCake = result.getFiltercake();
         if(filterCakeRepository.findFilterCakeByFilterCakeName(filterCake.getFilterCakeName()) != null){
             log.info("{}滤饼名重复",filterCake.getFilterCakeName());
             return ResultVoUtil.error("滤饼名称重复");
         }
-        // 1.编号不为空 2.编号与数据库中已有编号重复
-
         List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = result.getRelFilterCakeRawMaterialList();
         List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList = result.getRelFilterCakeFilterCakeList();
-        // 添加时指定一个不存在的id进而使用自增id
-        filterCake.setFilterCakeId(new Long(0));
+
         FilterCake savedFilterCake = filterCakeRepository.save(filterCake);
         saveRelFilterCakeRawMaterials(savedFilterCake,relFilterCakeRawMaterialList);
         saveRelFilterCakeFilterCakes(savedFilterCake,relFilterCakeFilterCakeList);
@@ -431,6 +433,32 @@ public class FilterCakeService {
         filterCakeStandard.setFilterCakeId(savedFilterCake.getFilterCakeId());
         return ResultVoUtil.success(filterCakeStandard);
     }
+
+    public ResultVo addFilterCake(FilterCakeStandardVo filterCakeStandard) {
+        // 添加时指定一个不存在的id进而使用自增id
+        filterCakeStandard.setFilterCakeId(new Long(0));
+        return saveFilterCake(filterCakeStandard);
+    }
+
+    // public ResultVo addFilterCake(FilterCakeStandardVo filterCakeStandard) {
+    //     DeStandardizeResult result = deStandardizeFilterCake(filterCakeStandard);
+    //     FilterCake filterCake = result.getFiltercake();
+    //     if(filterCakeRepository.findFilterCakeByFilterCakeName(filterCake.getFilterCakeName()) != null){
+    //         log.info("{}滤饼名重复",filterCake.getFilterCakeName());
+    //         return ResultVoUtil.error("滤饼名称重复");
+    //     }
+    //
+    //     List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = result.getRelFilterCakeRawMaterialList();
+    //     List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList = result.getRelFilterCakeFilterCakeList();
+    //     // 添加时指定一个不存在的id进而使用自增id
+    //     filterCake.setFilterCakeId(new Long(0));
+    //     FilterCake savedFilterCake = filterCakeRepository.save(filterCake);
+    //     saveRelFilterCakeRawMaterials(savedFilterCake,relFilterCakeRawMaterialList);
+    //     saveRelFilterCakeFilterCakes(savedFilterCake,relFilterCakeFilterCakeList);
+    //     // 设置更改后的id
+    //     filterCakeStandard.setFilterCakeId(savedFilterCake.getFilterCakeId());
+    //     return ResultVoUtil.success(filterCakeStandard);
+    // }
 
 
     //改
@@ -528,7 +556,7 @@ public class FilterCakeService {
             // excel信息转化为标准类
             FilterCakeStandardVo filterCakeStandard = transExcelToStandard(excelFilterCakeVo);
             // 更新数据库，已存在则会直接替换
-            updateFilterCake(filterCakeStandard);
+            saveFilterCake(filterCakeStandard);
         }
         return ResultVoUtil.success(excelFilterCakeVos);
     }

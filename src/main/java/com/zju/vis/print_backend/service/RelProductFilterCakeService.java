@@ -24,7 +24,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -75,6 +77,22 @@ public class RelProductFilterCakeService {
             return importResult;
         }
         List<ExcelRelProductFilterCakeVo> excelRelProductFilterCakeVos = importResult.getData();
+
+        // 删除原有关系
+        Set<String> relProductsToDelete = new HashSet<>();
+        // 获取所有传入的关系表商品名称，并据此删除原先的关系
+        for(ExcelRelProductFilterCakeVo excelRelProductFilterCakeVo: excelRelProductFilterCakeVos){
+            relProductsToDelete.add(excelRelProductFilterCakeVo.getProductName());
+        }
+        // 删除数据库中原有的PF关系
+        for(RelProductFilterCake relProductFilterCake: relProductFilterCakeRepository.findAll()){
+            // 如果关系的商品名与新传入的关系列表对应则删除
+            if(relProductsToDelete.contains(relProductFilterCake.getProduct().getProductName())){
+                delete(relProductFilterCake);
+            }
+        }
+
+        // 添加新关系
         for(ExcelRelProductFilterCakeVo excelRelProductFilterCakeVo: excelRelProductFilterCakeVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelProductFilterCake relProductFilterCake = transExcelToEntity(excelRelProductFilterCakeVo);

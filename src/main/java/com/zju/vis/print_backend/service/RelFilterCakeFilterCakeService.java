@@ -23,7 +23,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -62,6 +64,22 @@ public class RelFilterCakeFilterCakeService {
             return importResult;
         }
         List<ExcelRelFilterCakeFilterCakeVo> excelRelFilterCakeFilterCakeVos = importResult.getData();
+
+        // 删除原有关系
+        Set<String> relFilterCakesToDelete = new HashSet<>();
+        // 获取所有传入的关系表滤饼名称，并据此删除原先的关系
+        for(ExcelRelFilterCakeFilterCakeVo excelRelFilterCakeFilterCakeVo: excelRelFilterCakeFilterCakeVos){
+            relFilterCakesToDelete.add(excelRelFilterCakeFilterCakeVo.getFilterCakeName());
+        }
+        // 删除数据库中原有的FF的关系
+        for(RelFilterCakeFilterCake relFilterCakeFilterCake: relFilterCakeFilterCakeRepository.findAll()){
+            // 如果关系的滤饼与新传入的关系列表对应则删除
+            if(relFilterCakesToDelete.contains(relFilterCakeFilterCake.getFilterCake().getFilterCakeName())){
+                delete(relFilterCakeFilterCake);
+            }
+        }
+
+        // 添加新关系
         for(ExcelRelFilterCakeFilterCakeVo excelRelFilterCakeFilterCakeVo: excelRelFilterCakeFilterCakeVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelFilterCakeFilterCake relFilterCakeFilterCake = transExcelToEntity(excelRelFilterCakeFilterCakeVo);

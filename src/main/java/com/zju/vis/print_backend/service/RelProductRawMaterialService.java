@@ -20,7 +20,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -75,6 +77,22 @@ public class RelProductRawMaterialService {
             return importResult;
         }
         List<ExcelRelProductRawMaterialVo> excelRelProductRawMaterialVos = importResult.getData();
+
+        // 删除原有关系
+        Set<String> relProductsToDelete = new HashSet<>();
+        // 获取所有传入的关系表商品名称，并据此删除原先的关系
+        for(ExcelRelProductRawMaterialVo excelRelProductRawMaterialVo: excelRelProductRawMaterialVos){
+            relProductsToDelete.add(excelRelProductRawMaterialVo.getProductName());
+        }
+        // 删除数据库中原有的PR关系
+        for(RelProductRawMaterial relProductRawMaterial: relProductRawMaterialRepository.findAll()){
+            // 如果关系的商品名与新传入的关系列表对应则删除
+            if(relProductsToDelete.contains(relProductRawMaterial.getProduct().getProductName())){
+                delete(relProductRawMaterial);
+            }
+        }
+
+        // 添加新关系
         for(ExcelRelProductRawMaterialVo excelRelProductRawMaterialVo: excelRelProductRawMaterialVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelProductRawMaterial relProductRawMaterial = transExcelToEntity(excelRelProductRawMaterialVo);

@@ -290,27 +290,44 @@ public class RawMaterialService {
         }
     }
 
-    public ResultVo addRawMaterial(RawMaterialStandardVo rawMaterialStandard) {
+    public ResultVo saveRawMaterial(RawMaterialStandardVo rawMaterialStandard){
         DeStandardizeResult result = deStandardizeRawMaterial(rawMaterialStandard);
         RawMaterial rawMaterial = result.getRawMaterial();
         if(rawMaterialRepository.findRawMaterialByRawMaterialName(rawMaterial.getRawMaterialName()) != null){
             log.info("{}原料名称重复",rawMaterial.getRawMaterialName());
             return ResultVoUtil.error("原料名称重复");
         }
-        // 1.编号不为空 2.编号与数据库中已有编号重复
-        // if(!utils.isEmptyString(rawMaterial.getRawMaterialIndex()) &&
-        //         rawMaterialRepository.findRawMaterialByRawMaterialIndex(rawMaterial.getRawMaterialIndex()) != null){
-        //     return ResultVoUtil.error("原料编号重复");
-        // }
         List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
 
-        rawMaterial.setRawMaterialId(new Long(0));
         RawMaterial savedRawMaterial = rawMaterialRepository.save(rawMaterial);
         saveRelDateRawMaterials(savedRawMaterial, relDateRawMaterialList);
         // 设置变换后id
         rawMaterialStandard.setRawMaterialId(savedRawMaterial.getRawMaterialId());
         return ResultVoUtil.success(rawMaterialStandard);
     }
+
+    public ResultVo addRawMaterial(RawMaterialStandardVo rawMaterialStandard) {
+        // 设置一个不存在的id
+        rawMaterialStandard.setRawMaterialId(new Long(0));
+        return saveRawMaterial(rawMaterialStandard);
+    }
+
+    // public ResultVo addRawMaterial(RawMaterialStandardVo rawMaterialStandard) {
+    //     DeStandardizeResult result = deStandardizeRawMaterial(rawMaterialStandard);
+    //     RawMaterial rawMaterial = result.getRawMaterial();
+    //     if(rawMaterialRepository.findRawMaterialByRawMaterialName(rawMaterial.getRawMaterialName()) != null){
+    //         log.info("{}原料名称重复",rawMaterial.getRawMaterialName());
+    //         return ResultVoUtil.error("原料名称重复");
+    //     }
+    //     List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
+    //
+    //     rawMaterial.setRawMaterialId(new Long(0));
+    //     RawMaterial savedRawMaterial = rawMaterialRepository.save(rawMaterial);
+    //     saveRelDateRawMaterials(savedRawMaterial, relDateRawMaterialList);
+    //     // 设置变换后id
+    //     rawMaterialStandard.setRawMaterialId(savedRawMaterial.getRawMaterialId());
+    //     return ResultVoUtil.success(rawMaterialStandard);
+    // }
 
     //改
     //-------------------------------------------------------------------------
@@ -394,7 +411,7 @@ public class RawMaterialService {
             // excel信息转化为标准类
             RawMaterialStandardVo rawMaterialStandard = transExcelToStandard(excelRawMaterialVo);
             // 更新数据库，已存在则会直接替换
-            updateRawMaterial(rawMaterialStandard);
+            saveRawMaterial(rawMaterialStandard);
         }
         return ResultVoUtil.success(excelRawMaterialVos);
     }

@@ -20,7 +20,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Filter;
 
 @Slf4j
@@ -67,6 +69,21 @@ public class RelFilterCakeRawMaterialService {
             return importResult;
         }
         List<ExcelRelFilterCakeRawMaterialVo> excelRelFilterCakeRawMaterialVos = importResult.getData();
+
+        // 删除原有关系
+        Set<String> relFilterCakesToDelete = new HashSet<>();
+        // 获取所有传入的关系表滤饼名称，并据此删除原先的关系
+        for(ExcelRelFilterCakeRawMaterialVo excelRelFilterCakeRawMaterialVo: excelRelFilterCakeRawMaterialVos){
+            relFilterCakesToDelete.add(excelRelFilterCakeRawMaterialVo.getFilterCakeName());
+        }
+        // 删除数据库中原有的FR关系
+        for(RelFilterCakeRawMaterial relFilterCakeRawMaterial: relFilterCakeRawMaterialRepository.findAll()){
+            if(relFilterCakesToDelete.contains(relFilterCakeRawMaterial.getFilterCake().getFilterCakeName())){
+                delete(relFilterCakeRawMaterial);
+            }
+        }
+
+        // 添加新关系
         for(ExcelRelFilterCakeRawMaterialVo excelRelFilterCakeRawMaterialVo: excelRelFilterCakeRawMaterialVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelFilterCakeRawMaterial relFilterCakeRawMaterial = transExcelToEntity(excelRelFilterCakeRawMaterialVo);
@@ -95,7 +112,7 @@ public class RelFilterCakeRawMaterialService {
         return relFilterCakeRawMaterial;
     }
 
-    // 导入文件
+    // 导出文件
     //-------------------------------------------------------------------------
     public ResultVo<String> exportRelFilterCakeRawMaterialExcel(HttpServletResponse response){
         // 1.根据查询条件获取结果集

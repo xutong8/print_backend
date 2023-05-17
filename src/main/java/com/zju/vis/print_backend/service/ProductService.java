@@ -298,6 +298,9 @@ public class ProductService {
 
     // 计算历史价格
     public Double calculateProductHistoryPrice(Product product, Date historyDate){
+        if(product == null){
+            return -1.0;
+        }
         // 设置返回的简单滤饼表
         List<FilterCakeSimpleVo> filterCakeSimpleList = new ArrayList<>();
         if(product.getFilterCakeList() != null){
@@ -348,15 +351,18 @@ public class ProductService {
 
     // 列表形式返回历史价格
     public List<HistoryPriceVo> getProductHistoryPriceList(Long productId, Long months){
+        System.out.println("历史价格productId:" + productId);
         Product product = productRepository.findProductByProductId(productId);
         List<HistoryPriceVo> historyPriceList = new ArrayList<>();
-        for(int i = 0;i < months ; i++){
-            Date date = stepMonth(new Date(),-i);
-            // System.out.println(dateFormat.format(date));
-            HistoryPriceVo historyPrice = new HistoryPriceVo();
-            historyPrice.setDate(new java.sql.Date(date.getTime()));
-            historyPrice.setPrice(calculateProductHistoryPrice(product,date));
-            historyPriceList.add(historyPrice);
+        if(product != null){
+            for(int i = 0;i < months ; i++){
+                Date date = stepMonth(new Date(),-i);
+                // System.out.println(dateFormat.format(date));
+                HistoryPriceVo historyPrice = new HistoryPriceVo();
+                historyPrice.setDate(new java.sql.Date(date.getTime()));
+                historyPrice.setPrice(calculateProductHistoryPrice(product,date));
+                historyPriceList.add(historyPrice);
+            }
         }
         return historyPriceList;
     }
@@ -497,24 +503,16 @@ public class ProductService {
         }
     }
 
-    // @Transactional
-    public ResultVo addProduct(ProductStandardVo productStandard) {
+    public ResultVo saveProduct(ProductStandardVo productStandard){
         DeStandardizeResult result = deStandardizeProduct(productStandard);
         Product product = result.getProduct();
-        // if(productRepository.findProductByProductIndex(product.getProductIndex()) != null ||
-        //         productRepository.findProductByProductCode(product.getProductCode()) != null ){
-        //     return ResultVoUtil.error("商品编码或商品代码重复");
-        // }
-
         if(productRepository.findProductByProductName(product.getProductName()) != null){
             log.info("{}商品名字重复",product.getProductName());
             return ResultVoUtil.error("商品名字重复");
         }
-
         List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
         List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
-        // 添加时指定一个不存在的id进而使用自增id
-        product.setProductId(new Long(0));
+
         Product savedProduct = productRepository.save(product);
         saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
         saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
@@ -522,6 +520,33 @@ public class ProductService {
         productStandard.setProductId(savedProduct.getProductId());
         return ResultVoUtil.success(productStandard);
     }
+
+    public ResultVo addProduct(ProductStandardVo productStandard) {
+        productStandard.setProductId(new Long(0));
+        return saveProduct(productStandard);
+    }
+
+    // @Transactional
+    // public ResultVo addProduct(ProductStandardVo productStandard) {
+    //     DeStandardizeResult result = deStandardizeProduct(productStandard);
+    //     Product product = result.getProduct();
+    //
+    //     if(productRepository.findProductByProductName(product.getProductName()) != null){
+    //         log.info("{}商品名字重复",product.getProductName());
+    //         return ResultVoUtil.error("商品名字重复");
+    //     }
+    //
+    //     List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
+    //     List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
+    //     // 添加时指定一个不存在的id进而使用自增id
+    //     product.setProductId(new Long(0));
+    //     Product savedProduct = productRepository.save(product);
+    //     saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
+    //     saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
+    //     // 设置变换后的id
+    //     productStandard.setProductId(savedProduct.getProductId());
+    //     return ResultVoUtil.success(productStandard);
+    // }
 
     //改
     //-------------------------------------------------------------------------
@@ -579,7 +604,7 @@ public class ProductService {
             // excel信息转化为标准类
             ProductStandardVo productStandard = transExcelToStandard(excelProductVo);
             // 更新数据库，已经存在的则会直接修改，为更新关联数据已存在的关联数据会被删除
-            updateProduct(productStandard);
+            saveProduct(productStandard);
         }
         return ResultVoUtil.success(excelProductVos);
     }

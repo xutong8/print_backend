@@ -19,7 +19,9 @@ import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -54,6 +56,22 @@ public class RelDateRawMaterialService {
             return importResult;
         }
         List<ExcelRelDateRawMaterialVo> excelRelDateRawMaterialVos = importResult.getData();
+
+        // 删除原有关系
+        Set<String> relRawMaterialsToDelete = new HashSet<>();
+        // 获取所有传入的原料名称，并据此删除原先的关系
+        for(ExcelRelDateRawMaterialVo excelRelDateRawMaterialVo: excelRelDateRawMaterialVos){
+            relRawMaterialsToDelete.add(excelRelDateRawMaterialVo.getRawMaterialName());
+        }
+        // 删除数据库中原有的DR关系
+        for(RelDateRawMaterial relDateRawMaterial: relDateRawMaterialRepository.findAll()){
+            // 如果关系的原料名与新传入的关系列表对应则删除
+            if(relRawMaterialsToDelete.contains(relDateRawMaterial.getRawMaterial().getRawMaterialName())){
+                delete(relDateRawMaterial);
+            }
+        }
+
+        // 添加新关系
         for(ExcelRelDateRawMaterialVo excelRelDateRawMaterialVo: excelRelDateRawMaterialVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelDateRawMaterial relDateRawMaterial = transExcelToEntity(excelRelDateRawMaterialVo);
