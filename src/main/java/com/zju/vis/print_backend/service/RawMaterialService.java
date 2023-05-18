@@ -293,10 +293,21 @@ public class RawMaterialService {
     public ResultVo saveRawMaterial(RawMaterialStandardVo rawMaterialStandard){
         DeStandardizeResult result = deStandardizeRawMaterial(rawMaterialStandard);
         RawMaterial rawMaterial = result.getRawMaterial();
-        if(rawMaterialRepository.findRawMaterialByRawMaterialName(rawMaterial.getRawMaterialName()) != null){
-            log.info("{}原料名称重复",rawMaterial.getRawMaterialName());
-            return ResultVoUtil.error("原料名称重复");
+        // 表示添加
+        if(rawMaterialStandard.getRawMaterialId().longValue() == 0){
+            if(rawMaterialRepository.findRawMaterialByRawMaterialName(rawMaterialStandard.getRawMaterialName()) != null){
+                log.info("{}原料名称重复",rawMaterialStandard.getRawMaterialName());
+                return ResultVoUtil.error("原料名称重复");
+            }
+        }else{
+            RawMaterial originRawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(rawMaterialStandard.getRawMaterialId());
+            if(!rawMaterial.getRawMaterialName().equals(originRawMaterial.getRawMaterialName()) &&
+                    rawMaterialRepository.findRawMaterialByRawMaterialName(rawMaterial.getRawMaterialName()) != null){
+                log.info("{}原料名称重复",rawMaterial.getRawMaterialName());
+                return ResultVoUtil.error("原料名称重复");
+            }
         }
+
         List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
 
         RawMaterial savedRawMaterial = rawMaterialRepository.save(rawMaterial);

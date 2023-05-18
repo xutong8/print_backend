@@ -14,6 +14,7 @@ import com.zju.vis.print_backend.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -85,12 +86,15 @@ public class RelProductRawMaterialService {
             relProductsToDelete.add(excelRelProductRawMaterialVo.getProductName());
         }
         // 删除数据库中原有的PR关系
+        List<RelProductRawMaterial> list = new ArrayList<>();
         for(RelProductRawMaterial relProductRawMaterial: relProductRawMaterialRepository.findAll()){
             // 如果关系的商品名与新传入的关系列表对应则删除
             if(relProductsToDelete.contains(relProductRawMaterial.getProduct().getProductName())){
-                delete(relProductRawMaterial);
+                list.add(relProductRawMaterial);
+                // delete(relProductRawMaterial);
             }
         }
+        relProductRawMaterialRepository.deleteAllInBatch(list);
 
         // 添加新关系
         List<String> warnStringList = new ArrayList<>();

@@ -11,6 +11,7 @@ import com.zju.vis.print_backend.dao.RelProductFilterCakeRepository;
 import com.zju.vis.print_backend.entity.FilterCake;
 import com.zju.vis.print_backend.entity.Product;
 import com.zju.vis.print_backend.entity.RelProductFilterCake;
+import com.zju.vis.print_backend.entity.RelProductRawMaterial;
 import com.zju.vis.print_backend.vo.ExcelRawMaterialWriteVo;
 import com.zju.vis.print_backend.vo.ExcelRelProductFilterCakeVo;
 import com.zju.vis.print_backend.vo.ExcelRelProductFilterCakeWriteVo;
@@ -18,6 +19,7 @@ import com.zju.vis.print_backend.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -52,6 +54,7 @@ public class RelProductFilterCakeService {
         return relProductFilterCakeRepository.save(relProductFilterCake);
     }
 
+
     public void delete(RelProductFilterCake relProductFilterCake){
         relProductFilterCakeRepository.delete(relProductFilterCake);
     }
@@ -85,12 +88,15 @@ public class RelProductFilterCakeService {
             relProductsToDelete.add(excelRelProductFilterCakeVo.getProductName());
         }
         // 删除数据库中原有的PF关系
+        List<RelProductFilterCake> list = new ArrayList<>();
         for(RelProductFilterCake relProductFilterCake: relProductFilterCakeRepository.findAll()){
             // 如果关系的商品名与新传入的关系列表对应则删除
             if(relProductsToDelete.contains(relProductFilterCake.getProduct().getProductName())){
-                delete(relProductFilterCake);
+                list.add(relProductFilterCake);
+                // delete(relProductFilterCake);
             }
         }
+        relProductFilterCakeRepository.deleteAllInBatch(list);
 
         // 添加新关系
         List<String> warnStringList = new ArrayList<>();

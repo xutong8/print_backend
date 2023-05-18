@@ -506,10 +506,23 @@ public class ProductService {
     public ResultVo saveProduct(ProductStandardVo productStandard){
         DeStandardizeResult result = deStandardizeProduct(productStandard);
         Product product = result.getProduct();
-        if(productRepository.findProductByProductName(product.getProductName()) != null){
-            log.info("{}商品名字重复",product.getProductName());
-            return ResultVoUtil.error("商品名字重复");
+        // 1.表示添加
+        if(productStandard.getProductId().longValue() == 0){
+            // 2.表示已有同名表项
+            if(productRepository.findProductByProductName(productStandard.getProductName()) != null){
+                log.info("{}商品名字重复",productStandard.getProductName());
+                return ResultVoUtil.error("商品名字重复");
+            }
+        }else{
+            Product originProduct = productRepository.findProductByProductId(productStandard.getProductId());
+            // 1.新商品名称与原商品名称不一致 2.新商品名字与数据库中已有的名字重复
+            if(!product.getProductName().equals(originProduct.getProductName()) &&
+                    productRepository.findProductByProductName(product.getProductName())!=null){
+                log.info("{}商品名字重复",product.getProductName());
+                return ResultVoUtil.error("商品名字重复");
+            }
         }
+
         List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
         List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
 
@@ -523,6 +536,10 @@ public class ProductService {
 
     public ResultVo addProduct(ProductStandardVo productStandard) {
         productStandard.setProductId(new Long(0));
+        // if(productRepository.findProductByProductName(productStandard.getProductName()) != null){
+        //     log.info("{}商品名字重复",productStandard.getProductName());
+        //     return ResultVoUtil.error("商品名字重复");
+        // }
         return saveProduct(productStandard);
     }
 

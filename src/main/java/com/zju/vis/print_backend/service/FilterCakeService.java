@@ -419,10 +419,23 @@ public class FilterCakeService {
     public ResultVo saveFilterCake(FilterCakeStandardVo filterCakeStandard){
         DeStandardizeResult result = deStandardizeFilterCake(filterCakeStandard);
         FilterCake filterCake = result.getFiltercake();
-        if(filterCakeRepository.findFilterCakeByFilterCakeName(filterCake.getFilterCakeName()) != null){
-            log.info("{}滤饼名重复",filterCake.getFilterCakeName());
-            return ResultVoUtil.error("滤饼名称重复");
+
+        // 1.表示添加
+        if(filterCakeStandard.getFilterCakeId().longValue() == 0){
+            // 2.表示已有同名表项
+            if(filterCakeRepository.findFilterCakeByFilterCakeName(filterCakeStandard.getFilterCakeName()) != null){
+                log.info("{}滤饼名重复",filterCakeStandard.getFilterCakeName());
+                return ResultVoUtil.error("滤饼名称重复");
+            }
+        }else{
+            FilterCake originFilterCake = filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeStandard.getFilterCakeId());
+            if(!filterCake.getFilterCakeName().equals(originFilterCake.getFilterCakeName()) &&
+                    filterCakeRepository.findFilterCakeByFilterCakeName(filterCake.getFilterCakeName()) != null){
+                log.info("{}滤饼名重复",filterCake.getFilterCakeName());
+                return ResultVoUtil.error("滤饼名重复");
+            }
         }
+
         List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = result.getRelFilterCakeRawMaterialList();
         List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList = result.getRelFilterCakeFilterCakeList();
 
