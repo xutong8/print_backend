@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.Comparator;
 
 @Data
 @NoArgsConstructor
@@ -38,4 +39,5 @@ public class Sales {
     // 数量
     @Column(name = "number")
     private Long number;
+
 }

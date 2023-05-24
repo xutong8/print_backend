@@ -7,8 +7,13 @@ import com.zju.vis.print_backend.Utils.Utils;
 import com.zju.vis.print_backend.dao.ProductRepository;
 import com.zju.vis.print_backend.dao.SalesRepository;
 import com.zju.vis.print_backend.entity.Product;
+import com.zju.vis.print_backend.entity.ProductSeries;
 import com.zju.vis.print_backend.entity.Sales;
 import com.zju.vis.print_backend.vo.*;
+import io.swagger.models.auth.In;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,9 +21,12 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
+import static com.zju.vis.print_backend.Utils.Utils.stepMonth;
 import static com.zju.vis.print_backend.Utils.Utils.stringToDate;
 
 @Slf4j
@@ -37,6 +45,197 @@ public class SalesService {
     // 调用其他Service的方法
     @Resource
     private FileService fileService;
+
+    @Resource
+    private ProductService productService;
+
+    //查
+    //-------------------------------------------------------------------------
+
+    // 单产品查询
+    public ResultVo getSingleProductSales(String productName, String endTime, String timeSpan){
+        Product product = productRepository.findProductByProductName(productName);
+        if(product == null){
+            return ResultVoUtil.error("产品名没有对应的产品请仔细检查");
+        }
+        int month = 0;
+        switch (timeSpan){
+            case "最近三个月": month = -3; break;
+            case "最近半年": month = -6; break;
+            case "最近一年": month = -12; break;
+            case "最近两年": month = -24; break;
+            // 0 表示获取所有数据
+            case "全部数据": month = 0; break;
+        }
+        List<Sales> salesList = new ArrayList<Sales>();
+        Date endTimeDate = stringToDate(endTime);
+        Date startTimeDate = stepMonth(endTimeDate, month);
+        if(month == 0){
+            salesList = salesRepository.findAllByProductIndexEquals(product.getProductIndex());
+        }else{
+            for(Sales sales: salesRepository.findAllByProductIndexEquals(product.getProductIndex())){
+                if(startTimeDate.getTime() <= sales.getDate().getTime() &&  sales.getDate().getTime() <= endTimeDate.getTime()){
+                    salesList.add(sales);
+                }
+            }
+        }
+        // 按照日期从小到大排序
+        // Collections.sort(salesList, new Comparator<Sales>() {
+        //     @Override
+        //     public int compare(Sales o1, Sales o2) {
+        //         if(o1.getDate().getTime() > o2.getDate().getTime()){
+        //             return 1;
+        //         }else{
+        //             return -1;
+        //         }
+        //     }
+        // });
+        List<SalesStandardVo> salesStandardVos = new ArrayList<>();
+        long totalNumber = 0;
+        double totalProfit = 0.0;
+        for(;month < 0; month++){
+            long number = 0;
+            double profit = 0.0;
+            // System.out.println("-----------------------------------------------------------");
+            // System.out.println("startTime: " + stepMonth(endTimeDate,month).toString() + "  endTime: " + stepMonth(endTimeDate,month + 1).toString());
+            for(Sales sales: salesList){
+                if(stepMonth(endTimeDate,month).getTime() <= sales.getDate().getTime() && sales.getDate().getTime() < stepMonth(endTimeDate,month + 1).getTime()){
+                    number += sales.getNumber();
+                    profit += sales.getNumber() * (sales.getUnitPrice() - productService.calculateProductHistoryPrice(product,sales.getDate()));
+                    totalNumber += number;
+                    totalProfit += profit;
+                    // System.out.println("productName: " + productName + "  Index: "  + product.getProductIndex() + "  date: " + sales.getDate().toString());
+                    // System.out.println("number: " + number + "  profit: " + profit);
+                }
+            }
+            SalesStandardVo salesStandardVo = new SalesStandardVo();
+            salesStandardVo.setProductName(productName);
+            salesStandardVo.setProductIndex(product.getProductIndex());
+            DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            salesStandardVo.setStartTime(sdf.format(stepMonth(endTimeDate,month)));
+            salesStandardVo.setEndTime(sdf.format(stepMonth(endTimeDate,month + 1)));
+            salesStandardVo.setNumber(number);
+            salesStandardVo.setProfit(profit);
+            salesStandardVos.add(salesStandardVo);
+        }
+        SalesPackageVo salesPackageVo = new SalesPackageVo(totalNumber,totalProfit,salesStandardVos);
+        return ResultVoUtil.success(200, "共检索到" + salesList.size() + "条销售数据" , salesPackageVo);
+    }
+
+
+    // TopN查询
+    // method: 0 topN number  1 topN unitPrice
+    public ResultVo findTopNSalesProduct(String endTime, String timeSpan ,Integer topNumber, Integer method){
+        int month = 0;
+        switch (timeSpan){
+            case "最近三个月": month = -3; break;
+            case "最近半年": month = -6; break;
+            case "最近一年": month = -12; break;
+            case "最近两年": month = -24; break;
+            // 0 表示获取所有数据
+            case "全部数据": month = 0; break;
+        }
+        List<Sales> salesList = new ArrayList<Sales>();
+        Date endTimeDate = stringToDate(endTime);
+        Date startTimeDate = stepMonth(endTimeDate, month);
+        // 1.获取所有在时间范围内的数据
+        if(month == 0){
+            salesList = salesRepository.findAll();
+        }else{
+            for(Sales sales: salesRepository.findAll()){
+                if(startTimeDate.getTime() <= sales.getDate().getTime() &&  sales.getDate().getTime() <= endTimeDate.getTime()){
+                    salesList.add(sales);
+                }
+            }
+        }
+        HashMap<String, SalesPackSimple> salesMap = new HashMap<>();
+        for(Sales sales: salesList){
+            if(salesMap.containsKey(sales.getProductIndex())){
+                // 同个地址的对象，直接修改值
+                SalesPackSimple salesPackSimple = salesMap.get(sales.getProductIndex());
+                long tempNumber = salesPackSimple.getTotalNumber() + sales.getNumber();
+                double tempPrice = salesPackSimple.getTotalPrice() + sales.getNumber() * sales.getUnitPrice();
+                salesPackSimple.getList().add(sales);
+                salesPackSimple.setTotalNumber(tempNumber);
+                salesPackSimple.setTotalPrice(tempPrice);
+            }else{
+                SalesPackSimple salesAdd = new SalesPackSimple();
+                salesAdd.setTotalNumber(sales.getNumber());
+                salesAdd.setTotalPrice(sales.getUnitPrice() * sales.getNumber());
+                List<Sales> list = new ArrayList<>();
+                list.add(sales);
+                salesAdd.setList(list);
+                salesMap.put(sales.getProductIndex(),salesAdd);
+            }
+        }
+
+        // 2.转list用于对不同模式进行排序
+        List<Map.Entry<String,SalesPackSimple>> listForSort = new ArrayList<Map.Entry<String,SalesPackSimple>>(salesMap.entrySet());
+        // 按照销售数量排序
+        if(method == 0){
+            // 大到小排序
+            Collections.sort(listForSort, new Comparator<Map.Entry<String, SalesPackSimple>>() {
+                @Override
+                public int compare(Map.Entry<String, SalesPackSimple> o1, Map.Entry<String, SalesPackSimple> o2) {
+                    if(o1.getValue().getTotalNumber() < o2.getValue().getTotalNumber()){
+                        return 1;
+                    }else{
+                        return -1;
+                    }
+                }
+            });
+        }
+        // 按照销售总价排序
+        else if(method == 1){
+            // 大到小排序
+            Collections.sort(listForSort, new Comparator<Map.Entry<String, SalesPackSimple>>() {
+                @Override
+                public int compare(Map.Entry<String, SalesPackSimple> o1, Map.Entry<String, SalesPackSimple> o2) {
+                    if(o1.getValue().getTotalPrice() < o2.getValue().getTotalPrice()){
+                        return 1;
+                    }else{
+                        return -1;
+                    }
+                }
+            });
+        }else{
+            return ResultVoUtil.error("请输入有效的查询模式数字 0:TopN Number/1:TopN TotalPrice");
+        }
+
+        // 3.topN数据返回对应的销量值
+        List<SalesTopNPack> ResultList = new ArrayList<>();
+        for(int i = 0; i < topNumber && i < listForSort.size(); i++){
+            Map.Entry<String,SalesPackSimple> TopiMap = listForSort.get(i);
+            List<Product> TopiIndexProducts = productRepository.findAllByProductIndexEquals(TopiMap.getKey());
+            List<SalesPackageVo> TopiSalesPackageList = new ArrayList<>();
+            if(TopiIndexProducts.size()>0){
+                for(Product product: TopiIndexProducts){
+                    TopiSalesPackageList.add((SalesPackageVo)getSingleProductSales(product.getProductName(),endTime,timeSpan).getData());
+                }
+            }
+            ResultList.add(new SalesTopNPack(i+1,TopiMap.getKey(),TopiIndexProducts.size(),TopiSalesPackageList));
+        }
+        return ResultVoUtil.success(200,"ResultList总数为" + ResultList.size(),ResultList);
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SalesTopNPack{
+        private Integer topNum;
+        private String productIndex;
+        private Integer productNum;
+        private List<SalesPackageVo> list;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SalesPackSimple{
+        private Long totalNumber;
+        private Double totalPrice;
+        private List<Sales> list;
+    }
 
     // 增
     //-------------------------------------------------------------------------
