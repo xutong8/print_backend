@@ -91,15 +91,22 @@ public class ProductService {
         productStandard.setProductColor(product.getProductColor());
         productStandard.setProductAccountingQuantity(product.getProductAccountingQuantity());
         productStandard.setProductProcessingCost(product.getProductProcessingCost());
-        // 设置产品单价 当前为假数据 todo：递归计算真实数据
+        Double currentPrice = calculateProductPrice(product);
+        Date date = stepMonth(new Date(),-3);
+        Double historyPrice = calculateProductHistoryPrice(product,date);
         productStandard.setProductUnitPrice(
-                // 真实数据测试无问题
-                // calculateProductPrice(product)
-                Math.random() * (500.0 - 10.0) + 10.0
+                currentPrice
+                // Math.random() * (500.0 - 10.0) + 10.0
         );
-        // 设置产品价格涨幅 当前为假数据 todo：递归计算真实数据
+        int increasePercent = 0;
+        // System.out.println("currentPrice: " + currentPrice);
+        // System.out.println("historyPrice: " + historyPrice);
+        if(historyPrice.doubleValue() - 0.0 > 1e-5){
+            increasePercent = (int)((currentPrice - historyPrice) / historyPrice);
+        }
         productStandard.setProductPriceIncreasePercent(
-                (int) (Math.random() * 100) - 50
+                increasePercent
+                // (int) (Math.random() * 100) - 50
         );
         // 设置系列名称
         productStandard.setProductSeriesName(

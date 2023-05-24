@@ -22,7 +22,14 @@ public class Utils {
         return c.getTime();
     }
 
-    public static java.sql.Date StringToDate(String sDate) {
+    public static java.util.Date stepDay(java.util.Date sourceDate, int day){
+        Calendar c = Calendar.getInstance();
+        c.setTime(sourceDate);
+        c.add(Calendar.DATE, day);
+        return c.getTime();
+    }
+
+    public static java.sql.Date stringToDate(String sDate) {
         /**
          *str转date方法
          */

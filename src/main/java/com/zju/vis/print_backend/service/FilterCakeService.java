@@ -82,15 +82,20 @@ public class FilterCakeService {
         filterCakeStandard.setFilterCakeColor(filterCake.getFilterCakeColor());
         filterCakeStandard.setFilterCakeProcessingCost(filterCake.getFilterCakeProcessingCost());
         filterCakeStandard.setFilterCakeAccountingQuantity(filterCake.getFilterCakeAccountingQuantity());
-        // 设置滤饼单价 当前为假数据 todo：递归计算真实数据
+        Double currentPrice = calculateFilterCakePrice(filterCake);
+        Date date = stepMonth(new Date(),-3);
+        Double historyPrice = calculateFilterCakeHistoryPrice(filterCake,date);
         filterCakeStandard.setFilterCakeUnitPrice(
-                // 真实数据测试无问题
-                // calculateFilterCakePrice(filterCake)
-                Math.random() * (500.0 - 10.0) + 10.0
+                currentPrice
+                // Math.random() * (500.0 - 10.0) + 10.0
         );
-        // 设置滤饼价格涨幅 当前为假数据 todo：递归计算真实数据
+        int increasePercent = 0;
+        if(historyPrice.doubleValue() - 0.0 > 1e-5){
+            increasePercent = (int)((currentPrice - historyPrice) / historyPrice);
+        }
         filterCakeStandard.setFilterCakePriceIncreasePercent(
-                (int) (Math.random() * 100) - 50
+                increasePercent
+                // (int) (Math.random() * 100) - 50
         );
         filterCakeStandard.setFilterCakeSpecification(filterCake.getFilterCakeSpecification());
         filterCakeStandard.setFilterCakeRemarks(filterCake.getFilterCakeRemarks());
@@ -175,7 +180,7 @@ public class FilterCakeService {
         sum += filterCake.getFilterCakeProcessingCost();
         if(filterCakeSimpleList.size() != 0){
             for(FilterCakeSimpleVo filterCakeSimple: filterCakeSimpleList){
-                System.out.println("currnt filtercake id :" + filterCakeSimple.getFilterCakeId());
+                // System.out.println("currnt filtercake id :" + filterCakeSimple.getFilterCakeId());
                 sum +=  filterCakeSimple.getInventory() * calculateFilterCakePrice(filterCakeRepository.findFilterCakeByFilterCakeId(filterCakeSimple.getFilterCakeId()));
             }
         }
@@ -212,7 +217,7 @@ public class FilterCakeService {
         for(RawMaterialSimpleVo rawMaterialSimple: rawMaterialSimpleList){
             List<HistoryPriceVo> historyPriceList = rawMaterialService.findRawMaterialByRawMaterialId(rawMaterialSimple.getRawMaterialId()).getRawMaterialHistoryPrice();
             if(historyPriceList.size()!=0){
-                // 标识是否有增加过历史数据，没有则说明最早没有当时的历史数据则取当前原料最早的数据作为当时的虚拟数据
+                // 标识是否有选定日期之前的历史数据，没有则说明最早没有当时的历史数据则取当前原料最早的数据作为当时的虚拟数据
                 boolean flag = false;
                 // 逆序日期从大到小排序 2023.01.15 > 2022.12.31
                 Collections.reverse(historyPriceList);

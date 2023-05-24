@@ -19,6 +19,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.zju.vis.print_backend.Utils.Utils.stringToDate;
+
 @Slf4j
 @Service
 public class SalesService {
@@ -84,7 +86,7 @@ public class SalesService {
         // 表示添加
         sales.setSalesId(new Long(0));
         sales.setProductIndex(excelSalesVo.getProductIndex());
-        sales.setDate(Utils.StringToDate(excelSalesVo.getDate()));
+        sales.setDate(stringToDate(excelSalesVo.getDate()));
         sales.setCustomer(excelSalesVo.getCustomer());
         sales.setUnitPrice(excelSalesVo.getUnitPrice());
         sales.setNumber(excelSalesVo.getNumber());

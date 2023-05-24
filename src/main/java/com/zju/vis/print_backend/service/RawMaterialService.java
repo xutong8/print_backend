@@ -21,6 +21,8 @@ import java.io.File;
 import java.util.*;
 import java.sql.Date;
 
+import static com.zju.vis.print_backend.Utils.Utils.stepMonth;
+
 @Slf4j
 @Service
 public class RawMaterialService {
@@ -69,10 +71,17 @@ public class RawMaterialService {
         rawMaterialStandard.setRawMaterialId(rawMaterial.getRawMaterialId());
         rawMaterialStandard.setRawMaterialName(rawMaterial.getRawMaterialName());
         rawMaterialStandard.setRawMaterialIndex(rawMaterial.getRawMaterialIndex());
+        Double currentPrice = rawMaterial.getRawMaterialPrice();
+        java.util.Date date = stepMonth(new java.util.Date(),-3);
+        Double historyPriceForIncrease = getRawMaterialHistoryPrice(rawMaterial,date);
         rawMaterialStandard.setRawMaterialUnitPrice(rawMaterial.getRawMaterialPrice());
-        // 设置产品价格涨幅 当前为假数据 todo：递归计算真实数据
+        int increasePercent = 0;
+        if(historyPriceForIncrease.doubleValue() - 0.0 > 1e-5){
+            increasePercent = (int)((currentPrice - historyPriceForIncrease) / historyPriceForIncrease);
+        }
         rawMaterialStandard.setRawMaterialIncreasePercent(
-                (int) (Math.random() * 100) - 50
+                increasePercent
+                // (int) (Math.random() * 100) - 50
         );
         rawMaterialStandard.setRawMaterialConventional(rawMaterial.getRawMaterialConventional());
         rawMaterialStandard.setRawMaterialSpecification(rawMaterial.getRawMaterialSpecification());
@@ -141,6 +150,32 @@ public class RawMaterialService {
         rawMaterialSimple.setInventory(getInventoryF(rawMaterial.getRelFilterCakeRawMaterialList(),
                 filterCakeId,rawMaterial.getRawMaterialId()));
         return rawMaterialSimple;
+    }
+
+    // 获取原料历史价格
+    public Double getRawMaterialHistoryPrice(RawMaterial rawMaterial, java.util.Date historyDate){
+        if(rawMaterial == null){
+            return -1.0;
+        }
+        List<HistoryPriceVo> historyPriceList = new ArrayList<>();
+        for(RelDateRawMaterial relDateRawMaterial: rawMaterial.getRelDateRawMaterialList()){
+            HistoryPriceVo historyPrice = new HistoryPriceVo();
+            historyPrice.setDate(relDateRawMaterial.getId().getRawMaterialDate());
+            historyPrice.setPrice(relDateRawMaterial.getPrice());
+            historyPriceList.add(historyPrice);
+        }
+        if(historyPriceList.size() != 0){
+            Collections.reverse(historyPriceList);
+            for(HistoryPriceVo historyPrice: historyPriceList){
+                if(historyPrice.getDate().getTime() - (86400*1000) <= historyDate.getTime()){
+                    return historyPrice.getPrice();
+                }
+            }
+            // 没有选定日期之前的历史数据，则取当前原料最早的数据作为当时的虚拟数据
+            return historyPriceList.get(historyPriceList.size() - 1).getPrice();
+        }else{
+            return -1.0;
+        }
     }
 
     //查

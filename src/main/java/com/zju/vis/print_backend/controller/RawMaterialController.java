@@ -1,5 +1,7 @@
 package com.zju.vis.print_backend.controller;
 
+import com.zju.vis.print_backend.Utils.Utils;
+import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RawMaterialService;
 import com.zju.vis.print_backend.service.RelDateRawMaterialService;
@@ -10,6 +12,7 @@ import com.zju.vis.print_backend.vo.ResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+import org.apache.commons.collections4.Get;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 
 @Api(description = "原料管理")
@@ -129,5 +133,19 @@ public class RawMaterialController {
     @RequestMapping("/exportRelDRExcel")
     public ResultVo exportRelDateRawMaterialExcel(final HttpServletResponse response){
         return relDateRawMaterialService.exportRelDateRawMaterialExcel(response);
+    }
+
+    @Resource
+    private RawMaterialRepository rawMaterialRepository;
+
+    // 测试原料历史价格
+    @ApiOperation(value = "测历史价格")
+    @RequestMapping(value = "/testhistoryPrice",method = RequestMethod.GET)
+    public Double testHistoryPrice(
+            @RequestParam(value = "id" ,defaultValue = "10") Long id,
+            @RequestParam(value = "date" ,defaultValue = "2022-12-15") String date
+    ){
+        Date finalDate = Utils.stringToDate(date);
+        return rawMaterialService.getRawMaterialHistoryPrice(rawMaterialRepository.findRawMaterialByRawMaterialId(id),finalDate);
     }
 }
