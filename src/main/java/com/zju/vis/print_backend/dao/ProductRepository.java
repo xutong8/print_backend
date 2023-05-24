@@ -21,6 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // 查多个
     List<Product> findAll();
     List<Product> findAllByProductNameContaining(String productName);
+    List<Product> findAllByProductIndexEquals(String productIndex);
     List<Product> findAllByProductIndexContaining(String productIndex);
     List<Product> findAllByProductCodeContaining(String productCode);
     List<Product> findAllByProductColorContaining(String productColor);

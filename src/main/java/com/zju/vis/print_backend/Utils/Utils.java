@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.util.Calendar;
@@ -19,6 +20,22 @@ public class Utils {
         c.setTime(sourceDate);
         c.add(Calendar.MONTH, month);
         return c.getTime();
+    }
+
+    public static java.sql.Date StringToDate(String sDate) {
+        /**
+         *str转date方法
+         */
+        String str = sDate;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        java.util.Date d = null;
+        try {
+            d = format.parse(str);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        java.sql.Date date = new java.sql.Date(d.getTime());
+        return date;
     }
 
     // 判断字符串是否为空

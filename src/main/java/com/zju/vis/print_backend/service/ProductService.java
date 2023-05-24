@@ -42,10 +42,6 @@ public class ProductService {
     // 调用一般方法
     Utils utils = new Utils();
 
-    // 导入excel文件
-    @Resource
-    private ExcelUtil excelUtil;
-
     // 调用其他Service的方法
     @Resource
     private RawMaterialService rawMaterialService;
@@ -629,7 +625,7 @@ public class ProductService {
             saveProduct(productStandard);
         }
         if(warnStringList.size()>0){
-            return ResultVoUtil.success(201,"产品系列有未导入选项,请仔细检查数据表以及数据库内容并重新导入",warnStringList);
+            return ResultVoUtil.success(201,"产品有未导入选项,请仔细检查数据表以及数据库内容并重新导入",warnStringList);
         }
         return ResultVoUtil.success(excelProductVos);
     }
