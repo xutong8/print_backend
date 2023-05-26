@@ -5,10 +5,7 @@ import com.zju.vis.print_backend.dao.RawMaterialRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RawMaterialService;
 import com.zju.vis.print_backend.service.RelDateRawMaterialService;
-import com.zju.vis.print_backend.vo.EntityNameVo;
-import com.zju.vis.print_backend.vo.PackageVo;
-import com.zju.vis.print_backend.vo.RawMaterialStandardVo;
-import com.zju.vis.print_backend.vo.ResultVo;
+import com.zju.vis.print_backend.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -147,5 +144,15 @@ public class RawMaterialController {
     ){
         Date finalDate = Utils.stringToDate(date);
         return rawMaterialService.getRawMaterialHistoryPrice(rawMaterialRepository.findRawMaterialByRawMaterialId(id),finalDate);
+    }
+
+    // 原料历史价格列表 todo 按月返回原料的历史价格列表
+    @ApiOperation(value = "历史价格列表")
+    @RequestMapping(value = "/getRawMaterialHistoryPriceList",method = RequestMethod.GET)
+    public List<HistoryPriceVo> getRawMaterialHistoryPriceList(
+            @RequestParam(value = "rawMaterialId", defaultValue = "1" ) Long rawMaterialId,
+            @RequestParam(value = "months", defaultValue = "12") Long months
+    ){
+        return rawMaterialService.getRawMaterialHistoryPriceList(rawMaterialId,months);
     }
 }

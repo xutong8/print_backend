@@ -262,6 +262,9 @@ public class SalesService {
             return importResult;
         }
         List<ExcelSalesVo> excelSalesVos = importResult.getData();
+        // 维护数据一致性先删除全部再导入（因为没有唯一标识不能部分删除）
+        salesRepository.deleteAll();
+        log.info("销售数据已全部删除，当前数据库中数据数量为{}",salesRepository.findAll().size());
         List<String> warnStringList = new ArrayList<>();
         for(ExcelSalesVo excelSalesVo: excelSalesVos){
             Sales sales = transExcelToEntity(excelSalesVo);

@@ -178,10 +178,27 @@ public class RawMaterialService {
         }
     }
 
+    // 获取原料历史价格列表
+    public List<HistoryPriceVo> getRawMaterialHistoryPriceList(Long rawMaterialId, Long months){
+        log.info("获取rawMaterialId为: " + rawMaterialId + " 的历史价格列表");
+        RawMaterial rawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(rawMaterialId);
+        List<HistoryPriceVo> historyPriceVoList = new ArrayList<>();
+        if(rawMaterial != null){
+            for(int i = 0;i < months ; i++){
+                java.util.Date date = stepMonth(new java.util.Date(),-i);
+                HistoryPriceVo historyPrice = new HistoryPriceVo();
+                historyPrice.setDate(new java.sql.Date(date.getTime()));
+                historyPrice.setPrice(getRawMaterialHistoryPrice(rawMaterial,date));
+                historyPriceVoList.add(historyPrice);
+            }
+        }
+        return historyPriceVoList;
+    }
+
     //查
     //-------------------------------------------------------------------------
     public PackageVo findAll(Integer pageNo,
-                                        Integer pageSize
+                             Integer pageSize
     ) {
         Integer rawMaterialNum = rawMaterialRepository.findAll().size();
         Pageable pageable = PageRequest.of(pageNo, pageSize);
@@ -259,6 +276,8 @@ public class RawMaterialService {
         }
         return new ArrayList<>();
     }
+
+
 
     /**
      * 根据原料名字查找对应的产品模糊查询
