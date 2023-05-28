@@ -189,13 +189,6 @@ public class ProductSeriesService {
             log.info("ProductSeries Add ---> {}",updatedProductSeries.getProductSeriesName());
             ResultVo<ProductSeriesStandardVo> result = addProductSeries(updatedProductSeries);
             return result;
-            // if(result.checkSuccess()){
-            //     return "数据库中不存在对应数据,已添加Id为" + result.getData().getProductSeriesId() + "的条目" ;
-            // }
-            // else{
-            //     return "产品系列名重复";
-            // }
-
         }
         ProductSeries productSeries = deStandardizeProductSeries(updatedProductSeries);
         // 1.新名字与原名字不一致 2.新名字与数据库中已有的名字重复

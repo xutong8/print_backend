@@ -91,10 +91,12 @@ public class RelProductRawMaterialService {
             // 如果关系的商品名与新传入的关系列表对应则删除
             if(relProductsToDelete.contains(relProductRawMaterial.getProduct().getProductName())){
                 list.add(relProductRawMaterial);
-                // delete(relProductRawMaterial);
+                delete(relProductRawMaterial);
             }
         }
-        relProductRawMaterialRepository.deleteAllInBatch(list);
+        log.info("RelProductRawMaterial 关系表大小 --> " + relProductsToDelete.size());
+        // relProductRawMaterialRepository.deleteAllInBatch(list);
+        // log.info();
 
         // 添加新关系
         List<String> warnStringList = new ArrayList<>();

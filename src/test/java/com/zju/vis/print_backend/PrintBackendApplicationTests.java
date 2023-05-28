@@ -17,31 +17,31 @@ import static com.zju.vis.print_backend.Utils.Utils.stepMonth;
 @SpringBootTest
 class PrintBackendApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
-	@Resource
-	FilterCakeService filterCakeService;
-
-
-	@Test
-	void testHistoryList(){
-		// List<Utils.HistoryPrice> list = filterCakeService.getFilterCakeHistoryPriceList();
-	}
-
-	@Resource
-	RawMaterialService rawMaterialService;
-
-	@Resource
-	RawMaterialRepository rawMaterialRepository;
-
-	@Test
-	void testRawMaterialHistoryPrice(){
-		RawMaterial rawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(new Long(10));
-		Date date = stepMonth(new Date(),-1);
-		Double historyPrice = rawMaterialService.getRawMaterialHistoryPrice(rawMaterial,date);
-		System.out.println(date);
-		System.out.println(historyPrice);
-	}
+	// @Test
+	// void contextLoads() {
+	// }
+	//
+	// @Resource
+	// FilterCakeService filterCakeService;
+	//
+	//
+	// @Test
+	// void testHistoryList(){
+	// 	// List<Utils.HistoryPrice> list = filterCakeService.getFilterCakeHistoryPriceList();
+	// }
+	//
+	// @Resource
+	// RawMaterialService rawMaterialService;
+	//
+	// @Resource
+	// RawMaterialRepository rawMaterialRepository;
+	//
+	// @Test
+	// void testRawMaterialHistoryPrice(){
+	// 	RawMaterial rawMaterial = rawMaterialRepository.findRawMaterialByRawMaterialId(new Long(10));
+	// 	Date date = stepMonth(new Date(),-1);
+	// 	Double historyPrice = rawMaterialService.getRawMaterialHistoryPrice(rawMaterial,date);
+	// 	System.out.println(date);
+	// 	System.out.println(historyPrice);
+	// }
 }

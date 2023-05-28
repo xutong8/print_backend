@@ -188,9 +188,11 @@ public class ProductService {
     // 求交集
     public Set<Product> mixedSet(Set<Product> A, Set<Product> B) {
         if (A == null || A.size() == 0) {
-            if (B != null) return B;
+            // if (B != null) return B;
+            return new HashSet<>();
         } else if (B == null || B.size() == 0) {
-            return A;
+            // return A;
+            return new HashSet<>();
         }
         Set<Product> resultSet = A.stream().filter(B::contains).collect(Collectors.toSet());
         return resultSet;
@@ -238,30 +240,37 @@ public class ProductService {
         List<Product> resultList = new ArrayList<>();
 
         if (utils.isEmptyString(rawMaterialName) && utils.isEmptyString(filterCakeName) && utils.isEmptyString(productSeriesName)) {
-            System.out.println("M0 findAll");
+            log.info("FindByCondition return All");
             return findAll(pageNo, pageSize);
         }
         Set<Product> rawMaterialProductSet = new HashSet<>();
         Set<Product> filterCakeProductSet = new HashSet<>();
         Set<Product> productSeriesProductSet = new HashSet<>();
+        // 原料关联
         if (!utils.isEmptyString(rawMaterialName)) {
             rawMaterialProductSet = rawMaterialService.findProductsByRawMaterialName(rawMaterialName);
-            System.out.println("rawMaterialProductSet 大小" + rawMaterialProductSet.size());
+        }else{
+            rawMaterialProductSet.addAll(productRepository.findAll());
         }
+        log.info("RawMaterialProductSet 大小 --> " + rawMaterialProductSet.size());
+        // 滤饼关联
         if (!utils.isEmptyString(filterCakeName)) {
             filterCakeProductSet = filterCakeService.findProductsByFilterCakeName(filterCakeName);
-            System.out.println("filterCakeProductSet 大小" + filterCakeProductSet.size());
+        }else{
+            filterCakeProductSet.addAll(productRepository.findAll());
         }
+        log.info("FilterCakeProductSet 大小 --> " + filterCakeProductSet.size());
+        // 产品系列关联
         if (!utils.isEmptyString(productSeriesName)) {
             productSeriesProductSet = productSeriesService.findProductsByProductSeriesName(productSeriesName);
-            System.out.println("productSeriesProductSet 大小" + productSeriesProductSet.size());
+        }else{
+            productSeriesProductSet.addAll(productRepository.findAll());
         }
-
+        log.info("productSeriesProductSet 大小 --> " + productSeriesProductSet.size());
         // Set<Product> resultSet = mixedSet(rawMaterialProductSet, mixedSet(filterCakeProductSet, productSeriesProductSet));
         // System.out.println("resultSet 大小" + resultSet.size());
         resultList.addAll(mixedSet(rawMaterialProductSet, mixedSet(filterCakeProductSet, productSeriesProductSet)));
-
-        System.out.println("resultList 大小" + resultList.size());
+        log.info("resultList 大小 --> " + resultList.size());
         List<Product> subList = utils.pageList(resultList, pageNo, pageSize);
         Integer productNum = resultList.size();
         return packProduct(subList, pageNo, pageSize, productNum);

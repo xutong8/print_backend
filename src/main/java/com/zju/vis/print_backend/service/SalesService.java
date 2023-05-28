@@ -72,6 +72,27 @@ public class SalesService {
         Date startTimeDate = stepMonth(endTimeDate, month);
         if(month == 0){
             salesList = salesRepository.findAllByProductIndexEquals(product.getProductIndex());
+            // 找到最早的数据
+            Date earliestDate = new Date();
+            for(Sales sales: salesList){
+                if(sales.getDate().getTime() < earliestDate.getTime()){
+                    earliestDate = sales.getDate();
+                }
+            }
+            while(true){
+                if(stepMonth(endTimeDate,month).getTime() < earliestDate.getTime()){
+                    DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    log.info("最早的时间 --> " + sdf.format(earliestDate));
+                    log.info("选取的月份 --> " + month + " 最早的时间 --> " + sdf.format(stepMonth(endTimeDate,month)));
+                    break;
+                }
+                month--;
+                if(month < -9999){
+                    log.info("选取日期出错");
+                    break;
+                }
+            }
+            // Date date = stepMonth(new Date(),-i);
         }else{
             for(Sales sales: salesRepository.findAllByProductIndexEquals(product.getProductIndex())){
                 if(startTimeDate.getTime() <= sales.getDate().getTime() &&  sales.getDate().getTime() <= endTimeDate.getTime()){

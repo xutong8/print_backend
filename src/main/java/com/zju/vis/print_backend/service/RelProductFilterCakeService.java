@@ -93,10 +93,11 @@ public class RelProductFilterCakeService {
             // 如果关系的商品名与新传入的关系列表对应则删除
             if(relProductsToDelete.contains(relProductFilterCake.getProduct().getProductName())){
                 list.add(relProductFilterCake);
-                // delete(relProductFilterCake);
+                delete(relProductFilterCake);
             }
         }
-        relProductFilterCakeRepository.deleteAllInBatch(list);
+        log.info("RelProductFilterCake 关系表大小 --> " + relProductsToDelete.size());
+        // relProductFilterCakeRepository.deleteAllInBatch(list);
 
         // 添加新关系
         List<String> warnStringList = new ArrayList<>();
