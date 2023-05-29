@@ -18,10 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -73,6 +70,8 @@ public class RelDateRawMaterialService {
 
         // 添加新关系
         List<String> warnStringList = new ArrayList<>();
+        // Map 专门用于比较当前最大历史价格
+        // HashMap<>
         for(ExcelRelDateRawMaterialVo excelRelDateRawMaterialVo: excelRelDateRawMaterialVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelDateRawMaterial relDateRawMaterial = transExcelToEntity(excelRelDateRawMaterialVo);

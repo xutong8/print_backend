@@ -77,7 +77,7 @@ public class RawMaterialService {
         rawMaterialStandard.setRawMaterialUnitPrice(rawMaterial.getRawMaterialPrice());
         int increasePercent = 0;
         if(historyPriceForIncrease.doubleValue() - 0.0 > 1e-5){
-            increasePercent = (int)((currentPrice - historyPriceForIncrease) / historyPriceForIncrease);
+            increasePercent = (int)(100 * (currentPrice - historyPriceForIncrease) / historyPriceForIncrease);
         }
         rawMaterialStandard.setRawMaterialIncreasePercent(
                 increasePercent
@@ -361,8 +361,22 @@ public class RawMaterialService {
                 return ResultVoUtil.error("原料名称重复");
             }
         }
-
         List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
+
+        // 历史日期如果不为空则选择时间最近的
+        if(relDateRawMaterialList.size() != 0){
+            long MaxTime = -1;
+            Double price = -1.0;
+            for(RelDateRawMaterial rel: relDateRawMaterialList){
+                // 找到最近的时间对应的价格
+                if(rel.getId().getRawMaterialDate().getTime() > MaxTime){
+                    MaxTime = rel.getId().getRawMaterialDate().getTime();
+                    price = rel.getPrice();
+                }
+            }
+            // 将历史价格设置为最终价格
+            rawMaterial.setRawMaterialPrice(price);
+        }
 
         RawMaterial savedRawMaterial = rawMaterialRepository.save(rawMaterial);
         saveRelDateRawMaterials(savedRawMaterial, relDateRawMaterialList);
@@ -423,6 +437,20 @@ public class RawMaterialService {
 
         // 重新添加关系以修改内容
         List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
+        // 历史日期如果不为空则选择时间最近的
+        if(relDateRawMaterialList.size() != 0){
+            long MaxTime = -1;
+            Double price = -1.0;
+            for(RelDateRawMaterial rel: relDateRawMaterialList){
+                // 找到最近的时间对应的价格
+                if(rel.getId().getRawMaterialDate().getTime() > MaxTime){
+                    MaxTime = rel.getId().getRawMaterialDate().getTime();
+                    price = rel.getPrice();
+                }
+            }
+            // 将历史价格设置为最终价格
+            rawMaterial.setRawMaterialPrice(price);
+        }
 
         RawMaterial savedRawMaterial = rawMaterialRepository.save(rawMaterial);
         saveRelDateRawMaterials(savedRawMaterial,relDateRawMaterialList);

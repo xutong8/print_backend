@@ -102,7 +102,7 @@ public class ProductService {
         // System.out.println("currentPrice: " + currentPrice);
         // System.out.println("historyPrice: " + historyPrice);
         if(historyPrice.doubleValue() - 0.0 > 1e-5){
-            increasePercent = (int)((currentPrice - historyPrice) / historyPrice);
+            increasePercent = (int)(100 * (currentPrice - historyPrice) / historyPrice);
         }
         productStandard.setProductPriceIncreasePercent(
                 increasePercent
