@@ -515,11 +515,12 @@ public class ProductService {
         }
     }
 
-    public ResultVo saveProduct(ProductStandardVo productStandard){
+    // isImport 如果是导入文件则一定不会带关联信息因此不更新关联表
+    public ResultVo saveProduct(ProductStandardVo productStandard, Boolean isImport){
         DeStandardizeResult result = deStandardizeProduct(productStandard);
         Product product = result.getProduct();
         // 1.表示添加
-        if(productStandard.getProductId().longValue() == 0){
+        if(productStandard.getProductId() == 0){
             // 2.表示已有同名表项
             if(productRepository.findProductByProductName(productStandard.getProductName()) != null){
                 log.info("{}商品名字重复",productStandard.getProductName());
@@ -533,14 +534,23 @@ public class ProductService {
                 log.info("{}商品名字重复",product.getProductName());
                 return ResultVoUtil.error("商品名字重复");
             }
+
+            // 处理级联保存关系表消失的问题
+            if(isImport){
+                product.setRawMaterialList(originProduct.getRawMaterialList());
+                product.setFilterCakeList(originProduct.getFilterCakeList());
+            }
         }
 
         List<RelProductRawMaterial> relProductRawMaterials = result.getRelProductRawMaterials();
         List<RelProductFilterCake> relProductFilterCakes = result.getRelProductFilterCakes();
+        // 这个save会删除关系表
 
         Product savedProduct = productRepository.save(product);
-        saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
-        saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
+        if(!isImport){
+            saveRelProductRawMaterials(savedProduct, relProductRawMaterials);
+            saveRelProductFilterCakes(savedProduct, relProductFilterCakes);
+        }
         // 设置变换后的id
         productStandard.setProductId(savedProduct.getProductId());
         return ResultVoUtil.success(productStandard);
@@ -552,7 +562,7 @@ public class ProductService {
         //     log.info("{}商品名字重复",productStandard.getProductName());
         //     return ResultVoUtil.error("商品名字重复");
         // }
-        return saveProduct(productStandard);
+        return saveProduct(productStandard,false);
     }
 
     // @Transactional
@@ -619,6 +629,11 @@ public class ProductService {
     public void deleteByProductId(Long productId) {
         productRepository.deleteByProductId(productId);
     }
+    @Resource
+    RelProductFilterCakeRepository relProductFilterCakeRepository;
+
+    @Resource
+    RelProductRawMaterialRepository relProductRawMaterialRepository;
 
     // 导入文件
     //-------------------------------------------------------------------------
@@ -630,6 +645,7 @@ public class ProductService {
         }
         List<ExcelProductVo> excelProductVos = importResult.getData();
         List<String> warnStringList = new ArrayList<>();
+        System.out.println("save 前个数" + relProductFilterCakeRepository.findAll().size() + "/" + relProductRawMaterialRepository.findAll().size());
         for(ExcelProductVo excelProductVo: excelProductVos){
             // excel信息转化为标准类
             ProductStandardVo productStandard = transExcelToStandard(excelProductVo);
@@ -638,8 +654,10 @@ public class ProductService {
                 warnStringList.add(warnString);
             }
             // 更新数据库，已经存在的则会直接修改，为更新关联数据已存在的关联数据会被删除
-            saveProduct(productStandard);
+            saveProduct(productStandard,true);
         }
+
+        System.out.println("save 后个数" + relProductFilterCakeRepository.findAll().size() + "/" + relProductRawMaterialRepository.findAll().size());
         if(warnStringList.size()>0){
             return ResultVoUtil.success(201,"产品有未导入选项,请仔细检查数据表以及数据库内容并重新导入",warnStringList);
         }

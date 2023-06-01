@@ -419,7 +419,7 @@ public class FilterCakeService {
     }
 
 
-    public ResultVo saveFilterCake(FilterCakeStandardVo filterCakeStandard){
+    public ResultVo saveFilterCake(FilterCakeStandardVo filterCakeStandard, Boolean isImport){
         DeStandardizeResult result = deStandardizeFilterCake(filterCakeStandard);
         FilterCake filterCake = result.getFiltercake();
 
@@ -437,14 +437,23 @@ public class FilterCakeService {
                 log.info("{}滤饼名重复",filterCake.getFilterCakeName());
                 return ResultVoUtil.error("滤饼名重复");
             }
+
+            // 处理级联保存关系表消失问题
+            if(isImport){
+                filterCake.setRawMaterialList(originFilterCake.getRawMaterialList());
+                filterCake.setFilterCakeList(originFilterCake.getFilterCakeList());
+                filterCake.setProductList(originFilterCake.getProductList());
+            }
         }
 
         List<RelFilterCakeRawMaterial> relFilterCakeRawMaterialList = result.getRelFilterCakeRawMaterialList();
         List<RelFilterCakeFilterCake> relFilterCakeFilterCakeList = result.getRelFilterCakeFilterCakeList();
 
         FilterCake savedFilterCake = filterCakeRepository.save(filterCake);
-        saveRelFilterCakeRawMaterials(savedFilterCake,relFilterCakeRawMaterialList);
-        saveRelFilterCakeFilterCakes(savedFilterCake,relFilterCakeFilterCakeList);
+        if(!isImport){
+            saveRelFilterCakeRawMaterials(savedFilterCake,relFilterCakeRawMaterialList);
+            saveRelFilterCakeFilterCakes(savedFilterCake,relFilterCakeFilterCakeList);
+        }
         // 设置更改后的id
         filterCakeStandard.setFilterCakeId(savedFilterCake.getFilterCakeId());
         return ResultVoUtil.success(filterCakeStandard);
@@ -453,7 +462,7 @@ public class FilterCakeService {
     public ResultVo addFilterCake(FilterCakeStandardVo filterCakeStandard) {
         // 添加时指定一个不存在的id进而使用自增id
         filterCakeStandard.setFilterCakeId(new Long(0));
-        return saveFilterCake(filterCakeStandard);
+        return saveFilterCake(filterCakeStandard,false);
     }
 
     // public ResultVo addFilterCake(FilterCakeStandardVo filterCakeStandard) {
@@ -572,7 +581,7 @@ public class FilterCakeService {
             // excel信息转化为标准类
             FilterCakeStandardVo filterCakeStandard = transExcelToStandard(excelFilterCakeVo);
             // 更新数据库，已存在则会直接替换
-            saveFilterCake(filterCakeStandard);
+            saveFilterCake(filterCakeStandard,true);
         }
         return ResultVoUtil.success(excelFilterCakeVos);
     }

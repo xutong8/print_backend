@@ -115,6 +115,9 @@ public class UserService {
         if(userModify.getUserType().equals("user")  && (userModify.getUserAuthority()>>2)>=1){
             return ResultVoUtil.error("用户不能拥有修改权限");
         }
+        if(uApplicant.getUserType() == 0 && uModified.getUserType() == 0 && userModify.getUserAuthority().intValue() != 7){
+            return ResultVoUtil.error("拥有者权限不能修改");
+        }
         // 修改用户类型
         ResultVo result = updateUserType(uApplicant,uModified,uType);
         if(!result.checkSuccess()){

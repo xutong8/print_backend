@@ -344,7 +344,7 @@ public class RawMaterialService {
         }
     }
 
-    public ResultVo saveRawMaterial(RawMaterialStandardVo rawMaterialStandard){
+    public ResultVo saveRawMaterial(RawMaterialStandardVo rawMaterialStandard,Boolean isImport){
         DeStandardizeResult result = deStandardizeRawMaterial(rawMaterialStandard);
         RawMaterial rawMaterial = result.getRawMaterial();
         // 表示添加
@@ -359,6 +359,11 @@ public class RawMaterialService {
                     rawMaterialRepository.findRawMaterialByRawMaterialName(rawMaterial.getRawMaterialName()) != null){
                 log.info("{}原料名称重复",rawMaterial.getRawMaterialName());
                 return ResultVoUtil.error("原料名称重复");
+            }
+            // 解决关系表保存消失问题
+            if(isImport){
+                rawMaterial.setFilterCakeList(originRawMaterial.getFilterCakeList());
+                rawMaterial.setProductList(originRawMaterial.getProductList());
             }
         }
         List<RelDateRawMaterial> relDateRawMaterialList = result.getRelDateRawMaterialList();
@@ -388,7 +393,7 @@ public class RawMaterialService {
     public ResultVo addRawMaterial(RawMaterialStandardVo rawMaterialStandard) {
         // 设置一个不存在的id
         rawMaterialStandard.setRawMaterialId(new Long(0));
-        return saveRawMaterial(rawMaterialStandard);
+        return saveRawMaterial(rawMaterialStandard,false);
     }
 
     // public ResultVo addRawMaterial(RawMaterialStandardVo rawMaterialStandard) {
@@ -504,7 +509,7 @@ public class RawMaterialService {
             // excel信息转化为标准类
             RawMaterialStandardVo rawMaterialStandard = transExcelToStandard(excelRawMaterialVo);
             // 更新数据库，已存在则会直接替换
-            saveRawMaterial(rawMaterialStandard);
+            saveRawMaterial(rawMaterialStandard,true);
         }
         return ResultVoUtil.success(excelRawMaterialVos);
     }

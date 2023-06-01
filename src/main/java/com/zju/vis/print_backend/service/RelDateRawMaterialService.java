@@ -70,12 +70,21 @@ public class RelDateRawMaterialService {
 
         // 添加新关系
         List<String> warnStringList = new ArrayList<>();
-        // Map 专门用于比较当前最大历史价格
-        // HashMap<>
+        // Map 用于记录距离当前时间最近的历史价格
+        HashMap<RawMaterial,RelDateRawMaterial> latestDatePriceMap = new HashMap<>();
         for(ExcelRelDateRawMaterialVo excelRelDateRawMaterialVo: excelRelDateRawMaterialVos){
             // excel信息转化为关系表实体对象，注意这里有可能出现null对象（不匹配的情况）
             RelDateRawMaterial relDateRawMaterial = transExcelToEntity(excelRelDateRawMaterialVo);
             if(relDateRawMaterial != null){
+                if(!latestDatePriceMap.containsKey(relDateRawMaterial.getRawMaterial())){
+                    latestDatePriceMap.put(relDateRawMaterial.getRawMaterial(),relDateRawMaterial);
+                }else{
+                    // 如果有时间更近的日期价格关系则切换对应( 原Map对应关系的时间 < 当前关系对应的时间)
+                    RelDateRawMaterial originRel = latestDatePriceMap.get(relDateRawMaterial.getRawMaterial());
+                    if(originRel.getId().getRawMaterialDate().getTime() < relDateRawMaterial.getId().getRawMaterialDate().getTime()){
+                        latestDatePriceMap.put(relDateRawMaterial.getRawMaterial(),relDateRawMaterial);
+                    }
+                }
                 // 如果已有数据则会更新，没有则添加
                 addRelDateRawMaterial(relDateRawMaterial);
             }else{
@@ -83,6 +92,11 @@ public class RelDateRawMaterialService {
                 warnStringList.add(warnString);
             }
         }
+        // 保存最近的价格
+        latestDatePriceMap.forEach((RawMaterial,RelDR) -> {
+            RawMaterial.setRawMaterialPrice(RelDR.getPrice());
+            rawMaterialRepository.save(RawMaterial);
+        });
         if(warnStringList.size()>0){
             return ResultVoUtil.success(201,"存在未导入表项，请仔细检查数据表以及数据库内容并重新导入",warnStringList);
         }
