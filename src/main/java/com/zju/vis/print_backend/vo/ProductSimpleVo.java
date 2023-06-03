@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class ProductSimpleVo {
     private Long productId;
     private String productName;
+    private Double inventory;
 }

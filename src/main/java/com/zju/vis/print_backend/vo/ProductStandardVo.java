@@ -26,4 +26,5 @@ public class ProductStandardVo {
     private Integer productAccountingQuantity;
     private List<RawMaterialSimpleVo> rawMaterialSimpleList;
     private List<FilterCakeSimpleVo> filterCakeSimpleList;
+    private List<ProductSimpleVo> productSimpleList;
 }

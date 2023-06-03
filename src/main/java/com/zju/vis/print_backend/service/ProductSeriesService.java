@@ -67,7 +67,7 @@ public class ProductSeriesService {
         // 设置返回的简单产品列表
         List<ProductSimpleVo> productSimpleList = new ArrayList<>();
         for(Product product: productSeries.getProductList()){
-            productSimpleList.add(productService.simplifyProduct(product));
+            productSimpleList.add(productService.simplifyProductName(product));
         }
         productSeriesStandard.setProductSimpleList(productSimpleList);
         return productSeriesStandard;
