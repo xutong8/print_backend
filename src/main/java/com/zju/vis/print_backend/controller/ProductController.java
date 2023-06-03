@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import com.zju.vis.print_backend.dao.ProductRepository;
 import com.zju.vis.print_backend.entity.RawMaterial;
 import com.zju.vis.print_backend.service.RelProductFilterCakeService;
+import com.zju.vis.print_backend.service.RelProductProductService;
 import com.zju.vis.print_backend.service.RelProductRawMaterialService;
 import com.zju.vis.print_backend.vo.*;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,9 @@ public class ProductController {
 
     @Resource
     RelProductFilterCakeService productFilterCakeService;
+
+    @Resource
+    RelProductProductService productProductService;
 
 
     @ApiOperation(value = "获取所有产品")
@@ -183,18 +187,25 @@ public class ProductController {
         return productService.importProductExcelAndPersistence(excel);
     }
 
-    // 关系表文件上传 ProductRawMaterial
+    // 关系表文件上传 RelProductRawMaterial
     @ApiOperation(value = "上传RelProductRawMaterial文件并持久化")
     @RequestMapping(value = "/uploadRelPR")
     public ResultVo importRelProductRawMaterialExcel(@RequestParam("file") MultipartFile excel){
         return productRawMaterialService.importRelProductRawMaterialExcelAndPersistence(excel);
     }
 
-    // 关系表文件上传 ProductFilterCake
+    // 关系表文件上传 RelProductFilterCake
     @ApiOperation(value = "上传RelProductFilterCake文件并持久化")
     @RequestMapping(value = "/uploadRelPF")
     public ResultVo importRelProductFilterCakeExcel(@RequestParam("file") MultipartFile excel){
         return productFilterCakeService.importRelProductFilterCakeExcelAndPersistence(excel);
+    }
+
+    // 关系表文件上传 RelProductProduct
+    @ApiOperation(value = "上传RelProductProduct文件并持久化")
+    @RequestMapping(value = "/uploadRelPP")
+    public ResultVo importRelProductProductExcel(@RequestParam("file") MultipartFile excel){
+        return productProductService.importRelProductProductExcelAndPersistence(excel);
     }
 
     // 下载文件
@@ -218,4 +229,10 @@ public class ProductController {
         return productFilterCakeService.exportRelProductFilterCakeExcel(response);
     }
 
+    // 关系表文件下载 RelProductProduct
+    @ApiOperation(value = "下载RelProductProduct文件")
+    @RequestMapping("/exportRelPPExcel")
+    public ResultVo exportRelFilterCakeFilterCakeExcel(final HttpServletResponse response){
+        return productProductService.exportRelProductProductExcel(response);
+    }
 }

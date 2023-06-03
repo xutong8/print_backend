@@ -72,4 +72,10 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<RelProductFilterCake> relProductFilterCakeList;
+
+    @OneToMany(mappedBy = "product")
+    private List<RelProductProduct> relProductProductListUser;
+
+    @OneToMany(mappedBy = "productUsed")
+    private List<RelProductProduct> relProductProductListUsed;
 }

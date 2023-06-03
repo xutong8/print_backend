@@ -19,11 +19,13 @@ public class RelFilterCakeFilterCake {
     @JoinColumn(name = "filter_cake_id")
     @JsonIgnore
     FilterCake filterCake;
+
     @ManyToOne
     @MapsId("filterCakeIdUsed")
     @JoinColumn(name = "filter_cake_id_used")
     @JsonIgnore
     FilterCake filterCakeUsed;
+
     @Column(name = "inventory")
     Double inventory;
 
