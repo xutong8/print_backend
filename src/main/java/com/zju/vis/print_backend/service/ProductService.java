@@ -40,6 +40,12 @@ public class ProductService {
     @Resource
     private FilterCakeRepository filterCakeRepository;
 
+    @Resource
+    RelProductFilterCakeRepository relProductFilterCakeRepository;
+
+    @Resource
+    RelProductRawMaterialRepository relProductRawMaterialRepository;
+
     // 调用一般方法
     Utils utils = new Utils();
 
@@ -715,15 +721,30 @@ public class ProductService {
     //删
     //-------------------------------------------------------------------------
     //根据productId 删除记录
-    @Transactional
     public void deleteByProductId(Long productId) {
-        productRepository.deleteByProductId(productId);
+        deleteRelByProductId(productId);
+        deleteProductByProductId(productId);
     }
-    @Resource
-    RelProductFilterCakeRepository relProductFilterCakeRepository;
 
-    @Resource
-    RelProductRawMaterialRepository relProductRawMaterialRepository;
+    @Transactional
+    public void deleteProductByProductId(Long productId) {
+        Product product = productRepository.findProductByProductId(productId);
+        productRepository.delete(product);
+    }
+
+    @Transactional
+    public void deleteRelByProductId(Long productId) {
+        Product product = productRepository.findProductByProductId(productId);
+        // 删除产品关联表
+        for(RelProductProduct relProductProduct: product.getRelProductProductListUser()){
+            relProductProductService.delete(relProductProduct);
+        }
+        // 删除产品被关联表
+        for(RelProductProduct relProductProduct: product.getRelProductProductListUsed()){
+            relProductProductService.delete(relProductProduct);
+        }
+    }
+
 
     // 导入文件
     //-------------------------------------------------------------------------
